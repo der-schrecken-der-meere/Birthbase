@@ -1,0 +1,134 @@
+@tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+
+  @layer base {
+    :root {
+      --w: 0 0% 94%;
+
+      --b: 230 10% 23%;
+      --b2: 0 0% 15%;
+
+      --g: 232 9% 32%;
+      --g1: 232 9% 52%;
+      --g2: 232 9% 72%;
+
+      --a: 151 100% 50%;
+      
+      
+
+      --background: var(--w); /* Default background-color, switch circle */
+      --foreground: var(--b); /* Default color */
+
+      --card: 0 0% 100%;
+      --card-foreground: 0 0% 3.9%;
+
+      --popover: var(--w); /* select-popover */
+      --popover-foreground: var(--b);
+
+      --primary: var(--b); /* switch: active */
+      --primary-foreground: var(--a);
+
+      --secondary: var(--w);
+      --secondary-foreground: var(--w);
+
+      --muted: 0 0% 96.1%;
+      --muted-foreground: 0 0% 45.1%;
+
+      --accent: var(--g); /* select: active element */
+      --accent-foreground: var(--w);
+
+      --destructive: 0 84.2% 60.2%;
+      --destructive-foreground: 0 0% 98%;
+
+      --border: var(--g2); /* select-popover: border */
+      --input: var(--g2); /* switch: inactive, select: border */
+      --ring: var(--g1); /* focus */
+
+      --radius: 0.5rem;
+    }
+
+    .dark {
+      --background: var(--b); /* dark grey */
+      --foreground: var(--w); /* white */
+
+      --card: 200 50% 50%;
+      --card-foreground: 200 50% 50%;
+
+      --popover: var(--b);
+      --popover-foreground: 0 0% 98%;
+
+      --primary: var(--a);
+      --primary-foreground: 151, 100%, 50%;
+
+      --secondary: 34 50% 50%;
+      --secondary-foreground: 333 50% 50%;
+
+      --muted: 300 50% 14.9%;
+      --muted-foreground: 0 0% 63.9%;
+
+      --accent: var(--g);
+      --accent-foreground: var(--a);
+
+      --destructive: 0 62.8% 30.6%;
+      --destructive-foreground: 0 0% 98%;
+
+      --border: var(--b2);
+      --input: var(--b2);
+      --ring: var(--w);
+    }
+  }
+
+  @layer base {
+    * {
+      @apply border-border;
+    }
+    body {
+      @apply bg-background text-foreground;
+    }
+  }
+
+  :root {
+    --white: 239, 239, 239;
+    --black: 53, 55, 65;
+    --grey: 73, 75, 88;
+    --highlight: 0, 255, 132;
+    --highlight-05: 0, 255, 132, 0.5;
+}
+
+.dark.normal {
+    --text: var(--white);
+    --bg: var(--black);
+
+    --nav-bg: var(--black); 
+    --nav-border: var(--highlight);
+    --nav-page: var(--grey);
+    --nav-icons: var(--white);
+    --nav-icons-hover: var(--highlight-05);
+    --nav-icons-active: var(--highlight);
+
+    --content-header-border: var(--grey);
+
+    --switch-bg: var(--white);
+    --switch-text: var(--black);
+}
+.light.normal {
+    --text: var(--black);
+    --bg: var(--white);
+
+    --nav-bg: var(--black); 
+    --nav-border: var(--grey);
+    --nav-page: var(--white);
+    --nav-icons: var(--white);
+    --nav-icons-hover: var(--highlight-05);
+    --nav-icons-active: var(--highlight);
+
+    --content-header-border: var(--grey);
+
+    --switch-bg: var(--black);
+    --switch-text: var(--white);
+}
+
+div {
+  outline-color: hsl(0, 0%, 94%);
+}
