@@ -68,8 +68,6 @@ module.exports = {
         "highlight_05": "rgba(0, 255, 132, 0.5)",
         "caution": "rgba(255, 106, 106, 1)",
 
-
-        
         "main-bg": "rgb(var(--bg))",
         "main-text": "rgb(var(--text))",
 
