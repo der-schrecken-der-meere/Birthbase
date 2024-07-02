@@ -24,36 +24,40 @@ import { MdKeyboardArrowUp, MdKeyboardArrowDown } from "react-icons/md";
  * @type {import("@tanstack/react-table").ColumnDef<Birthday>[]}
  */
 export const columns = [
-    {
-        id: "select",
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableHiding: false,
-        enableSorting: false,
-    },
+    // {
+    //     id: "select",
+    //     header: ({ table }) => (
+    //         <Checkbox
+    //             checked={
+    //                 table.getIsAllPageRowsSelected() ||
+    //                 (table.getIsSomePageRowsSelected() && "indeterminate")
+    //             }
+    //             onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+    //             aria-label="Select all"
+    //         />
+    //     ),
+    //     cell: ({ row }) => (
+    //         <Checkbox
+    //             checked={row.getIsSelected()}
+    //             onCheckedChange={(value) => row.toggleSelected(!!value)}
+    //             aria-label="Select row"
+    //         />
+    //     ),
+    //     enableHiding: false,
+    //     enableSorting: false,
+    // },
     {
         accessorKey: "birthday",
         header: ({ column }) => {
+
+            console.log(column);
+
             return (
                 <Button
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
                     Datum
+                    {}
                     <MdKeyboardArrowDown className='ml-2 w-4 h-4'/>
                 </Button>
                 // <div className='text-right'>Datum</div>

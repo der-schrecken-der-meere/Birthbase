@@ -18,8 +18,8 @@ const Navbar = ({className}) => {
     }
 
     return (
-        <nav className='flex flex-col gap-5 bottom-0 left-0 w-full font-medium'>
-            <ul className={`w-full absolute left-0 bottom-0 z-10 transition-all bg-nav-page duration-300 p-20/30 text-xl overflow-hidden ${open ? "h-screen visible" : "h-0 invisible"}`}>
+        <nav className='flex flex-col gap-5 w-full font-medium'>
+            <ul className={`w-full absolute left-0 bottom-0 transition-all bg-nav-page duration-300 p-20/30 text-xl overflow-hidden ${open ? "h-full visible" : "h-0 invisible"}`}>
                 <DynNavLink 
                     className='py-[15px]'
                     to='/my_birthdays'
@@ -35,7 +35,7 @@ const Navbar = ({className}) => {
                     title="Gruppengeburtstage"    
                 /> */}
             </ul>
-            <ul className='flex absolute left-0 bottom-0 z-10 w-full justify-between p-10/60 border-t-nav-border border-t-2 bg-nav-bg lg:bg-nav-bg text-nav-icons'>
+            <ul className='flex w-full justify-between p-10/60 border-t-nav-border border-t-2 bg-nav-bg lg:bg-nav-bg text-nav-icons relative'>
                 <DynNavLink 
                     to='#'
                     link={false}

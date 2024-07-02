@@ -18,7 +18,7 @@
       
 
       --background: var(--w); /* Default background-color, switch circle */
-      --foreground: var(--b); /* Default color */
+      --foreground: var(--b2); /* Default color */
 
       --card: 0 0% 100%;
       --card-foreground: 0 0% 3.9%;
@@ -32,8 +32,8 @@
       --secondary: var(--w);
       --secondary-foreground: var(--w);
 
-      --muted: 0 0% 96.1%;
-      --muted-foreground: 0 0% 45.1%;
+      --muted: var(--a);
+      --muted-foreground: var(--g1);
 
       --accent: var(--g); /* select: active element */
       --accent-foreground: var(--w);
@@ -87,48 +87,3 @@
       @apply bg-background text-foreground;
     }
   }
-
-  :root {
-    --white: 239, 239, 239;
-    --black: 53, 55, 65;
-    --grey: 73, 75, 88;
-    --highlight: 0, 255, 132;
-    --highlight-05: 0, 255, 132, 0.5;
-}
-
-.dark.normal {
-    --text: var(--white);
-    --bg: var(--black);
-
-    --nav-bg: var(--black); 
-    --nav-border: var(--highlight);
-    --nav-page: var(--grey);
-    --nav-icons: var(--white);
-    --nav-icons-hover: var(--highlight-05);
-    --nav-icons-active: var(--highlight);
-
-    --content-header-border: var(--grey);
-
-    --switch-bg: var(--white);
-    --switch-text: var(--black);
-}
-.light.normal {
-    --text: var(--black);
-    --bg: var(--white);
-
-    --nav-bg: var(--black); 
-    --nav-border: var(--grey);
-    --nav-page: var(--white);
-    --nav-icons: var(--white);
-    --nav-icons-hover: var(--highlight-05);
-    --nav-icons-active: var(--highlight);
-
-    --content-header-border: var(--grey);
-
-    --switch-bg: var(--black);
-    --switch-text: var(--white);
-}
-
-div {
-  outline-color: hsl(0, 0%, 94%);
-}
