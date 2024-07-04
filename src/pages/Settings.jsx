@@ -1,6 +1,7 @@
 import React from 'react'
 import PageWrapper from '../components/PageWrapper'
 import { ThemeContext, useTheme } from "../components/ThemeProvider";
+import { useColor } from "../components/color-provider";
 import {
     Select,
     SelectContent,
@@ -15,6 +16,7 @@ import { Switch } from '@/components/ui/switch';
 
 const Settings = () => {
     const { theme, setTheme } = useTheme();
+    const { color, setColor } = useColor();
 
     // theme === "dark" ? true : false
     // onClick={(isActive) => {
@@ -29,7 +31,6 @@ const Settings = () => {
                 <Switch id="msg"/>
             </div>
             <div className='flex gap-[15px] items-center'>
-                {/* <label htmlFor='mode' className='uppercase font-light text-base w-min'>Modus</label> */}
                 <Label className="flex gap-4 items-center text-base font-light">Modus
                     <Select defaultValue={theme} onValueChange={(v) => {setTheme(v)}} >
                         <SelectTrigger className="w-[180px]">
@@ -40,6 +41,23 @@ const Settings = () => {
                             <SelectItem value="dark">Dunkel</SelectItem>
                             <SelectItem value="light">Hell</SelectItem>
                             <SelectItem value="system">System</SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </Label>
+            </div>
+            <div className='flex gap-[15px] items-center'>
+                <Label className="flex gap-4 items-center text-base font-light">Farbe
+                    <Select defaultValue={color} onValueChange={(v) => {setColor(v)}} >
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Farbe" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                            <SelectItem value="purple">Lila</SelectItem>
+                            <SelectItem value="blue">Blau</SelectItem>
+                            <SelectItem value="red">Rot</SelectItem>
+                            <SelectItem value="orange">Orange</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>

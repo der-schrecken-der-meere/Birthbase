@@ -183,7 +183,7 @@ const BirthdayForm = ({
                     {
                         form.formState.isSubmitting ? (
                             <TailSpin
-                                color='black'
+                                color='currentColor'
                                 height={16}
                                 width={16}
                             />

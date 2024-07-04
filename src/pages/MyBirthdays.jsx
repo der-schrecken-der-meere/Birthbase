@@ -12,7 +12,7 @@ const MyBirthdays = () => {
     const dialogContainerRef = useRef(null);
 
     return (
-        <PageWrapper className="overflow-auto max-h-full relative" title='Meine Geburtstage'>
+        <PageWrapper className="overflow-visible max-h-full relative" title='Meine Geburtstage'>
             <Label className="flex items-center gap-4 text-base font-light">Geburtstag erstellen
                 <Button size="icon" onClick={() => setOpen(!open)}>
                     <MdAdd color="hsl(var(--background))" size={24}/>

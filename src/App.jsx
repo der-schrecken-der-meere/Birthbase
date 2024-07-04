@@ -5,12 +5,12 @@ import Settings from "./pages/Settings";
 import MyBirthdays from "./pages/MyBirthdays";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
-import FromBirthday from "./pages/FormBirthday";
 import ThemeProvider from "./components/ThemeProvider";
+import { ColorProvider } from "./components/color-provider";
 
-import { invoke } from "@tauri-apps/api";
+// import { invoke } from "@tauri-apps/api";
 
-invoke("greet", {"name": "Hans"}).then((res) => alert(res)).catch((e) => alert(e));
+// invoke("greet", {"name": "Hans"}).then((res) => alert(res)).catch((e) => alert(e));
 
 function App() {
 
@@ -33,7 +33,9 @@ function App() {
     return (
         <>
             <ThemeProvider defaultTheme="dark" storageKey="theme">
-                <RouterProvider router={_router}/>
+                <ColorProvider defaultColor="blue" storageKey="vite-ui-color">
+                    <RouterProvider router={_router}/>
+                </ColorProvider>
             </ThemeProvider>
         </>
     );

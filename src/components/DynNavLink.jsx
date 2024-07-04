@@ -15,7 +15,7 @@ const DynNavLink = ({
   const linkClass = ({ isActive }) => `${isActive && "text-nav-icons-active "} flex items-center transition-colors duration-300 ${!hideText && "gap-[15px]"}`;
 
   return (
-    <li className={`${isStatic && "border-b-white_10 border-b-2 last:border-none"} ${className} uppercase`}>
+    <>
       {link ? (
         <NavLink to={to} onClick={onClick} className={linkClass}>
           {icon}
@@ -30,8 +30,8 @@ const DynNavLink = ({
             {title}
           )}
         </button>
-      )}  
-    </li>
+      )} 
+    </> 
   )
 }
 
