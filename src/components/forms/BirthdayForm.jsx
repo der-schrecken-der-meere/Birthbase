@@ -94,8 +94,6 @@ const BirthdayForm = ({
         })
     }
 
-    console.log(customContainer);
-
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -137,7 +135,7 @@ const BirthdayForm = ({
                     render={({field}) => (
                         <FormItem>
                             <FormLabel>Datum</FormLabel>
-                                <Popover modal={true} open={popoverOpen} onOpenChange={setPopoverOpen}>
+                                <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                                     <PopoverTrigger asChild>
                                         <FormControl>
                                             <Button
