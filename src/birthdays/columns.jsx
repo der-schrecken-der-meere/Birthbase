@@ -1,4 +1,5 @@
 import React from 'react'
+import { setYear, format } from 'date-fns';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -11,129 +12,151 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { calcAge, calcDaysUntilNextBirthday } from '@/util';
-import { MdKeyboardArrowUp, MdKeyboardArrowDown } from "react-icons/md";
+import { MdKeyboardArrowUp, MdKeyboardArrowDown, MdMoreHoriz, MdOutlineEdit } from "react-icons/md";
+import { RxCaretSort } from "react-icons/rx";
+import { LuTrash2 } from "react-icons/lu"
 /**
- * @typedef {Object} Birthday
- * @property {string} id
- * @property {string} lastname
- * @property {string} firstname
- * @property {{year: number, month: number, day: number, str: string}} birthday
+ * @typedef {{id: string, nameObj: {last: string, first: string}, birthday: string}} Birthday
  */
+
+/**
+ * 
+ * @param {{column: import('@tanstack/react-table').Column}} param0 
+ */
+const SortHeader = ({
+    column,
+}) => {
+    let sort = null;
+            switch(column.getIsSorted()) {
+                case "asc":
+                    sort = <MdKeyboardArrowDown className='ml-2 w-4 h-4'/>
+                    break;
+                case "desc":
+                    sort = <MdKeyboardArrowUp className='ml-2 w-4 h-4'/>
+                    break;
+                default:
+                    sort = <RxCaretSort className='ml-2 w-4 h-4'/>
+                    break
+            }
+    return (
+        <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting()}
+        >
+            {column.columnDef?.meta?.display}
+            {sort}
+        </Button>
+    );
+}
+
+function capitalize(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 /**
  * @type {import("@tanstack/react-table").ColumnDef<Birthday>[]}
  */
 export const columns = [
-    // {
-    //     id: "select",
-    //     header: ({ table }) => (
-    //         <Checkbox
-    //             checked={
-    //                 table.getIsAllPageRowsSelected() ||
-    //                 (table.getIsSomePageRowsSelected() && "indeterminate")
-    //             }
-    //             onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-    //             aria-label="Select all"
-    //         />
-    //     ),
-    //     cell: ({ row }) => (
-    //         <Checkbox
-    //             checked={row.getIsSelected()}
-    //             onCheckedChange={(value) => row.toggleSelected(!!value)}
-    //             aria-label="Select row"
-    //         />
-    //     ),
-    //     enableHiding: false,
-    //     enableSorting: false,
-    // },
     {
-        accessorKey: "birthday",
-        header: ({ column }) => {
-
-            console.log(column);
-
-            return (
-                <Button
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Datum
-                    {}
-                    <MdKeyboardArrowDown className='ml-2 w-4 h-4'/>
-                </Button>
-                // <div className='text-right'>Datum</div>
-            )
-        },
+        id: "birthday",
+        meta: {
+            display: "Datum",
+        }, 
+        accessorFn: (data, index) => setYear(new Date(data.birthday), new Date().getFullYear()),
+        sortingFn: "datetime",
+        header: ({ column }) => <SortHeader column={column} />,
         cell: ({ row }) => {
-            const birthday = row.getValue("birthday");
-            const date = new Date(birthday.year, birthday.month - 1, birthday.day);
-            const formatted = date.toLocaleDateString("de-DE", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-            });
-            const month_day = formatted.slice(0, -5);
-            return <div className='text-right font-medium'>{month_day}</div>
+            const date = new Date(row.getValue("birthday"));
+            return <div className='text-right font-medium'>{format(date, "dd.MM")}</div>
         },
     },
     {
-        accessorKey: "nameObjLast",
-        header: "Nachname",
-        filterFn: "myCustomFilterFn",
-        cell: ({ row }) => {
-            return <div className="capitalize">{row.original.nameObj.last}</div>
+        id: "lastname",
+        meta: {
+            display: "Nachname",
+        },
+        accessorKey: "nameObj.last",
+        sortingFn: "alphanumeric",
+        filterFn: "includesString",
+        enableColumnFilter: true,
+        header: ({ column }) => <SortHeader column={column} />,
+        cell: ({ cell }) => {
+            return <div className="capitalize">{cell.getValue()}</div>
         }
     },
     {
+        id: "firstname",
+        meta: {
+            display: "Vorname",
+        },
         accessorKey: "nameObj.first",
-        header: "Vorname",
-        cell: ({ row }) => {
-            return <div className="capitalize">{row.original.nameObj.first}</div>
+        sortingFn: "alphanumeric",
+        header: ({ column }) => <SortHeader column={column} />,
+        cell: ({ cell }) => {
+            return <div className="capitalize">{cell.getValue()}</div>
         }
     },
     {
-        header: "Alter",
-        cell: ({ row }) => {
-            const birthdayObj = row.getValue("birthday");
+        id: "age",
+        meta: {
+            display: "Alter",
+        },
+        accessorFn: (data, index) => {
             const currentDate = new Date(Date.now());
-            const birthdayDate = new Date(birthdayObj.year, birthdayObj.month - 1, birthdayObj.day);
-            const age = calcAge(birthdayDate, currentDate);
-            return <div className='text-right font-medium'>{age}</div>
+            const birthdayDate = new Date(data.birthday);
+            return calcAge(birthdayDate, currentDate);
+        },
+        sortingFn: "alphanumeric",
+        header: ({ column }) => <SortHeader column={column} />,
+        cell: ({ cell }) => {
+            return <div className='text-right font-medium'>{cell.getValue()}</div>
         }
     },
     {
-        accessorKey: "daysUntil",
-        header: () => <div className="text-nowrap">Tage bis</div>,
-        cell: ({ row }) => {
-            const birthdayObj = row.original.birthday;
+        id: "remaining",
+        meta: {
+            display: "Tage Bis",
+        },
+        accessorFn: (data, index) => {
             const currentDate = new Date(Date.now());
-            const birthdayDate = new Date(birthdayObj.year, birthdayObj.month - 1, birthdayObj.day);
-            const days = calcDaysUntilNextBirthday(birthdayDate, currentDate);
-            return <div className='text-right font-medium'>{days}</div>
+            const birthdayDate = new Date(data.birthday);
+            return calcDaysUntilNextBirthday(birthdayDate, currentDate);
+        },
+        sortingFn: "alphanumeric",
+        header: ({ column }) => <SortHeader column={column} />,
+        cell: ({ cell }) => {
+            return <div className='text-right font-medium'>{cell.getValue()}</div>
         }
     },
     {
-        id: "test",
-        accessorKey: "test",
-        header: "Test",
-        cell: ({ row }) => {
-            const birthday = row.original;
+        id: "actions",
+        meta: {
+            display: "Sonstiges",
+        },
+        accessorFn: (data, index) => {
+            return data;
+        },
+        header: ({ column }) => (column.columnDef.meta.display),
+        cell: ({ cell, row }) => {
+            const obj = cell.getValue();
+            const text = `${capitalize(obj.nameObj.first)} ${capitalize(obj.nameObj.last)} (${format(new Date(obj.birthday), "dd.MM.yyyy")}) wird in ${row.getValue("remaining")} Tagen ${row.getValue("age")} Jahr${row.getValue("age") === 1 ? "" : "e"} alt`;
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button>
-                            <span>Open menu</span>
+                        <Button variant="ghost">
+                            <MdMoreHoriz/>
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuContent align="center">
+                        <DropdownMenuLabel>Aktionen</DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(birthday.id)}
+                            onClick={() => navigator.clipboard.writeText(text)}
                         >
-                            Copy payment ID
+                            Geburtstag als Nachricht kopieren
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>View customer</DropdownMenuItem>
-                        <DropdownMenuItem>View payment details</DropdownMenuItem>
+                        <DropdownMenuItem className="flex gap-2">Ändern<MdOutlineEdit/></DropdownMenuItem>
+                        <DropdownMenuItem className="flex gap-2 text-destructive">Löschen<LuTrash2/></DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );

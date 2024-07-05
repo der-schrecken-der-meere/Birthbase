@@ -16,12 +16,12 @@ const MyBirthdays = () => {
 
     return (
         <PageWrapper className="overflow-visible max-h-full relative" title='Meine Geburtstage'>
-            <Label className="flex items-center gap-4 text-base font-light">Geburtstag erstellen
+            <Label className="inline-flex items-center gap-4 text-base font-light">Geburtstag erstellen
                 <Button size="icon" onClick={() => setOpen(!open)}>
                     <MdAdd color="hsl(var(--background))" size={24}/>
                 </Button> 
             </Label>
-            {/* <Birthdays/> */}
+            <Birthdays/>
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent container={mainRef?.current} ref={dialogContainerRef} className="overflow-auto">
                     <DialogHeader>

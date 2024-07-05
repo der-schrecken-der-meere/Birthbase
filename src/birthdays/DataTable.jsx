@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { setYear, getYear } from "date-fns";
 import {
     flexRender,
     getCoreRowModel,
@@ -24,25 +25,18 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { MdKeyboardArrowDown } from "react-icons/md";
 
 const DataTable = ({columns, data}) => {
-    /**
-     * @type {import("@tanstack/react-table").SortingState}
-     */
     const [sorting, setSorting] = React.useState([]);
-    /**
-     * @type {import("@tanstack/react-table").ColumnFiltersState}
-     */
     const [columnFilters, setColumnFilters] = React.useState([]);
-    /**
-     * @type {import("@tanstack/react-table").VisibilityState}
-     */
     const [columnVisibility, setColumnVisibility] = React.useState([]);
     const [rowSelection, setRowSelection] = React.useState({});
 
     const table = useReactTable({
         data,
         columns,
+        enableSortingRemoval: true,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         onSortingChange: setSorting,
@@ -52,9 +46,10 @@ const DataTable = ({columns, data}) => {
         onColumnVisibilityChange: setColumnVisibility,
         onRowSelectionChange: setRowSelection,
         filterFns: {
-            myCustomFilterFn: (row, columnId, filterValue) => {
-                return row.original.nameObj.first.includes(filterValue);
-            }
+            
+        },
+        sortingFns: {
+
         },
         state: {
             sorting,
@@ -65,24 +60,20 @@ const DataTable = ({columns, data}) => {
     })
 
     return (
-        <div>
+        <div className='w-full'>
             <div className='flex items-center py-4'>
                 <Input
-                    placeholder="Filter Daten..."
-                    value={(() => {
-                        console.log(table.getColumn("nameObjLast"))
-                        return ((table.getColumn("nameObjLast")?.getFilterValue()) ?? "");
-                    })()}
-                    onChange={(event) => {
-                        console.log(event.target.value);
-                        return table.getColumn("nameObjLast")?.setFilterValue(event.target.value);
-                    }}
+                    placeholder="Filter Nachname..."
+                    value={(() => (table.getColumn("lastname")?.getFilterValue()) ?? "")()}
+                    onChange={(event) => 
+                        table.getColumn("lastname")?.setFilterValue(event.target.value)
+                    }
                     className="max-w-sm"
                 />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button className="ml-auto">
-                            Columns
+                        <Button variant="outline" className="ml-auto">
+                            Spalten <MdKeyboardArrowDown className='ml-2 h-4 w-4'/>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -101,16 +92,12 @@ const DataTable = ({columns, data}) => {
                                             column.toggleVisibility(!!value)
                                         }
                                     >
-                                        {column.id}
+                                        {column.columnDef?.meta?.display ? column.columnDef.meta.display : column.id}
                                     </DropdownMenuCheckboxItem>
                                 )
                             })}
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <div className="flex-1 text-sm text-muted-foreground">
-                    {table.getFilteredSelectedRowModel().rows.length} of {" "}
-                    {table.getFilteredRowModel().rows.length} row(s) selected.
-                </div>
             </div>
             <div className='rounded-md border'>
                 <Table>
