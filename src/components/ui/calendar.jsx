@@ -42,15 +42,6 @@ function Calendar({
     )
   }, [props.fromYear, props.fromMonth, props.fromDate, props.toYear, props.toMonth, props.toDate]);
 
-
-  
-            
-            
-            
-
-            
-
-
   return (
     (<DayPicker
       showOutsideDays={showOutsideDays}

@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
 import PageWrapper from '../components/PageWrapper'
-import MdOutlineSunny from "../icons/MdOutlineSunny";
-import StyledButton from '../components/buttons/StyledButton';
 
 const Home = () => {
+
+    document.title = "Birthbase - Hauptmenü";
+
     return (
         <PageWrapper title='Home'>
             

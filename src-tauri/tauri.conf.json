@@ -1,38 +1,102 @@
 {
-  "productName": "birthday",
-  "version": "0.0.0",
-  "identifier": "com.tauri.dev",
+  "package": {
+    "productName": "birthbases",
+    "version": "0.1.0"
+  },
   "build": {
     "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:1420",
+    "devPath": "http://localhost:1420",
     "beforeBuildCommand": "npm run build",
-    "frontendDist": ["index.html"]
+    "distDir": "../dist"
   },
-  "app": {
+  "tauri": {
+    "allowlist": {
+      "all": true
+    },
+    "bundle": {
+      "longDescription": "A Webapplication for managing and storing birthdays and messaging yourself if a birthday is soon",
+      "active": true,
+      "appimage": {
+        "bundleMediaFramework": false
+      },
+      "deb": {
+        "files": {}
+      },
+      "dmg": {
+        "appPosition": {
+          "x": 180,
+          "y": 170
+        },
+        "applicationFolderPosition": {
+          "x": 480,
+          "y": 170
+        },
+        "windowSize": {
+          "height": 400,
+          "width": 660
+        }
+      },
+      "icon": [
+        "icons/icon.ico"
+      ],
+      "identifier": "com.max-voigt.dev",
+      "macOS": {
+        "minimumSystemVersion": "10.13"
+      },
+      "rpm": {
+        "epoch": 0,
+        "files": {},
+        "release": "1"
+      },
+      "targets": "all",
+      "useLocalToolsDir": false,
+      "windows": {
+        "allowDowngrades": true,
+        "certificateThumbprint": null,
+        "digestAlgorithm": null,
+        "nsis": null,
+        "signCommand": null,
+        "timestampUrl": null,
+        "tsp": false,
+        "webviewFixedRuntimePath": null,
+        "webviewInstallMode": {
+          "silent": true,
+          "type": "downloadBootstrapper"
+        },
+        "wix": null
+      }
+    },
+    "macOSPrivateApi": false,
+    "pattern": {
+      "use": "brownfield"
+    },
+    "security": {
+      "dangerousDisableAssetCspModification": false,
+      "dangerousRemoteDomainIpcAccess": [],
+      "dangerousUseHttpScheme": false,
+      "freezePrototype": false
+    },
+    "updater": {
+      "active": false,
+      "dialog": true,
+      "pubkey": "",
+      "windows": {
+        "installMode": "passive",
+        "installerArgs": []
+      }
+    },
     "windows": [
       {
-        "title": "Birthday",
+        "title": "Birthbase",
         "width": 800,
         "height": 600,
         "resizable": true,
-        "fullscreen": false,
-        "y": 0,
         "x": 0,
+        "y": 0,
         "theme": "Dark",
         "skipTaskbar": false,
         "decorations": true
       }
-    ],
-    "security": {
-      "csp": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src 'none';"
-    }
-  },
-  "bundle": {
-    "longDescription": "A Webapplication for managing provided birthdays and messaging yourself if a birthday is soon",
-    "active": true,
-    "targets": "all",
-    "icon": [
-      "icons/icon.ico"
     ]
   }
 }

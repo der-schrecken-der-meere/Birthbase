@@ -1,18 +1,48 @@
-import { Route, createBrowserRouter, createRoutesFromElements, RouterProvider, Routes } from "react-router-dom";
+import { useEffect, lazy } from "react";
 
-import MainLayout from "./layouts/MainLayout";
-import Settings from "./pages/Settings";
-import MyBirthdays from "./pages/MyBirthdays";
+// React Routers
+import { 
+    Route,
+    createBrowserRouter,
+    createRoutesFromElements,
+    RouterProvider
+} from "react-router-dom";
+
+// React Redux
+import { useDispatch } from "react-redux";
+
+// Pages
+// import Settings from "./pages/Settings";
+// import MyBirthdays from "./pages/MyBirthdays";
 import Home from "./pages/Home";
-import NotFound from "./pages/NotFound";
-import ThemeProvider from "./components/ThemeProvider";
-import { ColorProvider } from "./components/color-provider";
+// import NotFound from "./pages/NotFound";
 
-// import { invoke } from "@tauri-apps/api";
+// Layouts
+import MainLayout from "./layouts/MainLayout";
 
-// invoke("greet", {"name": "Hans"}).then((res) => alert(res)).catch((e) => alert(e));
+// Store Slices
+import { setPermission } from "./store/notification/notificationSlice";
+
+const MyBirthdays = lazy(() => import("./pages/MyBirthdays"));
+const Settings = lazy(() => import("./pages/Settings"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 function App() {
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        console.log("fafasf");
+
+        navigator.permissions.query({
+            name: "notifications",
+        }).then((perm) => {
+            dispatch(setPermission(perm.state));
+            perm.onchange = (e) => {
+                dispatch(setPermission(e.target.state));
+            }
+        })
+    }, [])   
 
     const _router = createBrowserRouter(
         createRoutesFromElements(
@@ -24,20 +54,16 @@ function App() {
                 <Route errorElement={<NotFound/>}>
                     <Route index element={<Home/>}/>
                     <Route path="settings" element={<Settings/>}/>
-                    <Route path="my_birthdays" element={<MyBirthdays/>}/>
+                    <Route path="my_birthdays" element={
+                        <MyBirthdays/>
+                    }/>
                 </Route>
             </Route>
         )
     );
 
     return (
-        <>
-            <ThemeProvider defaultTheme="dark" storageKey="theme">
-                <ColorProvider defaultColor="blue" storageKey="vite-ui-color">
-                    <RouterProvider router={_router}/>
-                </ColorProvider>
-            </ThemeProvider>
-        </>
+        <RouterProvider router={_router}/>
     );
 }
 

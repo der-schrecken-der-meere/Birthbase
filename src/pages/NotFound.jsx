@@ -1,4 +1,4 @@
-import React from 'react'
+// React Router
 import { Link, isRouteErrorResponse, useRouteError } from "react-router-dom";
 
 const NotFound = () => {

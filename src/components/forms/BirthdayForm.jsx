@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 
 import { createPortal } from "react-dom";
 
@@ -31,8 +31,14 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import { useToast } from '@/components/ui/use-toast';
+import { db } from "../../database/db";
+
+import { useDispatch, useSelector } from 'react-redux';
+import { changeMethod, changeData, changeDataInitial, toggleOpen } from "../../store/dataForm/dataFormSlice";
+import { addData, updateData, deleteData } from "../../store/data/dataSlice";
 
 const formSchema = z.object({
+    id: z.number(),
     firstname: z.string({
         required_error: "Vorname muss gefüllt sein",
         invalid_type_error: "Vorname muss ein String sein",
@@ -47,7 +53,7 @@ const formSchema = z.object({
     .min(3, {
         message: "Nachname muss mindestens 3 Buchstaben haben",
     }),
-    date: z.date({
+    date: z.coerce.date({
         message: "Falscher Datumsstring",
     })
     .max(new Date(), {
@@ -58,37 +64,78 @@ const formSchema = z.object({
 const BirthdayForm = ({
     customContainer,
 }) => {
-    
     const { toast } = useToast();
 
-    const [popoverOpen, setPopoverOpen] = React.useState(false);
+    const dispatch = useDispatch();
+
+    const birthday = useSelector((state) => state.dataForm.value);
+    const method = useSelector((state) => state.dataForm.method);
 
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            firstname: "",
-            lastname: "",
-            date: "",
+            id: birthday.id,
+            firstname: birthday.name.first,
+            lastname: birthday.name.last,
+            date: birthday.date,
         }
     });
 
     const onSubmit = async (data) => {
+        console.log("OnSubmit: ", data);
         try {
-            const response = await new Promise((resolve, reject) => {setTimeout(() => {reject("asdasd")}, 1000)});
+            const newObj = {
+                id: data.id,
+                name: {
+                    first: data.firstname,
+                    last: data.lastname,
+                },
+                date: data.date.toISOString(),
+            }
+            let response;  
+            console.log(method, newObj);
+            switch (method) {
+                case "add":
+                    response = (await db.POST(newObj))[0];
+                    newObj.id = response.id;
+                    console.log(newObj);
+                    dispatch(addData(newObj));
+                    dispatch(changeMethod("update"));
+                    dispatch(changeData(newObj));
+                    form.reset({
+                        id: newObj.id,
+                        date: newObj.date,
+                        firstname: newObj.name.first,
+                        lastname: newObj.name.last,
+                    })
+                    break;
+                case "delete":
+                    response = await db.DELETE(newObj.id);
+                    dispatch(deleteData(newObj.id));
+                    dispatch(changeDataInitial());
+                    break;
+                case "update":
+                    response = await db.PATCH(newObj);
+                    dispatch(changeData(newObj));
+                    dispatch(updateData(newObj));
+                break;
+                default:
+                    break;
+            }
+            
         } catch (e) {
             form.setError("root.serverError", {
                 type: e.statusCode,
             })
-            console.log(e);
+            console.error(e);
         }
-        console.log(data);
         
         toast({
             duration: 5000,
             title: "Sie haben diese Daten gesendet",
             description: (
                 <pre>
-                    <code className='text-black'>{JSON.stringify(data, null, 2)}</code>
+                    <code>{JSON.stringify(data, null, 2)}</code>
                 </pre>
             ),
         })
@@ -135,13 +182,12 @@ const BirthdayForm = ({
                     render={({field}) => (
                         <FormItem>
                             <FormLabel>Datum</FormLabel>
-                                <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                                <Popover>
                                     <PopoverTrigger asChild>
                                         <FormControl>
                                             <Button
                                                 variant="outline"
                                                 className={`w-full justify-start text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                                                onClick={() => setPopoverOpen(true)}
                                             >
                                                 {field.value ? (
                                                     format(field.value, "dd-MM-yyyy")
@@ -177,22 +223,59 @@ const BirthdayForm = ({
                         </FormItem>
                     )}
                 />
-                <Button className="min-w-min w-20" disabled={form.formState.isSubmitting} type="submit" variant="outline">
-                    {
-                        form.formState.isSubmitting ? (
-                            <TailSpin
-                                color='currentColor'
-                                height={16}
-                                width={16}
-                            />
-                        ) : (
-                            "Submit"
-                        )
-                    }
-                </Button>
+                <FormField
+                    control={form.control}
+                    name="id"
+                    render={({field}) => (
+                        <FormControl>
+                            <Input type="hidden" {...field}/>
+                        </FormControl>
+                    )}
+                />
+                <ActionButtons
+                    isSubmitting={form.formState.isSubmitting}
+                />
             </form>
         </Form>    
     )
 }
 
 export default BirthdayForm
+
+const ActionButtons = memo(({
+    isSubmitting,
+}) => {
+    const dispatch = useDispatch();
+    const method = useSelector((state) => state.dataForm.method);
+
+    return (
+        <div className='flex'>
+            <Button className="min-w-min w-20" disabled={isSubmitting} type="submit" variant="outline">
+                {
+                    isSubmitting ? (
+                        <TailSpin
+                            color='currentColor'
+                            height={16}
+                            width={16}
+                        />
+                    ) : (
+                        method === "add" ? "Hinzufügen" : "Ändern"
+                    )
+                }
+            </Button>
+            {(method === "update" || method === "delete") && <Button disabled={isSubmitting} onClick={() => dispatch(changeMethod("delete"))} type="submit" variant="destructive" className="ml-auto min-w-min w-20">
+                {
+                    isSubmitting ? (
+                        <TailSpin
+                            color='currentColor'
+                            height={16}
+                            width={16}
+                        />
+                    ) : (
+                        "Löschen"
+                    )
+                }   
+            </Button>}    
+        </div>
+    );
+});

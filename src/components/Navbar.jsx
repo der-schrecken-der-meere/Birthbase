@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import DynNavLink from './DynNavLink'
 import { 
     MdOutlineGroups,
     MdOutlineCelebration,
@@ -19,14 +18,9 @@ import MdOutlineSettings from "../icons/MdOutlineSettings";
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
-const Navbar = ({className}) => {
-    const [open, setOpen] = useState(false);
-    const handleMenuClick = (e) => {
-        setOpen(!open);
-    }
-    const handleLinkClick = (e) => {
-        if (open) setOpen(!open);
-    }
+const Navbar = () => {
+
+    console.log("render");
 
     return (
         // <nav className='flex flex-col gap-5 w-full font-medium'>
@@ -75,7 +69,7 @@ const Navbar = ({className}) => {
         <NavigationMenu className="flex-initial border-t-2">
             <NavigationMenuList className="w-screen py-2">
                 <NavigationMenuItem className="flex-auto grid place-items-center">
-                    <NavigationMenuTrigger icon={false} className={"h-auto"}>
+                    <NavigationMenuTrigger aria-label="open-second-navigation-menu" icon={false} className={"h-auto"}>
                         <MdMenu size={40}/>
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
@@ -95,6 +89,7 @@ const Navbar = ({className}) => {
                     <NavLink
                         to="/" 
                         className={({ isActive }) => cn(navigationMenuTriggerStyle(), "h-auto", (isActive && "bg-primary text-primary-foreground"))}
+                        aria-label='Return to the welcome site'
                     >
                         <MdOutlineCottage size={40}/>
                     </NavLink>
@@ -103,6 +98,7 @@ const Navbar = ({className}) => {
                     <NavLink
                         to="/settings"
                         className={({ isActive }) => cn(navigationMenuTriggerStyle(), "h-auto", (isActive && "bg-primary text-primary-foreground"))}
+                        aria-label='Go to the setting site'
                     >
                         <MdOutlineSettings size={40}/>
                     </NavLink>

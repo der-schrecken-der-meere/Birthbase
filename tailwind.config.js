@@ -1,14 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: ["class"],
   content: [
-    './pages/**/*.{js,jsx}',
-    './components/**/*.{js,jsx}',
-    './app/**/*.{js,jsx}',
-    './src/**/*.{js,jsx}',
+    './pages/**/*.{js,jsx,ts,tsx}',
+    './components/**/*.{js,jsx,ts,tsx}',
+    './app/**/*.{js,jsx,ts,tsx}',
+    './src/**/*.{js,jsx,ts,tsx}',
     "./index.html",
   ],
   prefix: "",
-  theme: {
+  theme: {    
     fontFamily: {
       "sans": ["Inter", "sans-serif"]
     },
@@ -59,7 +60,7 @@ module.exports = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-      },
+      },      
       padding: {
         "10/60": "0.625rem 3.75rem",
         "20/30": "1.25rem 1.875rem"
@@ -75,13 +76,6 @@ module.exports = {
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
-        },
-        rippleScale: {
-          "0%": {transform: "scale(0)", opacity: "0"},
-          "100%": {transform: "scale(4)", opacity: "0.3"}
-        },
-        rippleFade: {
-          "100%": {opacity: "0"}
         },
       },
       animation: {

@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
+
+// Date FNS
 import { setYear, format } from 'date-fns';
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
+
+// Shadcn UI
+import { Button } from "../components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,14 +12,34 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { calcAge, calcDaysUntilNextBirthday } from '@/util';
+} from "../components/ui/dropdown-menu"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "../components/ui/alert-dialog";
+
+
+import { calcAge, calcDaysUntilNextBirthday } from '../util';
 import { MdKeyboardArrowUp, MdKeyboardArrowDown, MdMoreHoriz, MdOutlineEdit } from "react-icons/md";
 import { RxCaretSort } from "react-icons/rx";
 import { LuTrash2 } from "react-icons/lu"
-/**
- * @typedef {{id: string, nameObj: {last: string, first: string}, birthday: string}} Birthday
- */
+import { db } from "../database/db";
+
+
+
+// React Redux
+import { useDispatch } from 'react-redux';
+
+// Store Slices
+import { changeDataState, toggleOpen, changeData, changeMethod } from "../store/dataForm/dataFormSlice"
+import { deleteData } from "../store/data/dataSlice"
 
 /**
  * 
@@ -27,17 +49,17 @@ const SortHeader = ({
     column,
 }) => {
     let sort = null;
-            switch(column.getIsSorted()) {
-                case "asc":
-                    sort = <MdKeyboardArrowDown className='ml-2 w-4 h-4'/>
-                    break;
-                case "desc":
-                    sort = <MdKeyboardArrowUp className='ml-2 w-4 h-4'/>
-                    break;
-                default:
-                    sort = <RxCaretSort className='ml-2 w-4 h-4'/>
-                    break
-            }
+    switch(column.getIsSorted()) {
+        case "asc":
+            sort = <MdKeyboardArrowDown className='ml-2 w-4 h-4'/>
+            break;
+        case "desc":
+            sort = <MdKeyboardArrowUp className='ml-2 w-4 h-4'/>
+            break;
+        default:
+            sort = <RxCaretSort className='ml-2 w-4 h-4'/>
+            break
+    }
     return (
         <Button
             variant="ghost"
@@ -54,7 +76,7 @@ function capitalize(string) {
 }
 
 /**
- * @type {import("@tanstack/react-table").ColumnDef<Birthday>[]}
+ * @type {import("@tanstack/react-table").ColumnDef<import('@/database/db').T_Birthday>[]}
  */
 export const columns = [
     {
@@ -62,12 +84,13 @@ export const columns = [
         meta: {
             display: "Datum",
         }, 
-        accessorFn: (data, index) => setYear(new Date(data.birthday), new Date().getFullYear()),
+        accessorFn: (data, index) => {
+            return setYear(new Date(data.date), new Date().getFullYear());
+        },
         sortingFn: "datetime",
         header: ({ column }) => <SortHeader column={column} />,
-        cell: ({ row }) => {
-            const date = new Date(row.getValue("birthday"));
-            return <div className='text-right font-medium'>{format(date, "dd.MM")}</div>
+        cell: ({ cell }) => {
+            return <div className='text-right font-medium'>{format(cell.getValue(), "dd.MM")}</div>
         },
     },
     {
@@ -75,7 +98,7 @@ export const columns = [
         meta: {
             display: "Nachname",
         },
-        accessorKey: "nameObj.last",
+        accessorKey: "name.last",
         sortingFn: "alphanumeric",
         filterFn: "includesString",
         enableColumnFilter: true,
@@ -89,7 +112,7 @@ export const columns = [
         meta: {
             display: "Vorname",
         },
-        accessorKey: "nameObj.first",
+        accessorKey: "name.first",
         sortingFn: "alphanumeric",
         header: ({ column }) => <SortHeader column={column} />,
         cell: ({ cell }) => {
@@ -103,7 +126,7 @@ export const columns = [
         },
         accessorFn: (data, index) => {
             const currentDate = new Date(Date.now());
-            const birthdayDate = new Date(data.birthday);
+            const birthdayDate = new Date(data.date);
             return calcAge(birthdayDate, currentDate);
         },
         sortingFn: "alphanumeric",
@@ -119,7 +142,7 @@ export const columns = [
         },
         accessorFn: (data, index) => {
             const currentDate = new Date(Date.now());
-            const birthdayDate = new Date(data.birthday);
+            const birthdayDate = new Date(data.date);
             return calcDaysUntilNextBirthday(birthdayDate, currentDate);
         },
         sortingFn: "alphanumeric",
@@ -138,30 +161,68 @@ export const columns = [
         },
         header: ({ column }) => (column.columnDef.meta.display),
         cell: ({ cell, row }) => {
+
             const obj = cell.getValue();
-            const text = `${capitalize(obj.nameObj.first)} ${capitalize(obj.nameObj.last)} (${format(new Date(obj.birthday), "dd.MM.yyyy")}) wird in ${row.getValue("remaining")} Tagen ${row.getValue("age")} Jahr${row.getValue("age") === 1 ? "" : "e"} alt`;
+            const age = row.getValue("age") + 1;
+            const text = `${capitalize(obj.name.first)} ${capitalize(obj.name.last)} (${format(new Date(obj.date), "dd.MM.yyyy")}) wird in ${row.getValue("remaining")} Tagen ${age} Jahr${age === 1 ? "" : "e"} alt`;
+            
             return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost">
-                            <MdMoreHoriz/>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="center">
-                        <DropdownMenuLabel>Aktionen</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(text)}
-                        >
-                            Geburtstag als Nachricht kopieren
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="flex gap-2">Ändern<MdOutlineEdit/></DropdownMenuItem>
-                        <DropdownMenuItem className="flex gap-2 text-destructive">Löschen<LuTrash2/></DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <AktionDropdown
+                    navigatorText={text}
+                    cell={obj}
+                />
             );
         }
     }
 ];
+
+const AktionDropdown = ({
+    navigatorText,
+    cell,
+}) => {
+    const dispatch = useDispatch();
+
+    return (<DropdownMenu>
+        <DropdownMenuTrigger asChild>
+            <Button variant="ghost">
+                <MdMoreHoriz/>
+            </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="center">
+            <DropdownMenuLabel>Aktionen</DropdownMenuLabel>
+            <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(navigatorText)}
+            >
+                Geburtstag als Nachricht kopieren
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="flex gap-2" onClick={() => {
+                const obj = {
+                    id: cell.id,
+                    name: cell.name,
+                    date: cell.date
+                }
+                dispatch(changeDataState({
+                    method: "update",
+                    value: obj,
+                    open: true,
+                }));
+                // dispatch(changeDataMethod({
+                //     method: "update",
+                //     value: v,
+                // }))
+                // dispatch(toggleOpen());
+            }}>Ändern<MdOutlineEdit/></DropdownMenuItem>
+            <DropdownMenuItem className="flex gap-2 text-destructive" onClick={async () => {
+                try {
+                    db.DELETE(cell.id);
+                    dispatch(deleteData(cell.id));
+                } catch (e) {
+                    console.error(e);
+                }
+            }}>Löschen<LuTrash2/></DropdownMenuItem>
+        </DropdownMenuContent>
+    </DropdownMenu>);
+}
 
 export default columns
