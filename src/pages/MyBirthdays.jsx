@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, lazy, Suspense } from 'react'
 
 // Shadcn Components
 import { Label } from "../components/ui/label.jsx"
@@ -12,10 +12,10 @@ import {
     DialogHeader,
     DialogTitle
 } from '../components/ui/dialog';
+import { Skeleton } from "../components/ui/skeleton.jsx";
 
 // Custom Components
 import PageWrapper from '../components/PageWrapper'
-import BirthdayForm from "../components/forms/BirthdayForm";
 import DataTable from '../birthdays/DataTable';
 
 // React Icons
@@ -29,6 +29,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 // Store Slices
 import { toggleOpen, changeDataState, changeDataInitial } from "../store/dataForm/dataFormSlice"
+
+const BirthdayForm = lazy(() => import("../components/forms/BirthdayForm.jsx"))
 
 const MyBirthdays = () => {
     document.title = "Birthbase - Meine Geburtstage";
@@ -84,7 +86,28 @@ const DialogWindow = () => {
                     </DialogDescription>
                 </DialogHeader>
 
-                <BirthdayForm customContainer={dialogContainerRef}/>
+                <Suspense fallback={
+                    <div className='flex flex-col space-y-8'>
+                        <div className='space-y-2'>
+                            <Skeleton className="w-[80px] h-6"/>
+                            <Skeleton className="w-full h-10"/>
+                            <Skeleton className="w-full h-5"/>
+                        </div>
+                        <div className='space-y-2'>
+                            <Skeleton className="w-[80px] h-6"/>
+                            <Skeleton className="w-full h-10"/>
+                            <Skeleton className="w-full h-5"/>
+                        </div>
+                        <div className='space-y-2'>
+                            <Skeleton className="w-[80px] h-6"/>
+                            <Skeleton className="w-full h-10"/>
+                            <Skeleton className="w-full h-5"/>
+                        </div>
+                        <Skeleton className="w-[120px] h-10"/>
+                    </div>
+                }>
+                    <BirthdayForm customContainer={dialogContainerRef}/>
+                </Suspense>
 
                 <DialogFooter>
                 </DialogFooter>

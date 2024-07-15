@@ -24,7 +24,13 @@ import MainLayout from "./layouts/MainLayout";
 import { setPermission } from "./store/notification/notificationSlice";
 
 const MyBirthdays = lazy(() => import("./pages/MyBirthdays"));
-const Settings = lazy(() => import("./pages/Settings"));
+const Settings = lazy(
+    () => 
+        // new Promise(resolve => setTimeout(resolve, 300)).then(a => 
+            import("./pages/Settings")
+        // )    
+);
+
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 function App() {
