@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "nvmrc": "node -v > .nvmrc",
     "build": "vite build",
+    "postinstall": "npm nvmrc",
+    "predev": "npm nvmrc",
     "preview": "vite preview",
     "tauri": "tauri"
   },
