@@ -7,8 +7,8 @@
     "dev": "vite",
     "nvmrc": "node -v > .nvmrc",
     "build": "vite build",
-    "postinstall": "npm nvmrc",
-    "predev": "npm nvmrc",
+    "postinstall": "npm run nvmrc",
+    "predev": "npm run nvmrc",
     "preview": "vite preview",
     "tauri": "tauri"
   },
