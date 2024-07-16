@@ -1,7 +1,5 @@
 name: Publish Release
 on:
-  label:
-    types: [created, deleted]
   push:
     tags:
       - v**
