@@ -39,7 +39,7 @@ jobs:
         with:
           node-version: 'lts/*'
           cache: npm
-          # node-version-file: '.nvmrc'
+          node-version-file: '.nvmrc'
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
