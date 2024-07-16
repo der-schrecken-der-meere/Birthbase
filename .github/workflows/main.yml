@@ -30,6 +30,7 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      
     - name: Setup ARM build environment
       run: |
           rustup target add aarch64-unknown-linux-gnu
@@ -52,8 +53,8 @@ jobs:
           sudo apt install libwebkit2gtk-4.0-dev:arm64 -y
           sudo apt install libssl-dev:arm64 -y
           export PKG_CONFIG_SYSROOT_DIR=/usr/aarch64-linux-gnu/
-          pnpm install
-          pnpm rls --target aarch64-unknown-linux-gnu
+          npm install
+          npm run build --target aarch64-unknown-linux-gnu
     - name: Upload deb bundle
       uses: actions/upload-artifact@v4
       with:
@@ -68,7 +69,7 @@ jobs:
             args: '--target aarch64-apple-darwin'
           - platform: 'macos-latest' # for Intel based macs.
             args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04.
+          - platform: 'ubuntu-latest' # for Tauri v1 you could replace this with ubuntu-20.04.
             args: ''
           - platform: 'windows-latest'
             args: ''
