@@ -34,6 +34,7 @@ jobs:
     - name: Setup ARM build environment
       run: |
           sudo apt update
+          sudo apt upgrade
           rustup target add aarch64-unknown-linux-gnu
           sudo apt install gcc-aarch64-linux-gnu
           sudo dpkg --add-architecture arm64
