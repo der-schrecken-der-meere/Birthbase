@@ -1,8 +1,8 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { type T_Birthday } from "../../database/db";
+import { type I_Birthday } from "../../database/db";
 
 interface DataState {
-    value: T_Birthday[],
+    value: I_Birthday[],
 }
 
 const initialState: DataState = {
@@ -13,19 +13,19 @@ const dataSlice = createSlice({
     name: "data",
     initialState,
     reducers: {
-        setData: (data, action: PayloadAction<T_Birthday[]|T_Birthday>) => {
+        setData: (data, action: PayloadAction<I_Birthday[]|I_Birthday>) => {
             const flat = [action.payload].flat();
             data.value = flat;
         },
         deleteData: (data, action: PayloadAction<number|number[]>) => {
             const flat = [action.payload].flat();
-            data.value = data.value.filter(e => !flat.includes(e.id));
+            data.value = data.value.filter(e => !flat.includes(e.id as number));
         },
-        addData: (data, action: PayloadAction<T_Birthday|T_Birthday[]>) => {
+        addData: (data, action: PayloadAction<I_Birthday|I_Birthday[]>) => {
             const flat = [action.payload].flat();
             data.value = [...data.value, ...flat];
         },
-        updateData: (data, action: PayloadAction<T_Birthday|T_Birthday[]>) => {
+        updateData: (data, action: PayloadAction<I_Birthday|I_Birthday[]>) => {
             const flat = [action.payload].flat();
             data.value = data.value.map((d) => {
                 const f = flat.find(f => f.id === d.id);

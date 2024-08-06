@@ -1,22 +1,25 @@
+import { isTauri } from "@/constants/tauri";
+import { db, type I_Settings } from "@/database/db";
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { useDispatch } from "react-redux";
+import { isPermissionGranted, requestPermission } from '@tauri-apps/api/notification';
 
 interface NotificationState {
-    value: NotificationPermission;
+    permission: NotificationPermission;
 }
 
-const storageKey: string = "app-permission";
-
-const getStorage = () => localStorage.getItem(storageKey) as NotificationPermission|null;
-const setStorage = (permission: NotificationPermission) => {
-    localStorage.setItem(storageKey, permission);
+let permissionGranted: NotificationPermission = Notification.permission;
+if (isTauri) {
+    permissionGranted = await isPermissionGranted() ? "granted" : "default";
+    console.log(permissionGranted);
 }
 
-const notificationExists = () => ("Notification" in window);
+console.log(permissionGranted);
 
 const initialState: NotificationState = {
-    value: Notification.permission,
-}
+    permission: permissionGranted,
+};
+
+console.log(initialState);
 
 // const requestPermission = createAsyncThunk(
 //     "notification/requestPermission",
@@ -29,18 +32,33 @@ const initialState: NotificationState = {
 //     }
 // )
 
+
+
 const notificationSlice = createSlice({
     name: "notification",
     initialState,
     reducers: {
         setPermission: (data, action: PayloadAction<PermissionState>) => {
             console.log(action.payload);
-            if (action.payload === "prompt") data.value = "default";
-            else data.value = action.payload;
+            if (action.payload === "prompt") data.permission = "default";
+            else data.permission = action.payload;
         }
     },
+    extraReducers: (builder) => {
+        builder.addCase(setIDBNotificationPermission.fulfilled, (state, action) => {
+            state.permission = action.payload;
+        })
+    }
 })
 
-export const { setPermission } = notificationSlice.actions
+const setIDBNotificationPermission = createAsyncThunk<NotificationPermission, PermissionState>(
+    "notification/setIDBPermission",
+    async (permission) => {
+        const res = await db.STORE_SETTINGS({"notification": {"permission": permission === "prompt" ? "default" : permission}}) as I_Settings;
+        return res.notification.permission;
+    }
+)
 
+export const { setPermission } = notificationSlice.actions
+export { setIDBNotificationPermission }
 export default notificationSlice.reducer;

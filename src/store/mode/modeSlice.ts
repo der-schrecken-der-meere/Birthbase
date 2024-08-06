@@ -1,19 +1,17 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit"
+import { __APP_SETTINGS__, db, type I_Settings } from "@/database/db";
 
 type CoreMode = "dark"|"light";
 type Mode = CoreMode|"system";
 
 interface ModeState {
-    value: Mode
+    value: Mode;
 }
 
-const storageKey: string = "ui-mode";
 const root = window.document.body;
 
-const getStorage = () => localStorage.getItem(storageKey) as Mode|null;
 const setStorage = (mode: Mode) => {
     root.classList.remove("light", "dark");
-    localStorage.setItem(storageKey, mode);
     root.classList.add(matchMedia(mode));
 }
 const matchMedia = (mode: Mode): CoreMode => {
@@ -22,7 +20,7 @@ const matchMedia = (mode: Mode): CoreMode => {
 
 const initialState: ModeState = {
     value: (() => {
-        const mode = matchMedia(getStorage() || "dark");
+        const mode = matchMedia(__APP_SETTINGS__?.mode || "dark");
         setStorage(mode);
         return mode;
     })(),
@@ -37,8 +35,23 @@ const modeSlice = createSlice({
             mode.value = action.payload;
         }
     },
+    extraReducers: (builder) => {
+        builder.addCase(setIDBMode.fulfilled, (state, action) => {
+            setStorage(action.payload);
+            state.value = action.payload;
+        })
+    }
 })
 
-export const { setMode } = modeSlice.actions;
+const setIDBMode = createAsyncThunk<Mode, Mode>(
+    "mode/setIDBMode",
+    async (mode) => {
+        const res = await db.STORE_SETTINGS({"mode": mode}) as I_Settings
+        return res.mode;
+    }
+)
 
+export const { setMode } = modeSlice.actions;
+export type { Mode, CoreMode }
+export { setIDBMode }
 export default modeSlice.reducer;

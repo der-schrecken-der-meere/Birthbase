@@ -1,17 +1,17 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { type T_Birthday } from "../../database/db";
+import { type I_Birthday } from "../../database/db";
 
 type Method = "add"|"delete"|"update";
 
 interface DataFormState {
-    value: T_Birthday;
+    value: I_Birthday;
     method: Method;
     open: boolean;
 }
 
 type Opt_DataForm = {
     method?: Method;
-    value?: T_Birthday;
+    value?: I_Birthday;
     open?: boolean;
 }
 
@@ -35,7 +35,7 @@ const dataFormSlice = createSlice({
         changeMethod: (data, action: PayloadAction<Method>) => {
             data.method = action.payload;
         },
-        changeData: (data, action: PayloadAction<T_Birthday>) => {
+        changeData: (data, action: PayloadAction<I_Birthday>) => {
             data.value = action.payload;
         },
         toggleOpen: (data) => {
@@ -46,7 +46,7 @@ const dataFormSlice = createSlice({
             data.method = action.payload?.method ? action.payload.method : data.method;
             data.open = action.payload?.open ? action.payload.open : data.open;
         },
-        changeDataInitial: (data, action?: PayloadAction<Opt_DataForm>) => {
+        changeDataInitial: (data, action: PayloadAction<Opt_DataForm>) => {
             data.value = action?.payload?.value ? action.payload.value : initialState.value;
             data.method = action?.payload?.method ? action.payload.method : initialState.method;
             data.open = action?.payload?.open ? action.payload.open : initialState.open;

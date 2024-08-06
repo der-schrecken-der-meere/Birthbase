@@ -1,13 +1,14 @@
 {
   "package": {
     "productName": "birthbases",
-    "version": "0.1.0"
+    "version": "0.0.9"
   },
   "build": {
     "beforeDevCommand": "npm run dev",
     "devPath": "http://localhost:1420",
     "beforeBuildCommand": "npm run build",
-    "distDir": "../dist"
+    "distDir": "../dist",
+    "withGlobalTauri": true
   },
   "tauri": {
     "allowlist": {
@@ -81,7 +82,7 @@
       "dialog": false,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDcwN0Q3MDdEOTM2ODQ2QTcKUldTblJtaVRmWEI5Y0t0MEorK0JjRC96Q1dQNDFvNExLMDRTWG9OajR2b0JXM2dyNWVKSlZTNFoK",
       "endpoints": [
-        "https://releases.myapp.com/{{target}}/{{arch}}/{{current_version}}"
+        "https://github.com/der-schrecken-der-meere/Birthbase/releases/download/app-v0.1.0/latest.json"
       ],
       "windows": {
         "installMode": "passive",

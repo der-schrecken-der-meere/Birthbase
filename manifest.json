@@ -1,0 +1,45 @@
+{
+    "manifest_version": 2,
+    "author": "Max-Lukas Voigt",
+    "short_name": "Birthbase",
+    "name": "Birthbase",
+    "browser_action": {
+        "default_icon": "assets/32x32.png",
+        "default_title": "Birthbase"
+    },
+    "icons": [
+        {
+            "src": "/assets/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/assets/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ],
+    "start_url": "/?source=pwa",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "scope": "/",
+    "theme-color": "#6d28d9",
+    "shortcuts": [
+        {
+            "name": "Private Geburtstage",
+            "short_name": "Geburtstage",
+            "description": "Übesicht von privaten Geburtstagen",
+            "url": "/my_birthdays",
+            "icons": [
+                {
+                    "src": "/assets/icon-96x96.png",
+                    "sizes": "96x96"
+                }
+            ]
+        }
+    ],
+    "desciption": "__MSG_extensionDescription__",
+    "default_locale": "de"
+}

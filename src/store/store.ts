@@ -4,14 +4,18 @@ import colorReducer from "./color/colorSlice";
 import dataReducer from "./data/dataSlice";
 import dataFormReducer from "./dataForm/dataFormSlice";
 import notificationReducer from "./notification/notificationSlice";
+import tauriReducer from "./tauri/tauriSlice";
+import mediaTypeReducer from "./mediaType/mediaTypeSlice";
 
 export const store = configureStore({
     reducer: {
-        mode: modeReducer,
         color: colorReducer,
+        mode: modeReducer,
         data: dataReducer,
         dataForm: dataFormReducer,
         notification: notificationReducer,
+        tauri: tauriReducer,
+        mediaType: mediaTypeReducer,
     }
 });
 
