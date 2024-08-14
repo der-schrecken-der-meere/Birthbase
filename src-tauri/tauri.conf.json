@@ -1,28 +1,66 @@
 {
-  "package": {
-    "productName": "birthbases",
-    "version": "0.0.9"
+  "app": {
+    "enableGTKAppId": true,
+    "macOSPrivateApi": true,
+    "security": {
+      "assetProtocol": {
+        "enable": false,
+        "scope": []
+      },
+      "capabilities": [],
+      "csp": "default-src 'self'",
+      "dangerousDisableAssetCspModification": false,
+      "devCsp": null,
+      "freezePrototype": false,
+      "pattern": {
+        "use": "brownfield"
+      }
+    },
+    "windows": [
+      {
+        "closable": true,
+        "decorations": true,
+        "focus": true,
+        "height": 600,
+        "maximizable": true,
+        "minHeight": 600,
+        "minimizable": true,
+        "minWidth": 340,
+        "proxyUrl": "http://birthbase.app",
+        "resizable": true,
+        "shadow": true,
+        "theme": "Dark",
+        "title": "Birthbase",
+        "width": 800,
+        "x": 0,
+        "y": 0,
+        "zoomHotkeysEnabled": true
+      }
+    ],
+    "withGlobalTauri": true
   },
   "build": {
     "beforeDevCommand": "npm run dev",
-    "devPath": "http://localhost:1420",
+    "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "npm run build",
-    "distDir": "../dist",
-    "withGlobalTauri": true
+    "frontendDist": "../dist"
   },
-  "tauri": {
-    "allowlist": {
-      "all": true
-    },
-    "bundle": {
-      "longDescription": "A Webapplication for managing and storing birthdays and messaging yourself if a birthday is soon",
-      "active": true,
+  "bundle": {
+    "active": true,
+    "category": "Utility",
+    "icon": [
+      "icons/icon.ico"
+    ],
+    "linux": {
       "appimage": {
         "bundleMediaFramework": false
       },
       "deb": {
         "files": {}
-      },
+      }
+    },
+    "longDescription": "An Application for managing and storing birthdays and messaging yourself if a birthday is soon",
+    "macOS": {
       "dmg": {
         "appPosition": {
           "x": 180,
@@ -37,70 +75,37 @@
           "width": 660
         }
       },
-      "icon": [
-        "icons/icon.ico"
-      ],
-      "identifier": "com.max-voigt.dev",
-      "macOS": {
-        "minimumSystemVersion": "10.13"
+      "minimumSystemVersion": "10.13"
+    },
+    "targets": "all",
+    "windows": {
+      "allowDowngrades": true,
+      "certificateThumbprint": null,
+      "digestAlgorithm": null,
+      "nsis": null,
+      "signCommand": null,
+      "timestampUrl": null,
+      "tsp": false,
+      "webviewFixedRuntimePath": null,
+      "webviewInstallMode": {
+        "silent": true,
+        "type": "downloadBootstrapper"
       },
-      "rpm": {
-        "epoch": 0,
-        "files": {},
-        "release": "1"
-      },
-      "targets": "all",
-      "useLocalToolsDir": false,
-      "windows": {
-        "allowDowngrades": true,
-        "certificateThumbprint": null,
-        "digestAlgorithm": null,
-        "nsis": null,
-        "signCommand": null,
-        "timestampUrl": null,
-        "tsp": false,
-        "webviewFixedRuntimePath": null,
-        "webviewInstallMode": {
-          "silent": true,
-          "type": "downloadBootstrapper"
-        },
-        "wix": null
-      }
-    },
-    "macOSPrivateApi": false,
-    "pattern": {
-      "use": "brownfield"
-    },
-    "security": {
-      "dangerousDisableAssetCspModification": false,
-      "dangerousRemoteDomainIpcAccess": [],
-      "dangerousUseHttpScheme": false,
-      "freezePrototype": false
-    },
+      "wix": null
+    }
+  },
+  "identifier": "com.maxvoigt.Birthbase",
+  "plugins": {
     "updater": {
-      "active": true,
-      "dialog": false,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDcwN0Q3MDdEOTM2ODQ2QTcKUldTblJtaVRmWEI5Y0t0MEorK0JjRC96Q1dQNDFvNExLMDRTWG9OajR2b0JXM2dyNWVKSlZTNFoK",
       "endpoints": [
-        "https://github.com/der-schrecken-der-meere/Birthbase/releases/download/app-v0.1.0/latest.json"
+        "https://github.com/der-schrecken-der-meere/Birthbase/releases/latest/download/latest.json"
       ],
       "windows": {
-        "installMode": "passive",
-        "installerArgs": []
+        "installMode": "passive"
       }
-    },
-    "windows": [
-      {
-        "title": "Birthbase",
-        "width": 800,
-        "height": 600,
-        "resizable": true,
-        "x": 0,
-        "y": 0,
-        "theme": "Dark",
-        "skipTaskbar": false,
-        "decorations": true
-      }
-    ]
-  }
+    }
+  },
+  "productName": "birthbases",
+  "version": "0.0.9"
 }

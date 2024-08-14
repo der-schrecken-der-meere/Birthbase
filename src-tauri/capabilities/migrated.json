@@ -1,0 +1,14 @@
+{
+  "identifier": "migrated",
+  "description": "permissions that were migrated from v1",
+  "local": true,
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "notification:default",
+    "updater:default",
+    "core:app:allow-version",
+    "core:app:allow-tauri-version"
+  ]
+}

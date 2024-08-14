@@ -1,7 +1,7 @@
 import type { Dispatch, UnknownAction } from "@reduxjs/toolkit";
 import {
-    checkUpdate
-} from "@tauri-apps/api/updater";
+    check
+} from "@tauri-apps/plugin-updater";
 import {
     getTauriVersion,
     getVersion
@@ -9,11 +9,14 @@ import {
 import { setUpdateState, setManifest, setMetaData } from "../store/tauri/tauriSlice";
 
 export default async (dispatch: Dispatch<UnknownAction>) => {
-    const { shouldUpdate, manifest } = await checkUpdate()
+    const update = await check();
     const version = await getVersion();
     const tauriVersion = await getTauriVersion();
 
-    dispatch(setUpdateState( shouldUpdate ? "updateavailable" : "uptodate" ));
-    dispatch(setManifest(manifest));  
+    dispatch(setUpdateState( update?.available ? "available" : "latest" ));
+    if (update) dispatch(setManifest({
+        currentVersion: update.currentVersion,
+        updateVersion: update.version,
+    }));
     dispatch(setMetaData({version, tauriVersion}));
-} 
+}

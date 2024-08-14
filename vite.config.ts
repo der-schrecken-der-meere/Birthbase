@@ -1,12 +1,11 @@
 import { defineConfig } from 'vite'
 import path from "path"
 import react from '@vitejs/plugin-react'
-import { internalIpV4 } from "internal-ip";
 
-// const mobile = !!/android|ios/.exec(process.env.TAURI_ENV_PLATFORM);
+const host = process.env.TAURI_ENV_HOST;
 
 // https://vitejs.dev/config/
-export default defineConfig(async () => ({
+export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
@@ -21,24 +20,25 @@ export default defineConfig(async () => ({
   clearScreen: false,
 //   // 2. tauri expects a fixed port, fail if that port is not available
   server: {
+    host: host || false,
     port: 1420,
     strictPort: true,
 //     host: mobile ? "0.0.0.0" : false,
-    // hmr: mobile
-//       ? {
-//           protocol: "ws",
-//           host: await internalIpV4(),
-//           port: 1421,
-//         }
-//       : undefined,
+    hmr: host
+      ? {
+          protocol: "ws",
+          host: host,
+          port: 1430,
+        }
+      : undefined,
     watch: {
       // 3. tell vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
     },
   },
-//   build: {
-    // target: ["es2021", "chrome126", "safari13"],
-    // minify: !process.env.TAURI_DEBUG ? "esbuild" : false,
-    // sourcemap: true/*!!process.env.TAURI_DEBUG*/,
-//   }
-}))
+  build: {
+    target: ["esNext", "chrome126", "safari13"],
+    minify: !process.env.TAURI_DEBUG ? "esbuild" : false,
+    sourcemap: true/*!!process.env.TAURI_DEBUG*/,
+  }
+})

@@ -28,7 +28,7 @@ import {
 import { NavLink } from 'react-router-dom';
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import { RadioGroupItem, RadioGroup } from '@/components/ui/radio-group';
-import { SelectProps, SelectTriggerProps } from '@radix-ui/react-select';
+import { SelectProps } from '@radix-ui/react-select';
 
 const Settings = () => {
     return (
@@ -108,9 +108,11 @@ const NavigationLink = ({
             relative="path"
             className={"flex items-center py-2 px-4 gap-4 rounded-md hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"}
         >
-            {icon}
-            <div>
-                <div className='flex'>{children}</div>
+            <div className="w-min">
+                {icon}
+            </div>
+            <div className='flex-1 min-w-0'>
+                <div className='overflow-hidden text-ellipsis whitespace-pre'>{children}</div>
                 {caption && <span className='text-sm text-muted-foreground'>{caption}</span>}   
             </div>
             <LuChevronRight className='ml-auto'/>
@@ -133,14 +135,14 @@ const NavigationEntry = ({
 }: I_NavigationEntry) => {
     return (
         <div className='flex items-center py-2 gap-4'>
-            {onlyWrapp ? children : 
+            {onlyWrapp ? children :
             <>
                 <div className='relative w-full'>
                     <div>{children}</div>
-                    {caption && <span className='text-sm text-muted-foreground'>{caption}</span>}    
+                    {caption && <span className='text-sm text-muted-foreground'>{caption}</span>}
                 </div>
                 {rightElement && 
-                    <div className='ml-auto grid place-items-center'>
+                    <div className='ml-auto grid place-items-center text-nowrap'>
                         {rightElement}
                     </div>
                 }
@@ -227,25 +229,6 @@ const SelectAsRadio = ({
         </Drawer>
     );
 }
-
-// interface I_Section {
-//     children: React.ReactElement | React.ReactElement[];
-//     id: string;
-//     header: string;
-// }
-
-// const Section = ({
-//     children,
-//     id,
-//     header,
-// }: I_Section) => {
-//     return (
-//         <section className="space-y-4" id={id}>
-//             <h2 className='text-2xl tracking-tight font-medium border-b pb-2 mb-6'>{header}</h2>
-//             {children}
-//         </section>
-//     )
-// }
 
 export default Settings;
 export { NavigationEntry, NavigationLink, SelectAsRadio, SelectShortend };

@@ -18,15 +18,5 @@
 // }
 
 fn main() {
-    let _ = fix_path_env::fix();
-    // birthday_lib::run();
-    tauri::Builder::default()
-        // .plugin(tauri_plugin_notification::init())
-        // .invoke_handler(tauri::generate_handler![greet])
-        .run(tauri::generate_context!())
-        .expect("error while runnung tauri application")
+    app::run();
 }
-
-
-
-

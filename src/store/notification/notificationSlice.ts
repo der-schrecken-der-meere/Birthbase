@@ -1,7 +1,9 @@
 import { isTauri } from "@/constants/tauri";
 import { db, type I_Settings } from "@/database/db";
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { isPermissionGranted, requestPermission } from '@tauri-apps/api/notification';
+import { isPermissionGranted } from '@tauri-apps/plugin-notification';
+
+console.log(isPermissionGranted);
 
 interface NotificationState {
     permission: NotificationPermission;

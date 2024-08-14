@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { Checkbox } from "@/components/ui/checkbox.jsx"
+import { Checkbox } from "@/components/ui/checkbox"
 import type Decimal from "decimal.js"
 
 export type StorageSize = {
@@ -36,7 +36,7 @@ export const columns: ColumnDef<StorageSize>[] = [
     },
     {
         accessorKey: "size",
-        accessorFn: (data, index) => {
+        accessorFn: (data) => {
             return data.size
         },
         header: "Größe",

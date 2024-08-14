@@ -1,6 +1,6 @@
 import type { Color } from "@/store/color/colorSlice";
 import type { Mode } from "@/store/mode/modeSlice";
-import Dexie, { type EntityTable, type PromiseExtended, type Table, type UpdateSpec } from "dexie";
+import Dexie, { type PromiseExtended } from "dexie";
 
 
 interface I_Birthday {

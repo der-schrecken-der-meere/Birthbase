@@ -21,7 +21,6 @@ import Home from '@/pages/Home';
 import MainLayout from '@/layouts/MainLayout';
 
 // Store Slices
-import { setIDBNotificationPermission } from "./store/notification/notificationSlice";
 import { isTauri } from "./constants/tauri";
 import initTauri from "./backend/init";
 
@@ -32,12 +31,11 @@ import { useMediaQuery } from "react-responsive";
 import Appearance from '@/pages/Settings/Appearance/Appearance';
 import Notifications from "@/pages/Settings/Notifications/Notifications";
 import Info from "@/pages/Settings/Info/Info";
-import { __APP_SETTINGS__, db } from "./database/db";
 import Storage from "@/pages/Settings/Storage/Storage";
 import Time from "@/pages/Settings/Time/Time";
 import Language from "@/pages/Settings/Language/Language";
 import { AppDispatch } from "./store/store";
-import { setData } from "./store/data/dataSlice";
+import init from "./init";
 
 const MyBirthdays = lazy(() => import("./pages/MyBirthdays"));
 const Settings = lazy(
@@ -59,23 +57,7 @@ function App() {
     useEffect(() => {
         (async () => {
             if (isTauri) await initTauri(dispatch);
-
-            const perm = await navigator.permissions.query({
-                name: "notifications",
-            });
-
-            console.log(perm.state);
-
-            if (!__APP_SETTINGS__) dispatch(setIDBNotificationPermission(perm.state));
-            else dispatch(setIDBNotificationPermission(__APP_SETTINGS__.notification.permission as PermissionState));
-            perm.onchange = (e) => {
-                console.log((e.target as PermissionStatus).state);
-                dispatch(setIDBNotificationPermission((e.target as PermissionStatus).state));
-            }
-            await new Promise(resolve => setTimeout(resolve, 1000))
-
-            const birthdayData = await db.GET(undefined, "birthday");
-            dispatch(setData(birthdayData));
+            await init(dispatch);
 
             setIsloading(false);
         })();

@@ -1,8 +1,10 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { UpdateManifest } from "@tauri-apps/api/updater";
 
-type UpdateStatus = "uptodate"|"updateavailable"|"notallowed"
-type Manifest = undefined | UpdateManifest;
+type UpdateStatus = "latest"|"available"|"notallowed"
+type Manifest = {
+    currentVersion: string,
+    updateVersion: string,
+};
 
 type MetaData = {
     version: string;
@@ -16,7 +18,7 @@ type OptMetaData = {
 
 interface TauriState {
     updateState: UpdateStatus;
-    manifest: Manifest;
+    manifest: Manifest | undefined;
     metaData: MetaData;
 }
 

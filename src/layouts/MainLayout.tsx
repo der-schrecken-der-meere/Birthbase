@@ -1,4 +1,4 @@
-import React, {
+import {
     useRef,
     Suspense,
 } from 'react'
@@ -19,7 +19,7 @@ const MainLayout = () => {
         <div
             className={`
                 h-screen text-sans text-main-text
-                grid grid-rows-[minmax(0,1fr)_minmax(0,6rem)] 
+                grid grid-rows-[minmax(0,1fr)_max-content] 
                 md:grid-rows-1 md:grid-cols-[220px_minmax(0,1fr)]
             `}
         >
