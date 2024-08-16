@@ -6,6 +6,8 @@ import dataFormReducer from "./dataForm/dataFormSlice";
 import notificationReducer from "./notification/notificationSlice";
 import tauriReducer from "./tauri/tauriSlice";
 import mediaTypeReducer from "./mediaType/mediaTypeSlice";
+import appReducer from "./app/appSlice";
+import updateReducer from "./update/updateSlice";
 
 export const store = configureStore({
     reducer: {
@@ -16,6 +18,8 @@ export const store = configureStore({
         notification: notificationReducer,
         tauri: tauriReducer,
         mediaType: mediaTypeReducer,
+        app: appReducer,
+        update: updateReducer,
     }
 });
 

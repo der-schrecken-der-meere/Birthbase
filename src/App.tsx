@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 
 // React Redux
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 // Pages
 // import Settings from "./pages/Settings";
@@ -21,7 +21,7 @@ import Home from '@/pages/Home';
 import MainLayout from '@/layouts/MainLayout';
 
 // Store Slices
-import { isTauri } from "./constants/tauri";
+import { isTauri } from "./constants/environment";
 import initTauri from "./backend/init";
 
 import { ModuleLoader } from "./layouts/MainLayout";
@@ -34,8 +34,10 @@ import Info from "@/pages/Settings/Info/Info";
 import Storage from "@/pages/Settings/Storage/Storage";
 import Time from "@/pages/Settings/Time/Time";
 import Language from "@/pages/Settings/Language/Language";
-import { AppDispatch } from "./store/store";
+import { AppDispatch, RootState } from "./store/store";
 import init from "./init";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { setBooting } from "./store/app/appSlice";
 
 const MyBirthdays = lazy(() => import("./pages/MyBirthdays"));
 const Settings = lazy(
@@ -47,9 +49,8 @@ const Settings = lazy(
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-function App() {
-    const [isLoading, setIsloading] = useState(true);
-
+const App = () => {
+    const isBooting = useSelector((state: RootState) => state.app.isBooting);
     const dispatch = useDispatch<AppDispatch>();
 
     console.log("App wird gerendert");
@@ -59,7 +60,7 @@ function App() {
             if (isTauri) await initTauri(dispatch);
             await init(dispatch);
 
-            setIsloading(false);
+            dispatch(setBooting(false));
         })();
     }, []) 
 
@@ -86,20 +87,20 @@ function App() {
     );
 
     return (
-        <>
+        <ErrorBoundary fallback={<p>Something went wrong</p>}>
             <MediaQuery/>
             {
-                isLoading ? 
+                isBooting ? 
                     <div className="h-screen">
                         <ModuleLoader msg="App wird initialisiert" />
                     </div>
                     :
                     <RouterProvider router={_router}/>
             }
-        </>
-        
+        </ErrorBoundary>
     );
 }
+
 
 const MediaQuery = () => {
     const dispatch = useDispatch();

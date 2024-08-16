@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Switch } from '@/components/ui/switch';
 import { requestPermission } from '@tauri-apps/plugin-notification';
 import { setIDBNotificationPermission } from '@/store/notification/notificationSlice';
-import { isTauri } from "@/constants/tauri";
+import { isTauri } from "@/constants/environment";
 import { LuInfo } from 'react-icons/lu';
 import { 
     Popover,

@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { Platform } from "@tauri-apps/plugin-os";
 
 type UpdateStatus = "latest"|"available"|"notallowed"
 type Manifest = {
@@ -20,10 +21,12 @@ interface TauriState {
     updateState: UpdateStatus;
     manifest: Manifest | undefined;
     metaData: MetaData;
+    platform: Platform | undefined;
 }
 
 const initialState: TauriState = {
     updateState: "notallowed",
+    platform: undefined,
     manifest: undefined,
     metaData: {
         version: "",
@@ -31,8 +34,8 @@ const initialState: TauriState = {
     }
 }
 
-const updateSlice = createSlice({
-    name: "update",
+const tauriSlice = createSlice({
+    name: "taurio",
     initialState,
     reducers: {
         setUpdateState: (data, action: PayloadAction<UpdateStatus>) => {
@@ -44,10 +47,13 @@ const updateSlice = createSlice({
         setMetaData: (data, action: PayloadAction<OptMetaData>) => {
             action.payload?.tauriVersion && (data.metaData.tauriVersion = action.payload.tauriVersion);
             action.payload?.version && (data.metaData.version = action.payload.version);
+        },
+        setPlatform: (data, action: PayloadAction<Platform>) => {
+            data.platform = action.payload;
         }
     }
 })
 
-export const { setUpdateState, setManifest, setMetaData } = updateSlice.actions;
+export const { setUpdateState, setManifest, setMetaData } = tauriSlice.actions;
 
-export default updateSlice.reducer;
+export default tauriSlice.reducer;

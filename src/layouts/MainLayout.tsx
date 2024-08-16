@@ -6,13 +6,15 @@ import Navbar from '@/components/Navbar'
 import { Outlet } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import { TailSpin } from 'react-loader-spinner'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { getMediaScreen } from '../store/mediaType/mediaTypeSlice'
-import type { RootState } from '@/store/store'
+import { AppDispatch, type RootState } from '@/store/store'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { isTauri } from '@/constants/environment'
+import { Button } from '@/components/ui/button'
 // import anime from 'animejs'
 
 const MainLayout = () => {
-
     const mainRef = useRef(null);
 
     return (
@@ -37,12 +39,37 @@ const MainLayout = () => {
                 <Toaster/>
             </main>
             <Navigation className="md:col-start-1 md:col-end-2"/>
+            <Updater/>
         </div>
     )
 }
 
 interface I_Navigation {
     className?: string;
+}
+
+const Updater = () => {
+    const update = useSelector((state: RootState) => state.tauri.updateState);
+    const dispatch = useDispatch<AppDispatch>();
+
+    return (
+        (isTauri && update === "available") ? (
+            <Dialog defaultOpen={true}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Update wurde gefunden</DialogTitle>
+                        <DialogDescription>Updaten Sie die Applikation auf die neuste Version</DialogDescription>
+                    </DialogHeader>
+                    <div className='flex items-center justify-between'>
+                        <Button onClick={() => console.log("herunter")}>Herunterladen</Button>
+                        <DialogClose asChild>
+                            <Button variant="secondary">Abbrechen</Button>
+                        </DialogClose>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        ): null
+    );
 }
 
 const Navigation = ({

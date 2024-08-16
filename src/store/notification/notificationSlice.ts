@@ -1,4 +1,4 @@
-import { isTauri } from "@/constants/tauri";
+import { isTauri } from "@/constants/environment";
 import { db, type I_Settings } from "@/database/db";
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { isPermissionGranted } from '@tauri-apps/plugin-notification';

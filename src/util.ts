@@ -148,12 +148,21 @@ const getAllStorages = async () => {
     } catch (e) {
         throw new Error(e as string);
     }
+}
 
-    
+const strict_OR = <T>(variable: T, ...compare: T[]) => {
+    let v = false;
+    for (const e of compare) {
+        if (variable === e) {
+            v = true;
+            break;
+        }
+    }
+    return v;
 }
 
 const Format = {
     Byte: IntlByteFormat,
 }
 
-export { storageSize, StorageType, toSmallestByteType, objIsEmpty, Format, getAllStorages }
+export { storageSize, StorageType, toSmallestByteType, objIsEmpty, Format, getAllStorages, strict_OR }

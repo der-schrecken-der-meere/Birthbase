@@ -8,7 +8,7 @@
         "scope": []
       },
       "capabilities": [],
-      "csp": "default-src 'self'",
+      "csp": null,
       "dangerousDisableAssetCspModification": false,
       "devCsp": null,
       "freezePrototype": false,

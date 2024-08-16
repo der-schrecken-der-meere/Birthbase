@@ -1,7 +1,7 @@
 import PageWrapper from '@/components/PageWrapper'
 import { NavigationEntry } from '../Settings'
 import { Separator } from '@/components/ui/separator'
-import { isTauri } from '@/constants/tauri'
+import { isTauri } from '@/constants/environment'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store/store'
 
