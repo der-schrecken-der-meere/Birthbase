@@ -1,5 +1,6 @@
 import { AppDispatch } from "@/store/store";
 import { check } from "@tauri-apps/plugin-updater"
+import { relaunch } from "@tauri-apps/plugin-process"
 import { startDownload, updateProgress, finishDownload } from "@/store/update/updateSlice";
 
 const installUpdate = async (dispatch: AppDispatch) => {
@@ -19,4 +20,9 @@ const installUpdate = async (dispatch: AppDispatch) => {
                 break;
         }
     })
+
+    console.log("Update installiert");
+    await relaunch();
 }
+
+export { installUpdate };

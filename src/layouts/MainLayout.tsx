@@ -12,6 +12,8 @@ import { AppDispatch, type RootState } from '@/store/store'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { isTauri } from '@/constants/environment'
 import { Button } from '@/components/ui/button'
+import { installUpdate } from '@/backend/updater'
+import { Progress } from '@/components/ui/progress'
 // import anime from 'animejs'
 
 const MainLayout = () => {
@@ -49,23 +51,29 @@ interface I_Navigation {
 }
 
 const Updater = () => {
-    const update = useSelector((state: RootState) => state.tauri.updateState);
+    const updateState = useSelector((state: RootState) => state.tauri.updateState);
+    const update = useSelector((state: RootState) => state.update);
     const dispatch = useDispatch<AppDispatch>();
 
     return (
-        (isTauri && update === "available") ? (
+        (isTauri && updateState === "available") ? (
             <Dialog defaultOpen={true}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Update wurde gefunden</DialogTitle>
                         <DialogDescription>Updaten Sie die Applikation auf die neuste Version</DialogDescription>
                     </DialogHeader>
-                    <div className='flex items-center justify-between'>
-                        <Button onClick={() => console.log("herunter")}>Herunterladen</Button>
-                        <DialogClose asChild>
-                            <Button variant="secondary">Abbrechen</Button>
-                        </DialogClose>
-                    </div>
+                    {update.downloading ? (
+                        <Progress value={update.progress} />
+                    ) : (
+                        <div className='flex items-center justify-between'>
+                            <Button onClick={() => installUpdate(dispatch)}>Herunterladen</Button>
+                            <DialogClose asChild>
+                                <Button variant="secondary">Abbrechen</Button>
+                            </DialogClose>
+                        
+                        </div>
+                    )}
                 </DialogContent>
             </Dialog>
         ): null

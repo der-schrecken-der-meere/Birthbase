@@ -19,10 +19,6 @@ custom-protocol = ["tauri/custom-protocol"]
 default = ["custom-protocol"]
 
 [dependencies]
-# chrono = "0.4.38"
-# warp = "0.3.7"
-# tokio = "1.38.0"
-# rocket= "0.5.1"
 tauri = { version = "2.0.0-rc", features = [ "macos-private-api", "tray-icon"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -30,6 +26,7 @@ fix-path-env = { git = "https://github.com/tauri-apps/fix-path-env-rs"}
 tauri-plugin-notification = "2.0.0-rc.0"
 tauri-plugin-os = "2.0.0-rc.0"
 tauri-plugin-updater = "^2.0.0-beta.12"
+tauri-plugin-process = "2.0.0-rc.0"
 
 [profile.dev]
 incremental = true
