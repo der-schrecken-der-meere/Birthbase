@@ -25,71 +25,35 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
-      - name: Install Ubuntu dependencies
-        if: matrix.platform == 'ubuntu-22.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         # NOTE: enterprise developers may hard code a version
         with:
           node-version: 'lts/*'
           cache: npm
-          node-version-file: '.nvmrc'
-
+        
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
           # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
-
-      # - name: Setup Rust
-      #   run: |
-      #     rustup update --no-self-update
-
+          
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
+          
+      - name: Install Ubuntu dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: Install frontend
         run: |
           npm install
           
-      - name: CI Upload Windows
-        if: ${{ github.ref_type == 'branch' && matrix.platform == 'windows-latest' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: 'Windows Installers'
-          path: |
-            src-tauri/release/bundle/msi/*.msi
-            src-tauri/release/bundle/nsis/*.exe
-
-      - name: CI Upload macOS
-        if: ${{ github.ref_type == 'branch' && matrix.platform == 'macos-latest' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: 'macOS Installer'
-          path: |
-            src-tauri/release/bundle/dmg/*.dmg
-
-      - name: CI Upload Linux
-        if: ${{ github.ref_type == 'branch' && matrix.platform == 'ubuntu-latest' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: 'Linux Distributions'
-          path: |
-            src-tauri/target/release/bundle/deb/*.deb
-            src-tauri/target/release/bundle/AppImage/*.AppImage
-            
-      # - name: CI Build
-      #   if: ${{ github.ref_type == 'branch' }}
-      #   run: |
-      #     npm ls
-
       # - name: CI Upload Windows
       #   if: ${{ github.ref_type == 'branch' && matrix.platform == 'windows-latest' }}
       #   uses: actions/upload-artifact@v4
@@ -130,7 +94,6 @@ jobs:
           releaseName: "APP v__VERSION__"
           releaseBody: |
             ${{needs.changelog.outputs.changelog}}
-            See the assets to download this version and install.
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
