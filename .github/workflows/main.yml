@@ -59,8 +59,7 @@ jobs:
           # tauri-action replaces \_\_VERSION\_\_ with the app version
           tagName: app-v__VERSION__
           releaseName: "APP v__VERSION__"
-          releaseBody: |
-            ${{needs.changelog.outputs.changelog}}
+          releaseBody: ""
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
