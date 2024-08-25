@@ -1,9 +1,7 @@
 import { isTauri } from "@/constants/environment";
-import { db, type I_Settings } from "@/database/db";
+import { storeSettings } from "@/database/birthbase";
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { isPermissionGranted } from '@tauri-apps/plugin-notification';
-
-console.log(isPermissionGranted);
 
 interface NotificationState {
     permission: NotificationPermission;
@@ -15,26 +13,9 @@ if (isTauri) {
     console.log(permissionGranted);
 }
 
-console.log(permissionGranted);
-
 const initialState: NotificationState = {
     permission: permissionGranted,
 };
-
-console.log(initialState);
-
-// const requestPermission = createAsyncThunk(
-//     "notification/requestPermission",
-//     async (data, thunkAPI) => {
-//         if (notificationExists()) {
-//             if (data.value === "default") {
-//                 const a = await Notification.requestPermission()
-//             }
-//         }
-//     }
-// )
-
-
 
 const notificationSlice = createSlice({
     name: "notification",
@@ -56,8 +37,8 @@ const notificationSlice = createSlice({
 const setIDBNotificationPermission = createAsyncThunk<NotificationPermission, PermissionState>(
     "notification/setIDBPermission",
     async (permission) => {
-        const res = await db.STORE_SETTINGS({"notification": {"permission": permission === "prompt" ? "default" : permission}}) as I_Settings;
-        return res.notification.permission;
+        const res = await storeSettings({"permissions": {"notification": permission === "prompt" ? "default" : permission}});
+        return res.permissions.notification;
     }
 )
 

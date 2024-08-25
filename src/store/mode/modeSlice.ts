@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit"
-import { __APP_SETTINGS__, db, type I_Settings } from "@/database/db";
+import { __APP_SETTINGS__, storeSettings } from "@/database/birthbase";
 
 type CoreMode = "dark"|"light";
 type Mode = CoreMode|"system";
@@ -20,8 +20,8 @@ const matchMedia = (mode: Mode): CoreMode => {
 
 const initialState: ModeState = {
     value: (() => {
-        const mode = matchMedia(__APP_SETTINGS__?.mode || "dark");
-        setStorage(mode);
+        const mode = __APP_SETTINGS__?.mode || "system";
+        setStorage(matchMedia(mode));
         return mode;
     })(),
 }
@@ -46,7 +46,7 @@ const modeSlice = createSlice({
 const setIDBMode = createAsyncThunk<Mode, Mode>(
     "mode/setIDBMode",
     async (mode) => {
-        const res = await db.STORE_SETTINGS({"mode": mode}) as I_Settings
+        const res = await storeSettings({"mode": mode});
         return res.mode;
     }
 )

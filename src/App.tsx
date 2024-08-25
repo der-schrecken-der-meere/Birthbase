@@ -1,4 +1,4 @@
-import { useEffect, lazy, useState } from "react";
+import { useEffect, lazy } from "react";
 
 // React Routers
 import { 
@@ -41,10 +41,7 @@ import { setBooting } from "./store/app/appSlice";
 
 const MyBirthdays = lazy(() => import("./pages/MyBirthdays"));
 const Settings = lazy(
-    () => 
-        // new Promise(resolve => setTimeout(resolve, 300)).then(a => 
-            import("./pages/Settings/Settings")
-        // )    
+    () => import("./pages/Settings/Settings")
 );
 
 const NotFound = lazy(() => import("./pages/NotFound"));

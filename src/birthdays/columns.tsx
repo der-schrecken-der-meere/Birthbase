@@ -17,7 +17,7 @@ import { calcAge, calcDaysUntilNextBirthday } from '../util';
 import { MdKeyboardArrowUp, MdKeyboardArrowDown, MdMoreHoriz, MdOutlineEdit } from "react-icons/md";
 import { RxCaretSort } from "react-icons/rx";
 import { LuTrash2 } from "react-icons/lu"
-import { db } from "../database/db";
+import { db } from "../database/dexie_db";
 
 
 

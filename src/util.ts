@@ -1,6 +1,6 @@
 import { Decimal } from "decimal.js"
 import type { StorageSize } from "./storagesize/columns";
-import { db } from "./database/db";
+import { db } from "./database/dexie_db";
 
 export function calcAge (birthDate: Date, currentDate: Date) {
     let age = currentDate.getFullYear() - birthDate.getFullYear();

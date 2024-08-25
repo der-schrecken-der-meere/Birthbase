@@ -1,4 +1,4 @@
-import { __APP_SETTINGS__, db, type I_Settings } from "@/database/db";
+import { __APP_SETTINGS__, storeSettings } from "@/database/birthbase";
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 const colors = ["blue", "gray", "green", "orange", "purple", "red"] as const;
@@ -12,7 +12,7 @@ interface ColorState {
 
 const root = window.document.body;
 
-const setStorage = (color: Color) => {
+const setClasslist = (color: Color) => {
     root.classList.remove(...colors);
     root.classList.add(asCoreColor(color));
 }
@@ -23,15 +23,15 @@ const asCoreColor = (color: Color): CoreColor => {
 const initialState: ColorState = {
     value: (() => {
         const color = __APP_SETTINGS__?.color || asCoreColor("default")
-        setStorage(color);
+        setClasslist(color);
         return color;
     })(),
 }
 
-const setIDBColor = createAsyncThunk(
+const setIDBColor = createAsyncThunk<Color, Color>(
     "color/setIDBColor",
-    async (color: Color) => {
-        const res = await db.STORE_SETTINGS({"color": color}) as I_Settings;
+    async (color) => {
+        const res = await storeSettings({color});
         return res.color;
     }
 )
@@ -41,13 +41,13 @@ const colorSlice = createSlice({
     initialState,
     reducers: {
         setColor: (color, action: PayloadAction<Color>) => {
-            setStorage(action.payload);
+            setClasslist(action.payload);
             color.value = action.payload;
         }
     },
     extraReducers: (builder) => {
         builder.addCase(setIDBColor.fulfilled, (state, action) => {
-            setStorage(action.payload);
+            setClasslist(action.payload);
             state.value = action.payload;
         })
     }

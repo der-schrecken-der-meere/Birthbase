@@ -31,7 +31,7 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import { useToast } from '@/components/ui/use-toast';
-import { db } from "../../database/db";
+import { db } from "../../database/dexie_db";
 
 import { useDispatch, useSelector } from 'react-redux';
 import { changeMethod, changeData, changeDataInitial, toggleOpen } from "../../store/dataForm/dataFormSlice";

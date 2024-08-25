@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { type I_Birthday } from "../../database/db";
+import { type I_Birthday } from "../../database/birthbase";
 
 interface DataState {
     value: I_Birthday[],
