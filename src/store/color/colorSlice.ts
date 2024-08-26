@@ -17,6 +17,7 @@ const setClasslist = (color: Color) => {
     root.classList.add(asCoreColor(color));
 }
 const asCoreColor = (color: Color): CoreColor => {
+    // return color === "default" ? "purple" : color;
     return color === "default" ? "purple" : color;
 }
 
