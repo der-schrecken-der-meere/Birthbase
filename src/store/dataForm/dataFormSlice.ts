@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { type I_Birthday } from "../../database/dexie_db";
+import { type I_Birthday } from "../../database/birthbase";
 
 type Method = "add"|"delete"|"update";
 

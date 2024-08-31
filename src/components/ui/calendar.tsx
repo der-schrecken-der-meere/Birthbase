@@ -7,20 +7,23 @@ import { buttonVariants } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { format, setMonth } from "date-fns"
 
+export type CalendarProps = React.ComponentProps<typeof DayPicker>
+export type Arr_Years = {
+  label: string,
+  value: string,
+}[]
+
 function Calendar({
   className,
   classNames,
   showOutsideDays = true,
   ...props
-}) {
+}: CalendarProps) {
   const YearsSelect = React.useMemo(() => {
     const earliestYear = props.fromYear || props.fromMonth?.getFullYear() || props.fromDate?.getFullYear();
     const latestYear = props.toYear || props.toMonth?.getFullYear() || props.toDate?.getFullYear();
 
-    /**
-     * @type {{label: string, value: string}[]}
-     */
-    let selectItems = [];
+    let selectItems: Arr_Years = [];
     if (earliestYear && latestYear) {
       const yearsLength = latestYear - earliestYear + 1;
       selectItems = Array.from({length: yearsLength}, (_, i) => ({
@@ -43,7 +46,7 @@ function Calendar({
   }, [props.fromYear, props.fromMonth, props.fromDate, props.toYear, props.toMonth, props.toDate]);
 
   return (
-    (<DayPicker
+    <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
@@ -82,8 +85,8 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        IconLeft: () => <ChevronLeft className="h-4 w-4" />,
+        IconRight: () => <ChevronRight className="h-4 w-4" />,
         Dropdown: ({ ...props }) => {
           const { locale, fromDate, fromMonth, fromYear, toDate, toMonth, toYear } = useDayPicker();
 
@@ -100,7 +103,7 @@ function Calendar({
                 goToMonth(newDate);
               }} value={props.value?.toString()}>
                 <SelectTrigger>{format(currentMonth, "LLL", {locale})}</SelectTrigger>
-                <SelectContent portal={false}>
+                <SelectContent>
                   {selectItems.map((selectItem) => (
                     <SelectItem key={selectItem.value} value={selectItem.value}>
                       {selectItem.label}
@@ -113,10 +116,7 @@ function Calendar({
             const earliestYear = fromYear || fromMonth?.getFullYear() || fromDate?.getFullYear();
             const latestYear = toYear || toMonth?.getFullYear() || toDate?.getFullYear();
             
-            /**
-             * @type {{label: string, value: string}[]}
-             */
-            let selectItems = [];
+            let selectItems: Arr_Years = [];
 
             if (earliestYear && latestYear) {
               const yearsLength = latestYear - earliestYear + 1;
@@ -141,8 +141,9 @@ function Calendar({
           }
         },
       }}
-      {...props} />)
-  );
+      {...props}
+    />
+  )
 }
 Calendar.displayName = "Calendar"
 

@@ -17,7 +17,7 @@ import { calcAge, calcDaysUntilNextBirthday } from '../util';
 import { MdKeyboardArrowUp, MdKeyboardArrowDown, MdMoreHoriz, MdOutlineEdit } from "react-icons/md";
 import { RxCaretSort } from "react-icons/rx";
 import { LuTrash2 } from "react-icons/lu"
-import { db } from "../database/dexie_db";
+import { db } from "../database/birthbase";
 
 
 
@@ -29,7 +29,7 @@ import { changeDataState } from "../store/dataForm/dataFormSlice"
 import { deleteData } from "../store/data/dataSlice"
 import { Column, ColumnDef } from '@tanstack/react-table';
 
-import { I_Birthday } from "@/database/db";
+import { I_Birthday } from "@/database/birthbase";
 
 interface I_SortHeader<TData> {
     column: Column<TData>
@@ -207,7 +207,7 @@ const AktionDropdown = ({
             }}>Ändern<MdOutlineEdit/></DropdownMenuItem>
             <DropdownMenuItem className="flex gap-2 text-destructive" onClick={async () => {
                 try {
-                    db.DELETE(cell?.id as number);
+                    db.tables.birthdays.delete(cell?.id as number);
                     dispatch(deleteData(cell?.id as number));
                 } catch (e) {
                     console.error(e);

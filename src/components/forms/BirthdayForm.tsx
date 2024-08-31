@@ -1,11 +1,9 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 
-import { createPortal } from "react-dom";
 
-import { cn } from "@/lib/utils"
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
-import { useForm } from "react-hook-form"
+import { SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -31,11 +29,12 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import { useToast } from '@/components/ui/use-toast';
-import { db } from "../../database/dexie_db";
+import { db } from "../../database/birthbase";
 
 import { useDispatch, useSelector } from 'react-redux';
-import { changeMethod, changeData, changeDataInitial, toggleOpen } from "../../store/dataForm/dataFormSlice";
+import { changeMethod, changeData, changeDataInitial } from "../../store/dataForm/dataFormSlice";
 import { addData, updateData, deleteData } from "../../store/data/dataSlice";
+import { RootState } from '@/store/store';
 
 const formSchema = z.object({
     id: z.number(),
@@ -61,27 +60,27 @@ const formSchema = z.object({
     }),
 });
 
-const BirthdayForm = ({
-    customContainer,
-}) => {
+type T_Form = z.infer<typeof formSchema>
+
+const BirthdayForm = () => {
     const { toast } = useToast();
 
     const dispatch = useDispatch();
 
-    const birthday = useSelector((state) => state.dataForm.value);
-    const method = useSelector((state) => state.dataForm.method);
+    const birthday = useSelector((state: RootState) => state.dataForm.value);
+    const method = useSelector((state: RootState) => state.dataForm.method);
 
-    const form = useForm({
+    const form = useForm<T_Form>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             id: birthday.id,
             firstname: birthday.name.first,
             lastname: birthday.name.last,
-            date: birthday.date,
+            date: birthday.date as unknown as Date,
         }
     });
 
-    const onSubmit = async (data) => {
+    const onSubmit: SubmitHandler<T_Form> = async (data) => {
         console.log("OnSubmit: ", data);
         try {
             const newObj = {
@@ -92,30 +91,30 @@ const BirthdayForm = ({
                 },
                 date: data.date.toISOString(),
             }
-            let response;  
             console.log(method, newObj);
             switch (method) {
                 case "add":
-                    response = (await db.POST(newObj))[0];
-                    newObj.id = response.id;
+                    let { id, ...no_id } = newObj;
+                    let add_response = await db.tables.birthdays.create(no_id);
+                    newObj.id = add_response.id;
                     console.log(newObj);
                     dispatch(addData(newObj));
                     dispatch(changeMethod("update"));
                     dispatch(changeData(newObj));
                     form.reset({
                         id: newObj.id,
-                        date: newObj.date,
+                        date: newObj.date as unknown as Date,
                         firstname: newObj.name.first,
                         lastname: newObj.name.last,
                     })
                     break;
                 case "delete":
-                    response = await db.DELETE(newObj.id);
+                    await db.tables.birthdays.delete(newObj.id);
                     dispatch(deleteData(newObj.id));
-                    dispatch(changeDataInitial());
+                    dispatch(changeDataInitial({}));
                     break;
                 case "update":
-                    response = await db.PATCH(newObj);
+                    await db.tables.birthdays.update(newObj);
                     dispatch(changeData(newObj));
                     dispatch(updateData(newObj));
                 break;
@@ -124,10 +123,10 @@ const BirthdayForm = ({
             }
             
         } catch (e) {
-            form.setError("root.serverError", {
-                type: e.statusCode,
-            })
             console.error(e);
+            form.setError("root.serverError", {
+                type: (e as unknown as any).msg,
+            })
         }
         
         toast({
@@ -198,7 +197,7 @@ const BirthdayForm = ({
                                             </Button>
                                         </FormControl>
                                     </PopoverTrigger>
-                                    <PopoverContent container={customContainer} className="w-auto p-0" align="start">
+                                    <PopoverContent className="w-auto p-0" align="start">
                                         <Calendar
                                             locale={de}
                                             fromYear={1900}
@@ -242,11 +241,15 @@ const BirthdayForm = ({
 
 export default BirthdayForm
 
+interface I_ActionButtons {
+    isSubmitting: boolean,
+}
+
 const ActionButtons = memo(({
     isSubmitting,
-}) => {
+}: I_ActionButtons) => {
     const dispatch = useDispatch();
-    const method = useSelector((state) => state.dataForm.method);
+    const method = useSelector((state: RootState) => state.dataForm.method);
 
     return (
         <div className='flex'>
