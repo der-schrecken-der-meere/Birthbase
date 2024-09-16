@@ -8,7 +8,6 @@ class DexieDB extends Dexie implements I_Database_Methods<I_Birthbase> {
 
     constructor() {
         super("BirthdayDB");
-        console.log(this);
         try {
             this.version(1).stores({
                 birthdays: "++id, name, date",
@@ -36,7 +35,6 @@ class DexieDB extends Dexie implements I_Database_Methods<I_Birthbase> {
         record,
     ) => {
         return new Promise((resolve, reject) => {
-            console.log("updated")
             let _recs = Array.isArray(record) ? record : [record];
             let ids = _recs.map(e => e.id);
             this.transaction("rw", this[table], async () => {
@@ -111,7 +109,6 @@ class DexieDB extends Dexie implements I_Database_Methods<I_Birthbase> {
         record,
     ) => {
         return new Promise((resolve, reject) => {
-            console.log("created");
             this.transaction("rw", this[table], async () => {
                 if (Array.isArray(record)) {
                     if (record.length === 0) reject({

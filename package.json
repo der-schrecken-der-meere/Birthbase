@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest",
     "dev": "vite",
+    "dev:create-db-entries": "node automation/scripts/entries",
     "nvmrc": "node -v > .nvmrc",
     "build": "tsc && vite build",
     "postinstall": "npm run nvmrc",
@@ -33,6 +35,7 @@
     "@radix-ui/react-tooltip": "^1.1.2",
     "@reduxjs/toolkit": "^2.2.6",
     "@tanstack/react-table": "^8.17.3",
+    "@tauri-apps/plugin-fs": "^2.0.0-rc.2",
     "@tauri-apps/plugin-notification": "^2.0.0-beta.3",
     "@tauri-apps/plugin-os": "^2.0.0-rc.0",
     "@tauri-apps/plugin-process": "^2.0.0-rc.0",
@@ -40,7 +43,6 @@
     "@tauri-apps/plugin-sql": "^2.0.0-rc.0",
     "@tauri-apps/plugin-updater": "^2.0.0-rc.0",
     "@types/animejs": "^3.1.12",
-    "@types/jest": "^29.5.12",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "animejs": "^3.2.2",
@@ -69,17 +71,24 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.0.0",
+    "@jest/globals": "^29.7.0",
+    "@playwright/test": "^1.47.1",
     "@tauri-apps/api": "^2.0.0-rc.0",
     "@tauri-apps/cli": "^2.0.0-rc.3",
+    "@types/jest": "^29.5.13",
     "@types/node": "^20.14.14",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.19",
+    "cross-env": "^7.0.3",
     "internal-ip": "^7.0.0",
+    "jest": "^29.7.0",
     "postcss": "^8.4.38",
     "react-router-dom": "^6.23.1",
     "tailwindcss": "^3.4.3",
-    "vite": "^5.0.0"
+    "ts-jest": "^29.2.5",
+    "vite": "^5.4.3"
   }
 }

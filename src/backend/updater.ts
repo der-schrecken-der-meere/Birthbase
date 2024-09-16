@@ -1,9 +1,17 @@
-import { AppDispatch } from "@/store/store";
+import { AppDispatch, RootState } from "@/frontend/store/store";
 import { check } from "@tauri-apps/plugin-updater"
 import { relaunch } from "@tauri-apps/plugin-process"
-import { startDownload, updateProgress, finishDownload } from "@/store/update/updateSlice";
+import { startDownload, updateProgress, finishDownload } from "@/frontend/store/update/updateSlice";
+import { UseSelector } from "react-redux";
 
-const installUpdate = async (dispatch: AppDispatch) => {
+/**
+ * Downloads the latest Update
+ * 
+ * Notes: On Windows: the application will be restarted
+ */
+const installUpdate = async (dispatch: AppDispatch, selector: UseSelector) => {
+    const platform = selector((state: RootState) => state.tauri.appInfo.platform);
+
     const update = await check();
     await update?.downloadAndInstall((event) => {
         switch (event.event) {
@@ -21,8 +29,11 @@ const installUpdate = async (dispatch: AppDispatch) => {
         }
     })
 
-    console.log("Update installiert");
-    await relaunch();
+    // Due Windows Installer the application must be restarted or closed
+    // after the update has been downloaded
+    if (platform === "windows") {
+        await relaunch();
+    }
 }
 
 export { installUpdate };

@@ -14,6 +14,7 @@
     "os:allow-os-type",
     "os:allow-platform",
     "process:allow-restart",
-    "sql:default"
+    "sql:default",
+    "fs:default"
   ]
 }

@@ -3,7 +3,7 @@ interface I_Record {
 };
 interface I_DB_Error {
     code?: number;
-    msg: string;
+    msg: any;
 }
 
 type T_Table_Def = {
