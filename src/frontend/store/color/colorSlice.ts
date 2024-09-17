@@ -1,4 +1,4 @@
-import { __APP_SETTINGS__, storeSettings } from "@/database/birthbase";
+import { __INI_APP_SETTINGS__, storeSettings } from "@/database/birthbase";
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 const colors = ["blue", "gray", "green", "orange", "purple", "red"] as const;
@@ -17,13 +17,12 @@ const setClasslist = (color: Color) => {
     root.classList.add(asCoreColor(color));
 }
 const asCoreColor = (color: Color): CoreColor => {
-    // return color === "default" ? "purple" : color;
     return color === "default" ? "purple" : color;
 }
 
 const initialState: ColorState = {
     value: (() => {
-        const color = __APP_SETTINGS__?.color || asCoreColor("default")
+        const color = __INI_APP_SETTINGS__.color || asCoreColor("default")
         setClasslist(color);
         return color;
     })(),
@@ -33,7 +32,8 @@ const setIDBColor = createAsyncThunk<Color, Color>(
     "color/setIDBColor",
     async (color) => {
         const res = await storeSettings({color});
-        return res.color;
+        if (res.color) return res.color;
+        return "default";
     }
 )
 

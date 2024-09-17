@@ -29,4 +29,4 @@ type ExtractPropertyOfArray<
     K extends keyof T[number],
 > = T[number][K];
 
-export type { ISODateFull, ExtractPropertyOfArray }
+export type { ISODateFull, ExtractPropertyOfArray, TypeOrUndefined }

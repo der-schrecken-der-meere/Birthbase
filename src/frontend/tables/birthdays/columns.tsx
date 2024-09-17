@@ -27,7 +27,7 @@ import { db } from "@/database/birthbase";
 import { useDispatch } from 'react-redux';
 
 // Store Slices
-import { changeDataState } from "../../store/dataForm/dataFormSlice"
+import { changeFormState } from "../../store/dataForm/dataFormSlice"
 import { deleteData } from "../../store/data/dataSlice"
 import { ColumnDef } from '@tanstack/react-table';
 
@@ -158,7 +158,7 @@ const AktionDropdown = ({
                     name: cell.name,
                     date: cell.date
                 }
-                dispatch(changeDataState({
+                dispatch(changeFormState({
                     method: "update",
                     value: obj,
                     open: true,

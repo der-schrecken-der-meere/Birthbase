@@ -5,10 +5,10 @@ import { db as DexieDB } from "./dexie_db";
 // import { ISODateFull } from "@/lib/main_utils";
 
 interface I_Settings extends I_Record {
-    mode: Mode;
-    color: Color;
+    mode: Mode | undefined;
+    color: Color | undefined;
     permissions: {
-        notification: NotificationPermission,
+        notification: NotificationPermission | undefined,
     };
 }
 
@@ -86,7 +86,7 @@ const BirthdayConfig: I_Table_Methods_Config<I_Birthbase, "birthdays"> = {
 }
 
 let db: Database<I_Birthbase> = null as unknown as Database<I_Birthbase>; 
-let _: I_Settings[] = null as unknown as I_Settings[];
+let initial_settings: I_Settings[] = [];
 
 try {
     db = new Database<I_Birthbase>(() => {
@@ -104,20 +104,41 @@ try {
         ]
     );
 
-    _ = await db.tables.settings.read()
+    initial_settings = await db.tables.settings.read()
 } catch (error) {
     console.error((error as I_DB_Error).msg);
 }
-const __APP_SETTINGS__ = _[_.length - 1] as I_Settings | undefined;
 
+/**
+ * Settings Config at the start of the application
+ * 
+ * If App has no Config, Config will be filled with undefined values
+ */
+const __INI_APP_SETTINGS__ = await (async () => {
+    // If Config is available then take the first of the array
+    if (initial_settings.length > 0) return initial_settings[0];
+    // Create Config with undefined values if Config not found
+    const settings = await db.tables.settings.create({
+        color: undefined,
+        mode: undefined,
+        permissions: {
+            notification: undefined,
+        }
+    });
+    return settings;
+})();
+
+/**
+ * Updates the given attributes in the Config
+ * 
+ * If nothing passed attributes be the same
+ */
 const storeSettings = async (updates: Omit<Partial<I_Settings>, "id">): Promise<I_Settings> => {
-    const base_settings = (await db.tables.settings.read())[0] as I_Settings | undefined;
-    if (typeof base_settings === "undefined") {
-        return db.tables.settings.create(updates as I_Settings);
-    } else {
-        const newSettings = { ...base_settings, ...updates };
-        return db.tables.settings.update(newSettings);
-    }
+    // Get the first Config and take replace its older values with newer values
+    const base_settings = (await db.tables.settings.read())[0];
+    const newSettings = { ...base_settings, ...updates };
+
+    return db.tables.settings.update(newSettings);
 }
 
 // Check if datamigration json are defined
@@ -141,4 +162,4 @@ const getSettings = async (): Promise<I_Settings | undefined> => {
 }
 
 export type { I_Birthday, I_Settings, I_Birthbase }
-export { db, __APP_SETTINGS__, storeSettings, getSettings };
+export { db, __INI_APP_SETTINGS__, storeSettings, getSettings };

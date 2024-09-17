@@ -13,7 +13,7 @@ const dataSlice = createSlice({
     name: "data",
     initialState,
     reducers: {
-        setData: (data, action: PayloadAction<I_Birthday[]|I_Birthday>) => {
+        createData: (data, action: PayloadAction<I_Birthday[]|I_Birthday>) => {
             const flat = [action.payload].flat();
             data.value = flat;
         },
@@ -29,13 +29,12 @@ const dataSlice = createSlice({
             const flat = [action.payload].flat();
             data.value = data.value.map((d) => {
                 const f = flat.find(f => f.id === d.id);
-                if (f) return f;
-                return d;
+                return f ? f : d;
             })
         }
     }
 })
 
-export const { setData, deleteData, addData, updateData } = dataSlice.actions;
+export const { createData, deleteData, addData, updateData } = dataSlice.actions;
 
 export default dataSlice.reducer;

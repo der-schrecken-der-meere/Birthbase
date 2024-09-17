@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit"
-import { __APP_SETTINGS__, storeSettings } from "@/database/birthbase";
+import { __INI_APP_SETTINGS__, storeSettings } from "@/database/birthbase";
 
 type CoreMode = "dark"|"light";
 type Mode = CoreMode|"system";
@@ -20,11 +20,19 @@ const matchMedia = (mode: Mode): CoreMode => {
 
 const initialState: ModeState = {
     value: (() => {
-        const mode = __APP_SETTINGS__?.mode || "system";
+        const mode = __INI_APP_SETTINGS__.mode || "system";
         setStorage(matchMedia(mode));
         return mode;
     })(),
 }
+
+const setIDBMode = createAsyncThunk<Mode, Mode>(
+    "mode/setIDBMode",
+    async (mode) => {
+        const res = await storeSettings({"mode": mode});
+        return res.mode ? res.mode : "system";
+    }
+)
 
 const modeSlice = createSlice({
     name: "mode",
@@ -42,14 +50,6 @@ const modeSlice = createSlice({
         })
     }
 })
-
-const setIDBMode = createAsyncThunk<Mode, Mode>(
-    "mode/setIDBMode",
-    async (mode) => {
-        const res = await storeSettings({"mode": mode});
-        return res.mode;
-    }
-)
 
 export const { setMode } = modeSlice.actions;
 export type { Mode, CoreMode }

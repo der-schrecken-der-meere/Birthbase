@@ -49,6 +49,7 @@ const _mediaScreens: MediaScreenEntry[] = [
         isActive: false,
     },
 ];
+
 const mediaScreens = Object.freeze(_mediaScreens);
 export { mediaScreens };
 export type { MediaQuery, MediaScreenEntry, MediaScreenName };

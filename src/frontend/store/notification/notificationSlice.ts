@@ -9,7 +9,7 @@ interface NotificationState {
 
 let permissionGranted: NotificationPermission = Notification.permission;
 if (isTauri) {
-    permissionGranted = await isPermissionGranted() ? "granted" : "default";
+    permissionGranted = await isPermissionGranted() ? "granted" : "denied";
     console.log(permissionGranted);
 }
 
@@ -17,14 +17,21 @@ const initialState: NotificationState = {
     permission: permissionGranted,
 };
 
+const setIDBNotificationPermission = createAsyncThunk<NotificationPermission, PermissionState>(
+    "notification/setIDBPermission",
+    async (permission) => {
+        const res = await storeSettings({"permissions": {"notification": permission === "prompt" ? "default" : permission}});
+        return res.permissions.notification ? res.permissions.notification : "default";
+    }
+)
+
 const notificationSlice = createSlice({
     name: "notification",
     initialState,
     reducers: {
         setPermission: (data, action: PayloadAction<PermissionState>) => {
             console.log(action.payload);
-            if (action.payload === "prompt") data.permission = "default";
-            else data.permission = action.payload;
+            data.permission = action.payload === "prompt" ? "default" : action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -33,14 +40,6 @@ const notificationSlice = createSlice({
         })
     }
 })
-
-const setIDBNotificationPermission = createAsyncThunk<NotificationPermission, PermissionState>(
-    "notification/setIDBPermission",
-    async (permission) => {
-        const res = await storeSettings({"permissions": {"notification": permission === "prompt" ? "default" : permission}});
-        return res.permissions.notification;
-    }
-)
 
 export const { setPermission } = notificationSlice.actions
 export { setIDBNotificationPermission }

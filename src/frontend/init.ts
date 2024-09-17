@@ -1,7 +1,7 @@
-import { __APP_SETTINGS__, db } from "../database/birthbase";
+import { __INI_APP_SETTINGS__, db } from "../database/birthbase";
 import { setIDBNotificationPermission } from "./store/notification/notificationSlice";
 import { AppDispatch } from "./store/store";
-import { setData } from "./store/data/dataSlice";
+import { createData } from "./store/data/dataSlice";
 
 const init = async (dispatch: AppDispatch) => {
     await notifications(dispatch);
@@ -14,7 +14,7 @@ const notifications = async (dispatch: AppDispatch) => {
     });
 
     dispatch(setIDBNotificationPermission(
-        !__APP_SETTINGS__ ? perm.state : __APP_SETTINGS__.permissions.notification as PermissionState
+        !__INI_APP_SETTINGS__ ? perm.state : __INI_APP_SETTINGS__.permissions.notification as PermissionState
     ));
 
     perm.onchange = (e) => {
@@ -24,7 +24,7 @@ const notifications = async (dispatch: AppDispatch) => {
 
 const birthdayData = async (dispatch: AppDispatch) => {
     const data = await db.tables.birthdays.read();
-    dispatch(setData(data));
+    dispatch(createData(data));
 }
 
 export default init;

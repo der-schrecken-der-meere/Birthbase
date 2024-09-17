@@ -9,12 +9,6 @@ interface DataFormState {
     open: boolean;
 }
 
-type Opt_DataForm = {
-    method?: Method;
-    value?: I_Birthday;
-    open?: boolean;
-}
-
 const initialState: DataFormState = {
     value: {
         date: new Date().toISOString(),
@@ -41,12 +35,31 @@ const dataFormSlice = createSlice({
         toggleOpen: (data) => {
             data.open = !data.open;
         },
-        changeDataState: (data, action: PayloadAction<Opt_DataForm>) => {
-            data.value = action.payload?.value ? action.payload.value : data.value;
-            data.method = action.payload?.method ? action.payload.method : data.method;
-            data.open = action.payload?.open ? action.payload.open : data.open;
+        /**
+         * Changes the FormOpenState, FormData or FormMethod
+         */
+        changeFormState: (data, action: PayloadAction<Partial<DataFormState>>) => {
+            if (action.payload.value) data.value = action.payload.value;
+            if (action.payload.method) data.method = action.payload.method;
+            if (action.payload.open) data.open = action.payload.open;
         },
-        changeDataInitial: (data, action: PayloadAction<Opt_DataForm>) => {
+        /**
+         * Changes the FormState if provided. Else the FormState will be turned into to its initial value.
+         * 
+         *      Initialdata: {
+         *          method: "add"
+         *          open: false
+         *          value: {
+         *              id: -1
+         *              date: CurrentDate as ISOString
+         *              name: {
+         *                  first: ""
+         *                  last: ""
+         *              }
+         *          }
+         *      }
+         */
+        changeDataInitial: (data, action: PayloadAction<Partial<DataFormState>>) => {
             data.value = action?.payload?.value ? action.payload.value : initialState.value;
             data.method = action?.payload?.method ? action.payload.method : initialState.method;
             data.open = action?.payload?.open ? action.payload.open : initialState.open;
@@ -54,6 +67,6 @@ const dataFormSlice = createSlice({
     }
 })
 
-export const { changeData, changeDataState, changeMethod, toggleOpen, changeDataInitial } = dataFormSlice.actions;
+export const { changeData, changeFormState, changeMethod, toggleOpen, changeDataInitial } = dataFormSlice.actions;
 
 export default dataFormSlice.reducer;
