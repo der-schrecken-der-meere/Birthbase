@@ -29,6 +29,8 @@ import { NavLink } from 'react-router-dom';
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/frontend/components/ui/drawer';
 import { RadioGroupItem, RadioGroup } from '@/frontend/components/ui/radio-group';
 import { SelectProps } from '@radix-ui/react-select';
+import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/frontend/components/ui/scroll-area';
 
 const Settings = () => {
     return (
@@ -85,8 +87,59 @@ const Settings = () => {
             >
                 Info
             </NavigationLink>
+            <Separator/>
+            <NavigationLink
+                to={"./info"}
+                icon={<LuInfo size={24}/>}
+                caption={"Über die App"}
+            >
+                Info
+            </NavigationLink>
+            <Separator/>
+            <NavigationLink
+                to={"./info"}
+                icon={<LuInfo size={24}/>}
+                caption={"Über die App"}
+            >
+                Info
+            </NavigationLink>
         </PageWrapper>
     )
+}
+
+interface I_NavigationLinkCore {
+    icon?: React.ReactNode;
+    className?: string;
+    rightElement?: React.ReactNode;
+    children?: React.ReactNode;
+    caption?: React.ReactNode;
+}
+
+const NavigationLinkCore = ({
+    icon,
+    className,
+    rightElement,
+    children,
+    caption
+}: I_NavigationLinkCore) => {
+    return (
+        <div className={cn("flex items-center py-2 gap-2 min-h-16", className)}>
+            {icon &&
+                <div className="w-min px-2">
+                    {icon}
+                </div>
+            }
+            <div className='flex-1 min-w-0 h-full'>
+                <div className='overflow-hidden text-ellipsis whitespace-pre'>{children}</div>
+                {caption && <span className='text-sm text-muted-foreground'>{caption}</span>}
+            </div>
+            {rightElement && 
+                <div className='ml-auto grid place-items-center text-nowrap mr-1'>
+                    {rightElement}
+                </div>
+            }
+        </div>
+    );
 }
 
 interface I_NavigationLink {
@@ -106,49 +159,43 @@ const NavigationLink = ({
         <NavLink
             to={to}
             relative="path"
-            className={"flex items-center py-2 px-4 gap-4 rounded-md hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"}
         >
-            <div className="w-min">
-                {icon}
-            </div>
-            <div className='flex-1 min-w-0'>
-                <div className='overflow-hidden text-ellipsis whitespace-pre'>{children}</div>
-                {caption && <span className='text-sm text-muted-foreground'>{caption}</span>}
-            </div>
-            <LuChevronRight className='ml-auto'/>
+            <NavigationLinkCore
+                icon={icon}
+                className='rounded-md hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"'
+                caption={caption}
+                rightElement={<LuChevronRight className='mr-3'/>}
+            >
+                {children}
+            </NavigationLinkCore>
         </NavLink>
     );
 }
 
 interface I_NavigationEntry {
+    className?: string;
     caption?: React.ReactElement | string;
     children: React.ReactElement[] | React.ReactElement | string;
-    onlyWrapp?: boolean;
     rightElement?: React.ReactElement | string;
+    icon?: React.ReactElement;
 }
 
 const NavigationEntry = ({
     children,
     rightElement,
+    className,
     caption,
-    onlyWrapp,
+    icon,
 }: I_NavigationEntry) => {
     return (
-        <div className='flex items-center py-2 gap-4'>
-            {onlyWrapp ? children :
-            <>
-                <div className='relative w-full'>
-                    <div>{children}</div>
-                    {caption && <span className='text-sm text-muted-foreground'>{caption}</span>}
-                </div>
-                {rightElement && 
-                    <div className='ml-auto grid place-items-center text-nowrap'>
-                        {rightElement}
-                    </div>
-                }
-            </>
-            }
-        </div>
+        <NavigationLinkCore
+            className={className}
+            icon={icon}
+            caption={caption}
+            rightElement={rightElement}
+        >
+            {children}
+        </NavigationLinkCore>
     );
 }
 
@@ -201,30 +248,33 @@ const SelectAsRadio = ({
         <Drawer>
             <DrawerTrigger>
                 <div className='flex items-center gap-1'>
-                    <span className='text-sm text-muted-foreground'>{text}</span>
+                    <span className='text-sm text-muted-foreground'>{values.find((e) => e.value === defaultValue)?.text}</span>
                     <LuChevronRight className='text-muted-foreground'></LuChevronRight>
                 </div>
             </DrawerTrigger>
-            <DrawerContent>
-                <DrawerHeader className="py-2 px-4">
+            <DrawerContent className='max-h-[80%] h-full mt-0 px-4 py-2'>
+                <DrawerHeader className="py-2 px-0">
                     <DrawerTitle className="text-left">{text}</DrawerTitle>
                     <DrawerDescription className="hidden">Auswahlmenü für {text}</DrawerDescription>
                 </DrawerHeader>
-                <RadioGroup onValueChange={onValueChange} defaultValue={defaultValue} className="flex flex-col py-2 px-4 mb-20">
-                    {values.map((v, i) => {
-                        const id = `${text}-${v.value}`;
-                        return (
-                            <React.Fragment key={i}>
-                                <NavigationEntry
-                                    rightElement={<RadioGroupItem value={v.value} id={id}/>}
-                                >
-                                    <Label htmlFor={id}>{v.text}</Label>
-                                </NavigationEntry>
-                                {i !== values.length - 1 && <Separator/>}
-                            </React.Fragment>
-                        )
-                    })}
-                </RadioGroup>
+                <ScrollArea className='pr-2'>
+                    <RadioGroup onValueChange={onValueChange} defaultValue={defaultValue} className="flex flex-col py-2">
+                        {values.map((v, i) => {
+                            const id = `${text}-${v.value}`;
+                            return (
+                                <React.Fragment key={id}>
+                                    <NavigationEntry
+                                        className='min-h-0'
+                                        rightElement={<RadioGroupItem value={v.value} id={id} className='mr-2'/>}
+                                    >
+                                        <Label htmlFor={id}>{v.text}</Label>
+                                    </NavigationEntry>
+                                    {i !== values.length - 1 && <Separator/>}
+                                </React.Fragment>
+                            )
+                        })}
+                    </RadioGroup>
+                </ScrollArea>
             </DrawerContent>
         </Drawer>
     );

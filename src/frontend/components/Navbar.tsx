@@ -6,7 +6,6 @@ import {
     NavigationMenuList,
     navigationMenuTriggerStyle,
 } from '@/frontend/components/ui/navigation-menu';
-import { Input } from '@/frontend/components/ui/input';
 import {
     Drawer,
     DrawerContent,
@@ -18,19 +17,100 @@ import {
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
+import { Search } from 'lucide-react';
 import navigationList, { type NavSection } from '@/globals/constants/nav_entries';
+import { Button } from './ui/button';
+import { ScrollArea } from './ui/scroll-area';
+import { Logo } from './Logo';
 
-interface I_Navbar {
-    orientation?: "horizontal"|"vertical";
-    className?: string;
+interface I_CoreNavbar extends React.HTMLAttributes<HTMLDivElement> {}
+
+/** Basic Wrapper */
+const CoreNavbar = ({
+    className,
+    children,
+    ...props
+}: I_CoreNavbar) => {
+    return (
+        <div
+            className={cn(
+                'flex h-full w-full',
+                className
+            )}
+            {...props}
+        >
+            {children}
+        </div>
+    );
+}
+
+const VerticalNavbar = ({
+    children,
+    className,
+    ...props
+}: I_CoreNavbar) => {
+    return (
+        <CoreNavbar
+            className={cn(
+                "flex-col p-6 pr-2 space-y-2",
+                className
+            )}
+            {...props}
+        >
+            <div className='flex mb-2 items-center'>
+                <NavLink
+                    to="/"
+                    className="inline-flex items-center w-max"
+                >
+                    <Logo size={24}/>
+                    <span className="font-semibold tracking-wide ml-2">Birthbase</span>
+                </NavLink>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className='ml-auto'
+                >
+                    <Search size={16}/>
+                </Button>
+            </div>
+            <ScrollArea
+                className='pr-2 w-full h-full'
+            >
+                <NavigationMenu
+                    orientation="vertical"
+                    className="max-h-full flex-col justify-start items-start"
+                >
+                    <NavigationMenuList
+                        className="flex-col justify-start items-start h-full space-x-0 min-w-40"
+                    >
+                        {children}
+                    </NavigationMenuList>
+                </NavigationMenu>
+            </ScrollArea>
+        </CoreNavbar>
+    );
 }
 
 const Navbar = ({
-    orientation = "horizontal",
-    className,
-}: I_Navbar) => {
+    ...props
+}: I_CoreNavbar) => {
+    return (
+        <VerticalNavbar
+            {...props}
+        >
+            <NavList
+                list={navigationList}
+            />
+        </VerticalNavbar>
+    );
+};
 
-    const mobileNav = useMemo(() => {
+const MobileNavbar = ({
+    className,
+    ...props
+}: Omit<I_CoreNavbar, "children">) => {
+
+    const entries = useMemo(() => {
         return ["home", "settings"].map((str) => (
             navigationList.find((item) => item?.id === str) as NavSection
         ))        
@@ -40,82 +120,66 @@ const Navbar = ({
     }, []);
 
     return (
-        <NavigationMenu orientation={orientation} 
+        <CoreNavbar
             className={cn(
-                "border-t-2 md:border-t-0 md:border-r-2 md:justify-start max-w-none md:block",
+                'py-2',
                 className
             )}
+            {...props}
         >
-            <NavigationMenuList 
-                className={cn(
-                    "w-screen py-2",
-                    orientation === "vertical" && 
-                        "flex-col w-auto justify-start items-start py-4 h-screen space-x-0 space-y-4 mx-4"
-                )}
-            >
-                {orientation !== "vertical" ? (
-                    <>
-                        <NavigationMenuItem
-                            className="flex-auto grid place-items-center md:flex-initial"
-                        >
-                            <Drawer direction="left">
-                                <DrawerTrigger
-                                    className={cn(
-                                        navigationMenuTriggerStyle(),
-                                        "h-auto flex gap-2 px-4 py-2"
-                                    )}
-                                >
-                                    <MdMenu size={40} />
-                                </DrawerTrigger>
-                                <DrawerContent direction="left">
-                                    <DrawerHeader>
-                                        <DrawerTitle 
-                                            className={"hidden"}
-                                        >
-                                            Navigationsmenü
-                                        </DrawerTitle>
-                                        <DrawerDescription
-                                            className={"hidden"}
-                                        >
-                                            Suchen sie nach allem
-                                        </DrawerDescription>
-                                        <Input
-                                            placeholder="Suche..."
-                                            className="max-w-sm"
-                                            id="search"
-                                            type="search"
-                                        />
-                                    </DrawerHeader>
-                                    <NavList list={navigationList} />
-                                </DrawerContent>
-                            </Drawer>
-                        </NavigationMenuItem>
-                        {mobileNav.map((e, i) => (
-                            <NavigationLink
-                                key={i}
-                                to={e.href}
-                                ariaLabel={e.ariaLabel}
+            <NavigationMenu>
+                <NavigationMenuList className="justify-between w-screen space-x-0">
+                    <NavigationMenuItem className='flex-auto grid place-items-center md:flex-initial'>
+                        <Drawer direction="left">
+                            <DrawerTrigger
+                                aria-label="open-navigation"
+                                className={cn(
+                                    navigationMenuTriggerStyle(),
+                                    "h-full flex gap-2 px-4 py-2 group"
+                                )}
                             >
-                                {e.icon()}
-                                <span className={cn(
-                                    orientation === 'horizontal' && "hidden"
-                                )}>
-                                    {e.text}
-                                </span>
-                            </NavigationLink>
-                        ))}
-                    </>
-                ) : (
-                    <NavList list={navigationList} />
-                )}
-            </NavigationMenuList>
-        </NavigationMenu>
-    )
+                                <MdMenu size={32} />
+                            </DrawerTrigger>
+                            <DrawerContent
+                                direction="left"
+                                className='rounded-none border-none rounded-r-[10px]'
+                            >
+                                <DrawerHeader
+                                    className='p-0'
+                                >
+                                    <DrawerTitle 
+                                        className="hidden"
+                                    >
+                                        Navigationsmenü
+                                    </DrawerTitle>
+                                    <DrawerDescription
+                                        className="hidden"
+                                    >
+                                        Vollständige Navigationsansicht
+                                    </DrawerDescription>
+                                </DrawerHeader>
+                                <Navbar/>
+                            </DrawerContent>
+                        </Drawer>
+                    </NavigationMenuItem>
+                    {entries.map(e => (
+                        <NavigationLink
+                            key={e.id}
+                            to={e.href}
+                            ariaLabel={e.ariaLabel}
+                        >
+                            {e.icon(32)}
+                        </NavigationLink>
+                    ))}
+                </NavigationMenuList>
+            </NavigationMenu>
+        </CoreNavbar>
+    );
 }
 
 interface I_NavigationLink {
     ariaLabel: string,
-    children: React.ReactElement[],
+    children: React.ReactNode,
     className?: string,
     linkClass?: string,
     to: string,
@@ -130,11 +194,19 @@ const NavigationLink = ({
 }: I_NavigationLink) => {
     return (
         <NavigationMenuItem
-            className={cn("flex-auto grid place-items-center md:flex-initial", className)}
+            className={cn(
+                "flex-auto grid place-items-center md:flex-initial",
+                className
+            )}
         > 
             <NavLink
                 to={to}
-                className={({ isActive }) => cn(navigationMenuTriggerStyle(), "h-auto flex gap-2", (isActive && "bg-primary text-primary-foreground"), linkClass)}
+                className={({ isActive }) => cn(
+                    navigationMenuTriggerStyle(),
+                    "h-auto flex gap-2",
+                    (isActive && "bg-primary text-primary-foreground"),
+                    linkClass
+                )}
                 aria-label={ariaLabel}
             >
                 {children}
@@ -158,11 +230,17 @@ const NavList = ({
                 key={data.id}
                 className='w-full flex flex-col'
             >
-                <h4>
+                <h4
+                    className='mb-1'
+                >
                     <NavLink
                         to={data.href}
                         aria-label={data.ariaLabel}
-                        className={({ isActive }) => cn(linkClass(), "flex gap-2 font-semibold mb-1", isActive && "bg-primary text-primary-foreground")}
+                        className={({ isActive }) => cn(
+                            linkClass(),
+                            "flex gap-2 font-semibold",
+                            isActive && "bg-primary text-primary-foreground"
+                        )}
                     >
                         {data.text}
                     </NavLink>
@@ -185,5 +263,7 @@ const NavList = ({
         ))
     );
 }
+
+export { Navbar, MobileNavbar }
 
 export default Navbar

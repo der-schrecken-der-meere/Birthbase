@@ -3,11 +3,10 @@ import {
     Suspense,
     lazy,
 } from 'react'
-import Navbar from '../components/Navbar'
+import Navbar, { MobileNavbar } from '../components/Navbar'
 import { Outlet } from 'react-router-dom'
 import { Toaster } from '../components/ui/toaster'
 import { useSelector } from 'react-redux'
-import { getMediaScreen } from '../store/mediaType/mediaTypeSlice'
 import { type RootState } from '../store/store'
 import { isTauri } from '../../globals/constants/environment'
 import DeviceSize from '../components/DeviceSize'
@@ -27,6 +26,7 @@ const MainLayout = () => {
                     h-screen w-screen text-sans text-main-text
                     grid grid-rows-[minmax(0,1fr)_max-content] 
                     md:grid-rows-1 md:grid-cols-[13.75rem_minmax(0,1fr)]
+                    min-w-[300px]
                 `}
             >
                 <main className="relative md:col-start-2 md:col-end-3 md:row-start-1">
@@ -38,7 +38,14 @@ const MainLayout = () => {
                     </div>
                     <Toaster/>
                 </main>
-                <Navigation className="md:col-start-1 md:col-end-2"/>
+                <div className="md:col-start-1 md:col-end-2 shadow-[0_0_10px_-5px_hsl(var(--primary))]">
+                    <Navbar
+                        className='hidden md:flex'
+                    />
+                    <MobileNavbar
+                        className='md:hidden'
+                    />
+                </div>
                 {(isTauri && updateState === "available") && 
                     <Suspense fallback={null}>
                         <Updater/>
@@ -48,21 +55,6 @@ const MainLayout = () => {
         </>
         
     )
-}
-
-interface I_Navigation {
-    className?: string;
-}
-
-const Navigation = ({
-    className,
-}: I_Navigation) => {
-    const md = useSelector((state: RootState) => {
-        const screens = state.mediaType.screens;
-        return getMediaScreen("md", screens).value.isActive;
-    });
-    
-    return <Navbar orientation={md ? "vertical" : "horizontal"} className={className}/>;
 }
 
 export default MainLayout

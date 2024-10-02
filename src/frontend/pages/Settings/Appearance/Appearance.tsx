@@ -10,10 +10,13 @@ import { setIDBColor, type Color } from '@/frontend/store/color/colorSlice'
 import { Separator } from '@/frontend/components/ui/separator'
 import { AppDispatch, RootState } from '@/frontend/store/store';
 
+import { PaintbrushVertical, Palette } from 'lucide-react';
+
 const Appearance = () => {
     return (
         <PageWrapper goBack={1} title='Aussehen'>
             <NavigationEntry
+                icon={<PaintbrushVertical/>}
                 rightElement={<ModeSelect/>}
                 caption={"Ändert das Farbschema"}
             >
@@ -21,10 +24,11 @@ const Appearance = () => {
             </NavigationEntry>
             <Separator/>
             <NavigationEntry
+                icon={<Palette/>}
                 rightElement={<ColorSelect/>}
                 caption={"Ändert die Farbpalette"}
             >
-                Farbe
+                Akzentfarbe
             </NavigationEntry>
         </PageWrapper>
     ) 
@@ -43,7 +47,7 @@ const ModeSelect = () => {
         {text: "Hell", value: "light"},
         {text: "System", value: "system"},
     ];
-    const text = "Modus"
+    const text = "Modus";
     const onChange = (v: string) => dispatch(setIDBMode(v as Mode));
     const ariaLabel = "theme-toggle"
 

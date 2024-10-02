@@ -41,8 +41,8 @@ const DrawerContent = React.forwardRef<
   Ext_DrawerContent
 >(({ className, children, direction = "bottom", ...props }, ref) => {
   const slider = (direction === "top" || direction === "bottom") ?
-    <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" /> :
-    <div className="my-auto mr-4 w-2 h-[100px] rounded-full bg-muted" />;
+    <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted shrink-0" /> :
+    <div className="my-auto mr-4 w-2 h-[100px] rounded-full bg-muted shrink-0" />;
   return (
     <DrawerPortal>
       <DrawerOverlay />

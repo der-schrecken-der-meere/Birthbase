@@ -6,6 +6,7 @@ import { requestPermission } from '@tauri-apps/plugin-notification';
 import { setIDBNotificationPermission } from '@/frontend/store/notification/notificationSlice';
 import { isTauri } from "@/globals/constants/environment";
 import { LuInfo } from 'react-icons/lu';
+import { Bell } from 'lucide-react';
 import { 
     Popover,
     PopoverContent,
@@ -18,6 +19,7 @@ const Notifications = () => {
     return (
         <PageWrapper goBack={1} title='Benachrichtigungen'>
             <NavigationEntry
+                icon={<Bell/>}
                 caption={"Erlaubt der App Nachrichten an das System zu senden"}
                 rightElement={<NotificationSwitch/>}
             >

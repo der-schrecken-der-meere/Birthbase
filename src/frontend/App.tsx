@@ -29,14 +29,14 @@ import { promise_delay } from "@/lib/main_util";
 import { PageWrapperSkeleton, SettingsEntriesSkeleton } from "./components/PageWrapper";
 import { Skeleton } from "./components/ui/skeleton";
 
-const MyBirthdays = lazy(() => promise_delay(() => import("./pages/MyBirthdays"), 1000));
-const Settings = lazy(() => promise_delay(() => import("./pages/Settings/Settings"), 1000));
-const Appearance = lazy(() => promise_delay(() => import("./pages/Settings/Appearance/Appearance"), 1000));
-const Notifications = lazy(() => promise_delay(() => import("./pages/Settings/Notifications/Notifications"), 1000));
-const Info = lazy(() => promise_delay(() => import("./pages/Settings/Info/Info"), 1000));
-const Storage = lazy(() => promise_delay(() => import("./pages/Settings/Storage/Storage"), 1000));
-const Time = lazy(() => promise_delay(() => import("./pages/Settings/Time/Time"), 1000));
-const Language = lazy(() => promise_delay(() => import("./pages/Settings/Language/Language"), 1000));
+const MyBirthdays = lazy(() => promise_delay(() => import("./pages/MyBirthdays"), 0));
+const Settings = lazy(() => promise_delay(() => import("./pages/Settings/Settings"), 0));
+const Appearance = lazy(() => promise_delay(() => import("./pages/Settings/Appearance/Appearance"), 0));
+const Notifications = lazy(() => promise_delay(() => import("./pages/Settings/Notifications/Notifications"), 0));
+const Info = lazy(() => promise_delay(() => import("./pages/Settings/Info/Info"), 0));
+const Storage = lazy(() => promise_delay(() => import("./pages/Settings/Storage/Storage"), 0));
+const Time = lazy(() => promise_delay(() => import("./pages/Settings/Time/Time"), 0));
+const Language = lazy(() => promise_delay(() => import("./pages/Settings/Language/Language"), 0));
 
 const App = () => {
     const isBooting = useSelector((state: RootState) => state.app.isBooting);

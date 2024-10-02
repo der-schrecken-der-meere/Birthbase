@@ -33,14 +33,14 @@ const PageWrapper = ({
 
     return (
         <div className='flex flex-col h-full py-2 px-4'>
-            <div className='pl-1 flex items-center pb-2.5 h-[3.125rem]'>
+            <div className='flex items-center pb-2.5 h-[3.125rem]'>
                 {(goBack || typeof goBack === "number")  && 
                     <GoBackInHistory
                         amount={goBack}
                     />
                 }
                 <h1 
-                    className={`text-3xl font-semibold tracking-tight whitespace-pre text-ellipsis
+                    className={`text-2xl font-medium whitespace-pre text-ellipsis
                         overflow-hidden flex-1
                     `}
                 >
@@ -48,8 +48,8 @@ const PageWrapper = ({
                 </h1>
                 
             </div>
-            <ScrollArea className={cn('flex-1 w-full', className)}>
-                <div className='pl-1 pt-1 pr-2 pb-2 flex flex-col h-full'>
+            <ScrollArea className={cn('flex-1 w-full pr-2 pb-2', className)}>
+                <div className='lex flex-col h-full'>
                     {children}
                 </div>
                 <ScrollBar orientation="horizontal" />
@@ -65,7 +65,7 @@ const GoBackInHistory = ({
 
     return (
         <Button
-            className="mr-2"
+            className="ml-1 mr-3 h-8 w-8"
             variant="ghost"
             size="icon"
             disabled={amount === 0}

@@ -38,14 +38,14 @@ const Storage = () => {
 
     return (
         <PageWrapper goBack={1} title='Speicher'>
-            <NavigationEntry
-                caption={<>&nbsp;</>}
-            >
-                <div className='flex items-center'>
+            <NavigationEntry>
+                <div className='flex items-center mb-auto'>
                     <div>Belegter Speicher</div>
-                    <span className='ml-auto text-sm text-muted-foreground'>{value.used}/{value.available} belegt</span>
+                    <div className='ml-auto text-sm text-muted-foreground'>
+                        {value.used}/{value.available} belegt
+                    </div>
                 </div>
-                <Progress value={value.value} className="w-full absolute bottom-0"/>
+                <Progress value={value.value} className="w-full h-2 mt-2"/>
             </NavigationEntry>
             <Separator/>
             <NavigationEntry>
