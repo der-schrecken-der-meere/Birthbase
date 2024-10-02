@@ -20,6 +20,7 @@ export default defineConfig(({ command, mode, isPreview }) => {
   console.log("Env:", loadEnv(mode, process.cwd()));
 
   return {
+    publicDir: "public",
     plugins: [react()],
     resolve: {
       alias: {

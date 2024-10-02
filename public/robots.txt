@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /my_birthdays
+Allow: /settings
+Allow: /settings/appearance
+Allow: /settings/notifications
+Allow: /settings/storage
+Allow: /settings/time
+Allow: /settings/language
+Allow: /settings/info
