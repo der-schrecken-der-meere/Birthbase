@@ -12,9 +12,9 @@ const notifications = async (dispatch: AppDispatch) => {
     const perm = await navigator.permissions.query({
         name: "notifications",
     });
-
+    
     dispatch(setIDBNotificationPermission(
-        !__INI_APP_SETTINGS__ ? perm.state : __INI_APP_SETTINGS__.permissions.notification as PermissionState
+        __INI_APP_SETTINGS__.permissions.notification ?__INI_APP_SETTINGS__.permissions.notification as PermissionState : perm.state
     ));
 
     perm.onchange = (e) => {

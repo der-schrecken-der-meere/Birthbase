@@ -87,22 +87,6 @@ const Settings = () => {
             >
                 Info
             </NavigationLink>
-            <Separator/>
-            <NavigationLink
-                to={"./info"}
-                icon={<LuInfo size={24}/>}
-                caption={"Über die App"}
-            >
-                Info
-            </NavigationLink>
-            <Separator/>
-            <NavigationLink
-                to={"./info"}
-                icon={<LuInfo size={24}/>}
-                caption={"Über die App"}
-            >
-                Info
-            </NavigationLink>
         </PageWrapper>
     )
 }
@@ -252,7 +236,7 @@ const SelectAsRadio = ({
                     <LuChevronRight className='text-muted-foreground'></LuChevronRight>
                 </div>
             </DrawerTrigger>
-            <DrawerContent className='max-h-[80%] h-full mt-0 px-4 py-2'>
+            <DrawerContent className='max-h-[80%] h-full mt-0 px-4 py-2 border-0'>
                 <DrawerHeader className="py-2 px-0">
                     <DrawerTitle className="text-left">{text}</DrawerTitle>
                     <DrawerDescription className="hidden">Auswahlmenü für {text}</DrawerDescription>

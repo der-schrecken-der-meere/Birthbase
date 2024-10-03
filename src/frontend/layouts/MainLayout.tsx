@@ -11,6 +11,8 @@ import { type RootState } from '../store/store'
 import { isTauri } from '../../globals/constants/environment'
 import DeviceSize from '../components/DeviceSize'
 import { mediaScreens } from '@/globals/constants/media_screens'
+import useShortcuts from '../hooks/useShortcuts'
+import CMDK from '../components/CMDK'
 
 const Updater = lazy(() => import("../components/tauri/Updater"));
 
@@ -18,8 +20,11 @@ const MainLayout = () => {
     const mainRef = useRef(null);
     const updateState = useSelector((state: RootState) => state.tauri.updateInfo.updateState);
 
+    useShortcuts();
+
     return (
         <>
+            <CMDK/>
             <DeviceSize mediaScreens={mediaScreens} />
             <div
                 className={`
@@ -53,7 +58,6 @@ const MainLayout = () => {
                 }
             </div>
         </>
-        
     )
 }
 

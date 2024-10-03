@@ -9,9 +9,13 @@ import {
     DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle
+    DialogTitle,
+    DialogTrigger
 } from '@/frontend/components/ui/dialog';
 import { Skeleton } from "@/frontend/components/ui/skeleton";
+
+// Luicide
+import { Ellipsis } from 'lucide-react';
 
 // Custom Components
 import PageWrapper from '@/frontend/components/PageWrapper'
@@ -29,20 +33,51 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toggleOpen, changeDataInitial } from "@/frontend/store/dataForm/dataFormSlice.js"
 import Table from '@/frontend/tables/birthdays/Table.js';
 import { AppDispatch, RootState } from '@/frontend/store/store.js';
+import { promise_delay } from '@/lib/main_util';
 
 const BirthdayForm = lazy(() => import("@/frontend/components/forms/BirthdayForm"))
+const OtherFunctionDialog = lazy(() => promise_delay(() => import("./../components/dialogs/OtherFunctions"), 0));
 
 const MyBirthdays = () => {
     return (
         <PageWrapper docTitle='Birthbase - Meine Geburtstage' title='Meine Geburtstage'>
-            <Label className="inline-flex w-max items-center gap-4 text-base font-light">
-                Geburtstag erstellen
-                <AddButton/>
-            </Label>
-            <Table className=''/>
+            <div className='flex'>
+                <Label className="inline-flex w-max items-center gap-4 text-base font-light">
+                    Geburtstag erstellen
+                    <AddButton/>
+                </Label>
+                <OtherFunctions/>
+            </div>
+            <Table/>
             <DialogWindow/>
         </PageWrapper>
     )
+}
+
+const OtherFunctions = () => {
+    const { mainRef } = useOutletContext<{ mainRef: React.MutableRefObject<null> }>();
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="outline" className='h-full ml-auto' size="sm">
+                    <Ellipsis className='h-4 w-4'/>
+                    <span className="hidden sm:inline ml-2">Weitere Funktionen</span>
+                </Button>
+            </DialogTrigger>
+            <DialogContent
+                container={mainRef.current}
+            >
+                <DialogHeader>
+                    <DialogTitle>Weitere Funktionen</DialogTitle>
+                    <DialogDescription className='sr-only'>Geburtstage aus Datei importieren oder Geburtstage als Datei exportieren</DialogDescription>
+                </DialogHeader>
+                <Suspense fallback={<p>Rendering</p>}>
+                    <OtherFunctionDialog/>
+                </Suspense>
+            </DialogContent>
+        </Dialog>
+    );
 }
 
 export default MyBirthdays

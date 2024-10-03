@@ -49,6 +49,11 @@ const VerticalNavbar = ({
     className,
     ...props
 }: I_CoreNavbar) => {
+
+    const onClick = () => {
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "f", ctrlKey: true }));
+    }
+
     return (
         <CoreNavbar
             className={cn(
@@ -69,6 +74,7 @@ const VerticalNavbar = ({
                     variant="ghost"
                     size="icon"
                     className='ml-auto'
+                    onClick={onClick}
                 >
                     <Search size={16}/>
                 </Button>
