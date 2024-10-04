@@ -10,6 +10,7 @@ interface I_Settings extends I_Record {
     permissions: {
         notification: NotificationPermission | undefined,
     };
+    remember: number | undefined;
 }
 
 interface I_Birthday extends I_Record {
@@ -123,7 +124,8 @@ const __INI_APP_SETTINGS__ = await (async () => {
         mode: undefined,
         permissions: {
             notification: undefined,
-        }
+        },
+        remember: undefined,
     });
     return settings;
 })();
@@ -140,6 +142,14 @@ const storeSettings = async (updates: Omit<Partial<I_Settings>, "id">): Promise<
 
     return db.tables.settings.update(newSettings);
 }
+
+// const fileToIDB = <DB extends I_Table_Defs>(files: FileList, db: Database<DB>, table) => {
+//     if (files.length === 0) return;
+
+//     const size = [...files].reduce((acc, cur) => acc + cur.size, 0);
+//     if (size > 100_000_000_000) throw Error("The files exceeds the limit of 100GB");
+
+// }
 
 // Check if datamigration json are defined
 try {

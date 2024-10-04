@@ -1,10 +1,11 @@
 import { isTauri } from "@/globals/constants/environment";
-import { storeSettings } from "@/database/birthbase";
+import { __INI_APP_SETTINGS__, storeSettings } from "@/database/birthbase";
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { isPermissionGranted } from '@tauri-apps/plugin-notification';
 
 interface NotificationState {
     permission: NotificationPermission;
+    remember: number;
 }
 
 let permissionGranted: NotificationPermission = Notification.permission;
@@ -15,6 +16,7 @@ if (isTauri) {
 
 const initialState: NotificationState = {
     permission: permissionGranted,
+    remember: __INI_APP_SETTINGS__.remember || 14,
 };
 
 const setIDBNotificationPermission = createAsyncThunk<NotificationPermission, PermissionState>(
@@ -22,6 +24,14 @@ const setIDBNotificationPermission = createAsyncThunk<NotificationPermission, Pe
     async (permission) => {
         const res = await storeSettings({"permissions": {"notification": permission === "prompt" ? "default" : permission}});
         return res.permissions.notification ? res.permissions.notification : "default";
+    }
+)
+
+const setIDBRemember = createAsyncThunk<number, number>(
+    "notification/setIDBRemeber",
+    async (remember) => {
+        const res = await storeSettings({remember});
+        return res.remember as number;
     }
 )
 
@@ -38,9 +48,12 @@ const notificationSlice = createSlice({
         builder.addCase(setIDBNotificationPermission.fulfilled, (state, action) => {
             state.permission = action.payload;
         })
+        .addCase(setIDBRemember.fulfilled, (state, action) => {
+            state.remember = action.payload;
+        })
     }
 })
 
 export const { setPermission } = notificationSlice.actions
-export { setIDBNotificationPermission }
+export { setIDBNotificationPermission, setIDBRemember }
 export default notificationSlice.reducer;

@@ -60,7 +60,7 @@ const OtherFunctions = () => {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="outline" className='h-full ml-auto' size="sm">
+                <Button variant="outline" className='h-full ml-auto' size="icon">
                     <Ellipsis className='h-4 w-4'/>
                     <span className="hidden sm:inline ml-2">Weitere Funktionen</span>
                 </Button>

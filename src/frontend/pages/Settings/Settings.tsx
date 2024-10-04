@@ -107,14 +107,14 @@ const NavigationLinkCore = ({
     caption
 }: I_NavigationLinkCore) => {
     return (
-        <div className={cn("flex items-center py-2 gap-2 min-h-16", className)}>
+        <div className={cn("flex items-center py-2 gap-2 min-h-16 shrink-0", className)}>
             {icon &&
                 <div className="w-min px-2">
                     {icon}
                 </div>
             }
             <div className='flex-1 min-w-0 h-full'>
-                <div className='overflow-hidden text-ellipsis whitespace-pre'>{children}</div>
+                {children && <div className='overflow-hidden text-ellipsis whitespace-pre'>{children}</div>}
                 {caption && <span className='text-sm text-muted-foreground'>{caption}</span>}
             </div>
             {rightElement && 
@@ -158,10 +158,10 @@ const NavigationLink = ({
 
 interface I_NavigationEntry {
     className?: string;
-    caption?: React.ReactElement | string;
-    children: React.ReactElement[] | React.ReactElement | string;
-    rightElement?: React.ReactElement | string;
-    icon?: React.ReactElement;
+    caption?: React.ReactNode;
+    children?: React.ReactNode;
+    rightElement?: React.ReactNode;
+    icon?: React.ReactNode;
 }
 
 const NavigationEntry = ({

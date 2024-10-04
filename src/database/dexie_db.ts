@@ -11,7 +11,7 @@ class DexieDB extends Dexie implements I_Database_Methods<I_Birthbase> {
         try {
             this.version(1).stores({
                 birthdays: "++id, name, date",
-                settings: "++id, mode, color, permission.notification",
+                settings: "++id, mode, color, permission.notification, remember",
             })
         } catch (e) {
             console.error(e);

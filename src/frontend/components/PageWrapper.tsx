@@ -49,7 +49,7 @@ const PageWrapper = ({
                 
             </div>
             <ScrollArea className={cn('flex-1 w-full pr-2 pb-2', className)}>
-                <div className='lex flex-col h-full'>
+                <div className='flex flex-col h-full'>
                     {children}
                 </div>
                 <ScrollBar orientation="horizontal" />
