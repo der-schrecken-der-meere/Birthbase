@@ -8,26 +8,29 @@ import {
     RouterProvider
 } from "react-router-dom";
 
+// Shadcn UI
+import { Skeleton } from "./components/ui/skeleton";
+
 // React Redux
 import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "./store/store";
+import { setBooting } from "./store/app/appSlice";
 
 // Pages
 import Home from './pages/Home';
+import NotFound from "./pages/NotFound";
 
-// Layouts
+// Components
 import MainLayout from './layouts/MainLayout';
+import { PageWrapperSkeleton, SettingsEntriesSkeleton } from "./components/PageWrapper";
 
-// Store Slices
+// lib
 import { isTauri } from "../globals/constants/environment";
 import { initTauri } from "../backend/init";
-
-import { AppDispatch, RootState } from "./store/store";
 import init from "./init";
-import { setBooting } from "./store/app/appSlice";
-import NotFound from "./pages/NotFound";
 import { promise_delay } from "@/lib/main_util";
-import { PageWrapperSkeleton, SettingsEntriesSkeleton } from "./components/PageWrapper";
-import { Skeleton } from "./components/ui/skeleton";
+import ToastProvider from "./contexts/toastContext";
+import ConfirmProvider from "./contexts/alertContext";
 
 const MyBirthdays = lazy(() => promise_delay(() => import("./pages/MyBirthdays"), 0));
 const Settings = lazy(() => promise_delay(() => import("./pages/Settings/Settings"), 0));
@@ -149,7 +152,11 @@ const App = () => {
     if (isBooting) return null;
 
     return (
-        <RouterProvider router={_router}/>
+        <ToastProvider>
+            <ConfirmProvider>
+                <RouterProvider router={_router}/>
+            </ConfirmProvider>
+        </ToastProvider>
     )
 }
 
