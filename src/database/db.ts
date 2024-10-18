@@ -1,144 +1,223 @@
-interface I_Record {
-    id: number;
-};
-interface I_DB_Error {
-    code?: number;
-    msg: any;
+import Dexie, { BulkError, Collection, ModifyError } from "dexie";
+import { Birthday } from "./tables/birthday";
+import { getDefaultSettings, type Settings } from "./tables/setting";
+import { calcDaysUntilNextBirthday } from "@/lib/main_util";
+
+type DexieTable<T extends {id: number}> = Dexie.Table<T, number>;
+
+interface I_Birthbase {
+    birthdays: DexieTable<Birthday>;
+    settings: DexieTable<Settings>;
 }
 
-type T_Table_Def = {
-    in: I_Record;
-    out: I_Record;
-};
-interface I_Table_Defs {
-    [key: string]: T_Table_Def;
-}
+type insertType<T> = T extends DexieTable<infer A> ? A : never;
 
-type U_TableNames<T extends I_Table_Defs> = keyof T;
-type U_TableInType<T extends I_Table_Defs, K extends U_TableNames<T>> = T[K]["in"];
-type U_TableOutType<T extends I_Table_Defs, K extends U_TableNames<T>> = T[K]["out"];
+type getInsert<T extends keyof I_Birthbase> = insertType<I_Birthbase[T]>
 
-type I_Create_Method_DB<T extends I_Table_Defs> = {
-    <K extends U_TableNames<T>>(table: K, record: Omit<U_TableInType<T, K>, "id">): Promise<U_TableOutType<T, K>>;
-    <K extends U_TableNames<T>>(table: K, record: Omit<U_TableInType<T, K>, "id">[]): Promise<U_TableOutType<T, K>[]>;
-}
-type I_Read_Method_DB<T extends I_Table_Defs> = {
-    <K extends U_TableNames<T>>(table: K): Promise<U_TableOutType<T, K>[]>;
-    <K extends U_TableNames<T>>(table: K, id: number): Promise<U_TableOutType<T, K> | undefined>;
-}
-type I_Update_Method_DB<T extends I_Table_Defs> = {
-    <K extends U_TableNames<T>>(table: K, records: U_TableInType<T, K>): Promise<U_TableOutType<T, K>>;
-    <K extends U_TableNames<T>>(table: K, records: U_TableInType<T, K>[]): Promise<U_TableOutType<T, K>[]>;
-}
-interface I_Database_Methods<T extends I_Table_Defs> {
-    getStorageSize: () => Promise<number | undefined>;
-    _create: I_Create_Method_DB<T>;
-    _read: I_Read_Method_DB<T>;
-    _update: I_Update_Method_DB<T>;
-    _delete: <K extends U_TableNames<T>>(table: K, records: number|number[]) => Promise<number>;
-}
+class DexieDB extends Dexie implements I_Birthbase {
+    birthdays!: Dexie.Table<Birthday, number>;
+    settings!: Dexie.Table<Settings, number>;
 
-interface I_Ref_Props<T extends I_Table_Defs> {
-    db_instance: I_Database_Methods<T>;
-}
+    constructor() {
+        super("BirthdayDB");
+        this.version(1).stores({
+            birthdays: "++id, name, date, marked",
+            settings: "id, mode, color, permission.notification, remember",
+        })
+        this.version(2).stores({
+            settings: null,
+        })
+        this.version(3).stores({
+            settings: "++id, mode, color, permission.notification, remember",
+        })
+    }
+    create<K extends keyof I_Birthbase, T extends getInsert<K>>(table: K, record: Omit<T, "id">): Promise<T>;
+    create<K extends keyof I_Birthbase, T extends getInsert<K>>(table: K, record: Omit<T, "id">[]): Promise<T[]>;
+    create<K extends keyof I_Birthbase, T extends getInsert<K>>(table: K, record: Omit<T, "id">|Omit<T, "id">[]): Promise<T|T[]> {
+        return new Promise((resolve, reject) => {
+            this.transaction("rw", this[table], async () => {
+                if (Array.isArray(record)) {
+                    if (record.length === 0) reject({
+                        msg: "No records passed to the function",
+                    });
+                    return await (this[table] as Dexie.Table<any, number>).bulkAdd(record, {allKeys: true});
+                } else {
+                    return await (this[table] as Dexie.Table<any, number>).add(record);
+                }
+            })
+            .then(async (v) => {
+                if (Array.isArray(v)) {
+                    const _records = await this[table].where("id").anyOf(v).toArray();
+                    resolve(_records as T[]);
+                } else {
+                    const _record = await this.read(table, v);
+                    resolve(_record as T);
+                }
+            })
+            .catch(Dexie.BulkError, (e: BulkError) => {
+                reject({
+                    msg: e.message,
+                })
+            })
+            .catch((e) => {
+                reject({
+                    msg: e,
+                });
+            })
+        })
+    }
+    read<K extends keyof I_Birthbase, T extends getInsert<K>>(table: K): Promise<T[]>;
+    read<K extends keyof I_Birthbase, T extends getInsert<K>>(table: K, id: number): Promise<T>;
+    read<K extends keyof I_Birthbase, T extends getInsert<K>>(table: K, id?: number): Promise<T|T[]> {
+        return new Promise((resolve, reject) => {
+            this.transaction("r", (this[table] as Dexie.Table<any, number>), async () => {
+                if (typeof id === "number") {
+                    return this[table].get(id);
+                } else {
+                    return this[table].toArray();
+                }
+            })
+            .then(v => {
+                if (Array.isArray(v)) resolve(v as any);
+                else if (typeof v === "undefined") resolve (v as any);
+                else resolve(v as any);
+            })
+            .catch((e) => {
+                reject({
+                    msg: e,
+                })
+            })
+        })
+    }
+    update<K extends keyof I_Birthbase, T extends getInsert<K>>(table: K, record: T): Promise<T>;
+    update<K extends keyof I_Birthbase, T extends getInsert<K>>(table: K, record: T[]): Promise<T[]>;
+    update<K extends keyof I_Birthbase, T extends getInsert<K>>(table: K, record: T|T[]): Promise<T|T[]> {
+        return new Promise((resolve, reject) => {
+            let ids: null|number[] = 
+                Array.isArray(record) ? record.map(e => e.id) : null;
+            this.transaction("rw", this[table], async () => {
+                if (Array.isArray(record)) {
+                    await (this[table].where("id").anyOf(ids as number[]) as Collection<T>).modify((v, r) => {
+                        r.value = record.find((value) => value.id === v.id) as T
+                    })
+                } else {
+                    const { id, ..._record } = record;
+                    await (this[table] as Dexie.Table<any, number>).update(record.id, _record);
+                }
+            })
+            .then(() => {
+                resolve(record);
+            })
+            .catch(Dexie.ModifyError, (error: ModifyError) => {
+                reject({
+                    msg: error.message,
+                })
+            })
+            .catch(error => {
+                reject({
+                    msg: error,
+                })
+            })
+        });
+    }
+    Delete<K extends keyof I_Birthbase>(table: K, records: number|number[]): Promise<number> {
+        return new Promise((resolve, reject) => {
+            this.transaction("rw", this[table], async () => {
+                if (Array.isArray(records) && records.length === 0) {
+                    reject({
+                        msg: "No records passed to the function",
+                    });
+                }
+                return await this[table].where("id").anyOf(records).delete();
+            })
+            .then(v => {
+                resolve(v);
+            })
+            .catch((e) => {
+                reject({
+                    msg: e,
+                })
+            })
+        })
+    }
 
-type I_Create_Method_Config<T extends I_Table_Defs, IN extends I_Record, OUT extends I_Record> = {
-    (ref: I_Ref_Props<T>, record: Omit<IN, "id">): Promise<OUT>
-    (ref: I_Ref_Props<T>, records: Omit<IN, "id">[]): Promise<OUT[]>
-}
-type I_Read_Method_Config<T extends I_Table_Defs, OUT extends I_Record> = {
-    (ref: I_Ref_Props<T>): Promise<OUT[]>;
-    (ref: I_Ref_Props<T>, id: number): Promise<OUT | undefined>;
-}
-type I_Update_Method_Config<T extends I_Table_Defs, IN extends I_Record, OUT extends I_Record> = {
-    (ref: I_Ref_Props<T>, record: IN): Promise<OUT>;
-    (ref: I_Ref_Props<T>, records: IN[]): Promise<OUT[]>;
-}
-type I_Delete_Method_Config<T extends I_Table_Defs> = {
-    (ref: I_Ref_Props<T>, ids: number|number[]): Promise<number>;
-}
-interface I_Table_Methods_Config<T extends I_Table_Defs, K extends keyof T> {
-    create: I_Create_Method_Config<T, U_TableInType<T, K>, U_TableOutType<T, K>>
-    read: I_Read_Method_Config<T, U_TableOutType<T, K>>;
-    update: I_Update_Method_Config<T, U_TableInType<T, K>, U_TableOutType<T, K>>;
-    delete: I_Delete_Method_Config<T>;
-}
+    /**
+     * Updates the given attributes in the Config
+     * 
+     * If nothing passed attributes be the same
+     */
+    async storeSettings (updates: Omit<Partial<Settings>, "id"> = {}): Promise<Settings> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const settingsArray = await this.read("settings");
+                const settings = await (async () => {
+                    const _settings = await getDefaultSettings();
+                    if (settingsArray.length === 0) {
+                        const { id, ...updatedSettings } = ({ ..._settings, ...updates } as Settings);
+                        const newSettings = this.create("settings", updatedSettings);
+                        return newSettings
+                    }
+                    const updatedSettings = { ..._settings, ...settingsArray[0], ...updates }
+                    const newSettings = this.update("settings", updatedSettings);
+                    return newSettings;
+                })();
+                resolve(settings);
+            } catch (e) {
+                console.error()
+                reject(e);
+            }
+        })
+    }
 
-type I_Read_Method<O extends I_Record> = {
-    (): Promise<O[]>;
-    (id: number): Promise<O | undefined>;
-}
-type I_Create_Method<I extends I_Record, O extends I_Record> = {
-    (record: Omit<I, "id">): Promise<O>;
-    (records: Omit<I, "id">[]): Promise<O[]>;
-}
-type I_Update_Method<I extends I_Record, O extends I_Record> = {
-    (record: I): Promise<O>;
-    (records: I[]): Promise<O[]>;
-}
-type I_Delete_Method = {
-    (ids: number|number[]): Promise<number>;
-}
-interface I_Table_Methods<I extends I_Record, O extends I_Record> {
-    create: I_Create_Method<I, O>;
-    read: I_Read_Method<O>;
-    update: I_Update_Method<I, O>;
-    delete: I_Delete_Method;
-}
+    /**
+     * Returns Birthdays between today and earliest notification
+     * 
+     * @param days earliest notification
+     * @param maxBirthdays How many birthdays will be returned
+     */
+    async getSortedBirthdays (days: number, maxBirthdays: number = 10): Promise<Birthday[]> {
+        const today = new Date();
+        return new Promise((resolve, reject) => {
+            if (maxBirthdays === 0) reject("Must be atleast one entry");
+            this.transaction("r", this.birthdays, async () => {
+                return await this.birthdays.filter((birthday) => {
+                    if (birthday.marked) return false;
+                    const date = new Date(birthday.date);
+                    const difference = (calcDaysUntilNextBirthday(date, today));
+                    return difference <= days;
+                }).limit(maxBirthdays).sortBy("date");
+            })
+            .then((v) => {
+                resolve(v);
+            })
+            .catch((e) => {
+                reject(e.msg);
+            })
+        })
+    }
 
-interface I_Uni_Database<T extends I_Table_Defs> {
-    db_instance: I_Database_Methods<T>;
-    tables: {
-        [K in keyof T]: {
-            [M in keyof I_Table_Methods<T[K]["in"], T[K]["out"]>]: I_Table_Methods<T[K]["in"], T[K]["out"]>[M];
-        };
+    getStorageSize = async (): Promise<number | undefined> => {
+        return new Promise(async (resolve, reject) => {
+            if (navigator.storage) {
+                const estimation = await navigator.storage.estimate();
+                if (estimation.usageDetails) resolve(estimation.usageDetails.indexedDB);
+                else resolve(undefined);
+            } else {
+                reject({
+                    msg: "Storage Manager not found",
+                })
+            }
+        })
     };
 }
 
-interface I_Table_Def_DB<T extends I_Table_Defs, N extends U_TableNames<T>> {
-    tableName: N;
-    table: I_Table_Methods_Config<T, N>
-}
+const db = new DexieDB();
 
-class Database <T extends I_Table_Defs> implements I_Uni_Database<T> {
-    db_instance!: I_Database_Methods<T>;
-    tables!: { [K in keyof T]: {
-        create: I_Create_Method<T[K]["in"], T[K]["out"]>;
-        read: I_Read_Method<T[K]["out"]>;
-        update: I_Update_Method<T[K]["in"], T[K]["out"]>;
-        delete: I_Delete_Method;
-    }; };
-    constructor (
-        db_instance: () => I_Database_Methods<T>,
-        tables: I_Table_Def_DB<T, U_TableNames<T>>[]
-    ) {
-        this.db_instance = db_instance();
-        this.tables = {} as any;
-        tables.forEach((v) => {
-            const ref_props: I_Ref_Props<T> = {
-                db_instance: this.db_instance,
-            }
-            this.tables[v.tableName] = {
-                create: (record) => {
-                    return v.table.create(ref_props, record as any) as any;
-                },
-                read: (id?) => {
-                    if (typeof id === "number") {
-                        return v.table.read(ref_props, id) as any;
-                    } else {
-                        return v.table.read(ref_props) as any;
-                    }
-                },
-                update: (record) => {
-                    return v.table.update(ref_props, record as any) as any;
-                },
-                delete: (id) => {
-                    return v.table.delete(ref_props, id);
-                }
-            };
-        })
-    }
-}
+/**
+ * Settings Config at the start of the application
+ * 
+ * If App has no Config, Config will be filled with undefined values
+ */
+const __INI_APP_SETTINGS__ = await db.storeSettings();
 
-export type { I_Record, I_DB_Error, I_Table_Methods_Config, T_Table_Def, I_Database_Methods, I_Update_Method_DB, I_Read_Method_DB, I_Create_Method_DB, U_TableInType, U_TableNames, U_TableOutType, I_Table_Def_DB, I_Table_Defs }
-export { Database }
+export { DexieDB, db, __INI_APP_SETTINGS__};

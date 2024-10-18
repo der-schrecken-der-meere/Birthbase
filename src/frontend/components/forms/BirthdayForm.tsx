@@ -1,16 +1,40 @@
-import { memo } from 'react'
+import { useCallback, useRef } from 'react'
 
-
+// React Date
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
-import { SubmitHandler, useForm } from "react-hook-form"
+
+// React Forms
+import {
+    SubmitHandler,
+    useForm
+} from "react-hook-form"
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+// React Icons
 import { MdCalendarMonth } from "react-icons/md";
 
+// React Loader
 import { TailSpin } from "react-loader-spinner";
 
+// React Redux
+import {
+    useDispatch,
+    useSelector
+} from 'react-redux';
+import {
+    FormMethod,
+    close,
+} from "@/frontend/store/dataForm/dataFormSlice";
+import {
+    addData,
+    deleteData,
+    updateData,
+} from "@/frontend/store/data/dataSlice";
+import { RootState } from '@/frontend/store/store';
+
+// Shadcn UI
 import { Button } from '@/frontend/components/ui/button';
 import { Calendar } from '@/frontend/components/ui/calendar';
 import {
@@ -28,13 +52,12 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/frontend/components/ui/popover';
-import { useToast } from '@/frontend/components/ui/use-toast';
-import { db } from "@/database/birthbase";
 
-import { useDispatch, useSelector } from 'react-redux';
-import { changeMethod, changeData, changeDataInitial } from "@/frontend/store/dataForm/dataFormSlice";
-import { addData, updateData, deleteData } from "@/frontend/store/data/dataSlice";
-import { RootState } from '@/frontend/store/store';
+// Database
+import { db } from "@/database/database_exports";
+import { Birthday } from '@/database/tables/birthday';
+import { useToastNotification } from '@/frontend/contexts/toastContext';
+import { useConfirm } from '@/frontend/contexts/confirmContext';
 
 const formSchema = z.object({
     id: z.number(),
@@ -53,7 +76,7 @@ const formSchema = z.object({
         message: "Nachname muss mindestens 3 Buchstaben haben",
     }),
     date: z.coerce.date({
-        message: "Falscher Datumsstring",
+        message: "Falsches Datumsformat",
     })
     .max(new Date(), {
         message: "Datum liegt in der Zukunft",
@@ -62,13 +85,17 @@ const formSchema = z.object({
 
 type T_Form = z.infer<typeof formSchema>
 
-const BirthdayForm = () => {
-    const { toast } = useToast();
+type AllMethods = FormMethod|"delete";
 
+const BirthdayForm = () => {
     const dispatch = useDispatch();
+    const { setErrorNotification, setSuccessNotification } = useToastNotification();
+    const { setConfirm } = useConfirm();
 
     const birthday = useSelector((state: RootState) => state.dataForm.value);
     const method = useSelector((state: RootState) => state.dataForm.method);
+
+    const methodRef = useRef<AllMethods>(method);
 
     const form = useForm<T_Form>({
         resolver: zodResolver(formSchema),
@@ -80,64 +107,100 @@ const BirthdayForm = () => {
         }
     });
 
+    const onAddUpdateClick = useCallback(() => {
+        methodRef.current = method;
+    }, [method]);
+
+    const onDeleteClick = useCallback(() => {
+        methodRef.current = "delete";
+    }, []);
+
     const onSubmit: SubmitHandler<T_Form> = async (data) => {
-        console.log("OnSubmit: ", data);
         try {
-            const newObj = {
+            const offset = data.date.getTimezoneOffset();
+            data.date.setMinutes(data.date.getMinutes() - offset);
+            const newObj: Birthday = {...birthday, ...{
                 id: data.id,
                 name: {
                     first: data.firstname,
                     last: data.lastname,
                 },
                 date: data.date.toISOString(),
-            }
+            }}
             console.log(method, newObj);
-            switch (method) {
+            switch (methodRef.current) {
                 case "add":
                     let { id, ...no_id } = newObj;
-                    let add_response = await db.tables.birthdays.create(no_id);
+                    let add_response = await db.create("birthdays", no_id);
                     newObj.id = add_response.id;
-                    console.log(newObj);
                     dispatch(addData(newObj));
-                    dispatch(changeMethod("update"));
-                    dispatch(changeData(newObj));
-                    form.reset({
-                        id: newObj.id,
-                        date: newObj.date as unknown as Date,
-                        firstname: newObj.name.first,
-                        lastname: newObj.name.last,
+                    setSuccessNotification({
+                        title: "Erfolgreich",
+                        description: (
+                            <>
+                                Der Geburtstag wurde erstellt
+                                <pre>
+                                    <code>{JSON.stringify(no_id, null, 2)}</code>
+                                </pre>
+                            </>
+                        )
                     })
                     break;
                 case "delete":
-                    await db.tables.birthdays.delete(newObj.id);
-                    dispatch(deleteData(newObj.id));
-                    dispatch(changeDataInitial({}));
+                    setConfirm({
+                        title: "Sind Sie wirklich sicher?",
+                        description: "Der Geburtstag wird gelöscht und danach nicht mehr angezeigt.",
+                        onConfirm: async () => {
+                            await db.Delete("birthdays", newObj.id);
+                            dispatch(deleteData(newObj.id));
+                            setSuccessNotification({
+                                title: "Erfolgreich",
+                                description: (
+                                    <>
+                                        Der Geburtstag wurde gelöscht.
+                                        <pre>
+                                            <code>{JSON.stringify(newObj, null, 2)}</code>
+                                        </pre>
+                                    </>
+                                ),
+                            });
+                        }
+                    })
                     break;
                 case "update":
-                    await db.tables.birthdays.update(newObj);
-                    dispatch(changeData(newObj));
+                    await db.update("birthdays", newObj);
                     dispatch(updateData(newObj));
+                    setSuccessNotification({
+                        title: "Erfolreich",
+                        description: (
+                            <>
+                                Der Geburtstag wurde geändert
+                                <pre>
+                                    <code>{JSON.stringify(newObj, null, 2)}</code>
+                                </pre>
+                            </>
+                        )
+                    })
                 break;
                 default:
                     break;
             }
-            
+            dispatch(close());
         } catch (e) {
             console.error(e);
+            setErrorNotification({
+                title: "Operation fehlgeschlagen",
+                description: (
+                    <>
+                        Geburtstag konnte nicht gelöscht werden
+                        <div>Fehler: {e as string}</div>
+                    </>
+                ),
+            })
             form.setError("root.serverError", {
                 type: (e as unknown as any).msg,
             })
         }
-        
-        toast({
-            duration: 5000,
-            title: "Sie haben diese Daten gesendet",
-            description: (
-                <pre>
-                    <code>{JSON.stringify(data, null, 2)}</code>
-                </pre>
-            ),
-        })
     }
 
     return (
@@ -181,7 +244,7 @@ const BirthdayForm = () => {
                     render={({field}) => (
                         <FormItem>
                             <FormLabel>Datum</FormLabel>
-                                <Popover>
+                                <Popover modal>
                                     <PopoverTrigger asChild>
                                         <FormControl>
                                             <Button
@@ -214,7 +277,7 @@ const BirthdayForm = () => {
                                             initialFocus
                                         />
                                     </PopoverContent>
-                                </Popover>    
+                                </Popover>
                             <FormDescription>
                                 Das Datum des Geburtstages
                             </FormDescription>
@@ -231,54 +294,38 @@ const BirthdayForm = () => {
                         </FormControl>
                     )}
                 />
-                <ActionButtons
-                    isSubmitting={form.formState.isSubmitting}
-                />
+                <div className='flex items-center'>
+                    <Button className="min-w-min w-20" onClick={onAddUpdateClick} disabled={form.formState.isSubmitting} type="submit" variant="outline">
+                        {
+                            form.formState.isSubmitting ? (
+                                <TailSpin
+                                    color='currentColor'
+                                    height={16}
+                                    width={16}
+                                />
+                            ) : (
+                                method === "add" ? "Hinzufügen" : "Ändern"
+                            )
+                        }
+                    </Button>
+                    {(method === "update") && <Button disabled={form.formState.isSubmitting} onClick={onDeleteClick} type="submit" variant="destructive" className="ml-auto min-w-min w-20">
+                        {
+                            form.formState.isSubmitting ? (
+                                <TailSpin
+                                    color='currentColor'
+                                    height={16}
+                                    width={16}
+                                />
+                            ) : (
+                                "Löschen"
+                            )
+                        }
+                    </Button>}
+                </div>
+                
             </form>
-        </Form>    
+        </Form>
     )
 }
 
-export default BirthdayForm
-
-interface I_ActionButtons {
-    isSubmitting: boolean,
-}
-
-const ActionButtons = memo(({
-    isSubmitting,
-}: I_ActionButtons) => {
-    const dispatch = useDispatch();
-    const method = useSelector((state: RootState) => state.dataForm.method);
-
-    return (
-        <div className='flex'>
-            <Button className="min-w-min w-20" disabled={isSubmitting} type="submit" variant="outline">
-                {
-                    isSubmitting ? (
-                        <TailSpin
-                            color='currentColor'
-                            height={16}
-                            width={16}
-                        />
-                    ) : (
-                        method === "add" ? "Hinzufügen" : "Ändern"
-                    )
-                }
-            </Button>
-            {(method === "update" || method === "delete") && <Button disabled={isSubmitting} onClick={() => dispatch(changeMethod("delete"))} type="submit" variant="destructive" className="ml-auto min-w-min w-20">
-                {
-                    isSubmitting ? (
-                        <TailSpin
-                            color='currentColor'
-                            height={16}
-                            width={16}
-                        />
-                    ) : (
-                        "Löschen"
-                    )
-                }   
-            </Button>}    
-        </div>
-    );
-});
+export default BirthdayForm;

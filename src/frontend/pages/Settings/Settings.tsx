@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 // Custom Components
 import PageWrapper from '../../components/PageWrapper'
@@ -31,6 +31,9 @@ import { RadioGroupItem, RadioGroup } from '@/frontend/components/ui/radio-group
 import { SelectProps } from '@radix-ui/react-select';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/frontend/components/ui/scroll-area';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/frontend/components/ui/collapsible';
+import { Button } from '@/frontend/components/ui/button';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const Settings = () => {
     return (
@@ -158,9 +161,13 @@ const NavigationLink = ({
 
 interface I_NavigationEntry {
     className?: string;
+    /** Short description of Context */
     caption?: React.ReactNode;
+    /** The title of Context */
     children?: React.ReactNode;
+    /** Element (mostly interactive) on the far right side of Context */
     rightElement?: React.ReactNode;
+    /** Descriptive Icon of Context */
     icon?: React.ReactNode;
 }
 
@@ -181,6 +188,48 @@ const NavigationEntry = ({
             {children}
         </NavigationLinkCore>
     );
+}
+
+interface I_CollapsibleNavEntry extends Omit<I_NavigationEntry, "rightElement"|"children"> {
+    /** The Title of Context */
+    title?: string,
+    /** Collapsible Content */
+    children?: React.ReactNode,
+}
+
+const CollapsibleNavEntry = ({
+    title,
+    caption,
+    icon,
+    children,
+    className,
+}: I_CollapsibleNavEntry) => {
+    const [open, setOpen] = useState(false);
+
+    return (
+        <Collapsible open={open} onOpenChange={setOpen}>
+            <NavigationEntry
+                icon={icon}
+                caption={caption}
+                rightElement={
+                    <CollapsibleTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                        >
+                            {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        </Button>
+                    </CollapsibleTrigger>
+                }
+                className={className}
+            >
+                {title}
+            </NavigationEntry>
+            <CollapsibleContent>
+                {children}
+            </CollapsibleContent>
+        </Collapsible>
+    )
 }
 
 type SelectValue = {
@@ -265,4 +314,4 @@ const SelectAsRadio = ({
 }
 
 export default Settings;
-export { NavigationEntry, NavigationLink, SelectAsRadio, SelectShortend };
+export { NavigationEntry, NavigationLink, SelectAsRadio, SelectShortend, CollapsibleNavEntry };

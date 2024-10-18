@@ -1,5 +1,5 @@
 import PageWrapper from '@/frontend/components/PageWrapper';
-import { NavigationEntry } from '../Settings'
+import { CollapsibleNavEntry, NavigationEntry } from '../Settings'
 import { useDispatch, useSelector } from 'react-redux';
 import { Switch } from '@/frontend/components/ui/switch';
 import { requestPermission } from '@tauri-apps/plugin-notification';
@@ -9,7 +9,6 @@ import {
     Bell,
     Info,
     AlarmClock,
-    ChevronDown,
 } from 'lucide-react';
 import { 
     Popover,
@@ -18,7 +17,6 @@ import {
 } from "@/frontend/components/ui/popover";
 import { Separator } from '@/frontend/components/ui/separator';
 import { AppDispatch, RootState } from '@/frontend/store/store';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/frontend/components/ui/collapsible';
 import { Button } from '@/frontend/components/ui/button';
 import { Input } from '@/frontend/components/ui/input';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage } from '@/frontend/components/ui/form';
@@ -56,30 +54,16 @@ const Notifications = () => {
                 </div>
             </NavigationEntry>
             <Separator/>
-            <Collapsible>
+            <CollapsibleNavEntry
+                icon={<AlarmClock/>}
+                caption="Wann Sie vor bevorstehende Geburtstagen erinnert werden"
+                title='Erinnerung'
+            >
                 <NavigationEntry
-                    icon={<AlarmClock/>}
-                    caption="Wann Sie vor bevorstehende Geburtstage erinnert werden"
-                    rightElement={
-                        <CollapsibleTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                            >
-                                <ChevronDown size={16} />
-                            </Button>
-                        </CollapsibleTrigger>
-                    }
+                    caption={<RememberInput/>}
                 >
-                    Erinnerung
                 </NavigationEntry>
-                <CollapsibleContent>
-                    <NavigationEntry
-                        caption={<RememberInput/>}
-                    >
-                    </NavigationEntry>
-                </CollapsibleContent>
-            </Collapsible>
+            </CollapsibleNavEntry>
         </PageWrapper>
     )
 }

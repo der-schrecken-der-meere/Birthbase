@@ -12,33 +12,34 @@ import {
     DropdownMenuTrigger,
 } from "@/frontend/components/ui/dropdown-menu"
 
-
-import { calcAge, calcDaysUntilNextBirthday } from '@/lib/main_util';
+// React Icons
 import {
     Trash2,
     Ellipsis,
     Pencil,
 } from "lucide-react"
-import { db } from "@/database/birthbase";
-
-
 
 // React Redux
 import { useDispatch } from 'react-redux';
 
 // Store Slices
-import { changeFormState } from "../../store/dataForm/dataFormSlice"
+import { openUpdate } from "../../store/dataForm/dataFormSlice"
 import { deleteData } from "../../store/data/dataSlice"
+
+// Tanstack table
 import { ColumnDef } from '@tanstack/react-table';
 
-import { I_Birthday } from "@/database/birthbase";
+// Tableblueprints
 import { DataTableColumnHeader } from '@/frontend/components/table_blueprint/DataTableColumnHeader';
 
-function capitalize(string: string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
+// Database
+import { db } from "@/database/database_exports";
+import { Birthday } from '@/database/tables/birthday';
 
-export const columns: ColumnDef<I_Birthday>[] = [
+// Lib
+import { calcAge, calcDaysUntilNextBirthday, capitalize } from '@/lib/main_util';
+
+export const columns: ColumnDef<Birthday>[] = [
     {
         id: "Datum",
         size: 9.375,
@@ -112,7 +113,7 @@ export const columns: ColumnDef<I_Birthday>[] = [
         header: ({ column }) => (column.id),
         cell: ({ cell, row }) => {
 
-            const obj = cell.getValue() as I_Birthday;
+            const obj = cell.getValue() as Birthday;
             const age = row.getValue("Alter") as number + 1;
             const text = `${capitalize(obj.name.first)} ${capitalize(obj.name.last)} (${format(new Date(obj.date), "dd.MM.yyyy")}) wird in ${row.getValue("Tage bis")} Tagen ${age} Jahr${age === 1 ? "" : "e"} alt`;
             
@@ -129,7 +130,7 @@ export const columns: ColumnDef<I_Birthday>[] = [
 
 interface I_ActionDropdown {
     clipboardText: string;
-    cell: I_Birthday;
+    cell: Birthday;
 }
 
 const AktionDropdown = ({
@@ -138,53 +139,49 @@ const AktionDropdown = ({
 }: I_ActionDropdown) => {
     const dispatch = useDispatch();
 
-    return (<DropdownMenu>
-        <DropdownMenuTrigger asChild>
-            <Button variant="ghost">
-                <Ellipsis className='h-4 w-4'/>
-            </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="center">
-            <DropdownMenuLabel>Aktionen</DropdownMenuLabel>
-            <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(clipboardText)}
-            >
-                Geburtstag als Nachricht kopieren
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="flex gap-2" onClick={() => {
-                const obj = {
-                    id: cell.id,
-                    name: cell.name,
-                    date: cell.date
-                }
-                dispatch(changeFormState({
-                    method: "update",
-                    value: obj,
-                    open: true,
-                }));
-                // dispatch(changeDataMethod({
-                //     method: "update",
-                //     value: v,
-                // }))
-                // dispatch(toggleOpen());
-            }}>
-                Ändern
-                <Pencil className='h-4 w-4'/>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="flex gap-2 text-destructive" onClick={async () => {
-                try {
-                    db.tables.birthdays.delete(cell?.id as number);
-                    dispatch(deleteData(cell?.id as number));
-                } catch (e) {
-                    console.error(e);
-                }
-            }}>
-                Löschen
-                <Trash2 className='h-4 w-4'/>
-            </DropdownMenuItem>
-        </DropdownMenuContent>
-    </DropdownMenu>);
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost">
+                    <Ellipsis className='h-4 w-4'/>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center">
+                <DropdownMenuLabel>Aktionen</DropdownMenuLabel>
+                <DropdownMenuItem
+                    onClick={() => navigator.clipboard.writeText(clipboardText)}
+                >
+                    Geburtstag als Nachricht kopieren
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="flex gap-2" onClick={() => {
+                    const obj: Birthday = {
+                        id: cell.id,
+                        name: cell.name,
+                        date: cell.date,
+                        marked: false,
+                    }
+                    dispatch(openUpdate(obj));
+                }}>
+                    Ändern
+                    <Pencil className='h-4 w-4'/>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="flex gap-2 text-destructive" onClick={async () => {
+                    try {
+                        const isDeleted = await db.Delete("birthdays", cell.id);
+                        if (isDeleted > 0) {
+                            dispatch(deleteData(cell.id));
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }}>
+                    Löschen
+                    <Trash2 className='h-4 w-4'/>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
 }
 
 export default columns

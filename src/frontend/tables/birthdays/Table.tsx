@@ -1,24 +1,31 @@
-import columns from "./columns";
+import { useState } from "react";
 
+// React Router Dom
+import { useSearchParams } from "react-router-dom";
+
+// React Redux
 import { useSelector } from "react-redux";
 import { RootState } from "@/frontend/store/store";
-import { DataTable } from "@/frontend/components/table_blueprint/DataTable";
-import { useState } from "react";
-import { ColumnFiltersState, SortDirection, SortingState, VisibilityState } from "@tanstack/react-table";
-import RowsPerPage from "@/frontend/components/table_blueprint/Pagination/RowsPerPage";
-import CurrentPage from "@/frontend/components/table_blueprint/Pagination/CurrentPage";
-import Navigation from "@/frontend/components/table_blueprint/Pagination/Navigation";
-import ValueFilter from "@/frontend/components/table_blueprint/Filter/ValueFilter";
-import DataTableViewOptions from "@/frontend/components/table_blueprint/Filter/DataTableViewOptions";
-import MobileTableOptions from "@/frontend/components/table_blueprint/MobileTableOptions";
-import { useSearchParams } from "react-router-dom";
-import { strict_OR } from "@/lib/main_util";
 
+// Tanstack Table
+import { ColumnFiltersState, SortDirection, SortingState, VisibilityState } from "@tanstack/react-table";
+
+// Tableblueprints
+import { DataTable }        from "@/frontend/components/table_blueprint/DataTable";
+import RowsPerPage          from "@/frontend/components/table_blueprint/Pagination/RowsPerPage";
+import CurrentPage          from "@/frontend/components/table_blueprint/Pagination/CurrentPage";
+import Navigation           from "@/frontend/components/table_blueprint/Pagination/Navigation";
+import ValueFilter          from "@/frontend/components/table_blueprint/Filter/ValueFilter";
+import DataTableViewOptions from "@/frontend/components/table_blueprint/Filter/DataTableViewOptions";
+import MobileTableOptions   from "@/frontend/components/table_blueprint/MobileTableOptions";
+
+import columns from "./columns";
+import { strict_OR } from "@/lib/main_util";
 
 const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">>> = ({
     className
 }) => {
-    let [searchParams, _] = useSearchParams();
+    let [searchParams] = useSearchParams();
     const birthdays = useSelector((state: RootState) => state.data.value);
 
     const params: [string|null,SortDirection|null] = [null, null];

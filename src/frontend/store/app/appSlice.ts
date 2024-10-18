@@ -13,7 +13,10 @@ const appSlice = createSlice({
     initialState,
     reducers: {
         setBooting: (data, action: PayloadAction<boolean>) => {
-            if (!action.payload) document.getElementById("loader")?.remove();
+            if (!action.payload) {
+                const loader = document.getElementById("loader");
+                if (loader) loader.remove();
+            }
             data.isBooting = action.payload;
         }
     }

@@ -30,9 +30,10 @@ import { useOutletContext } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 // Store Slices
-import { toggleOpen, changeDataInitial } from "@/frontend/store/dataForm/dataFormSlice.js"
-import Table from '@/frontend/tables/birthdays/Table.js';
+import { toggleOpen, openAdd } from "@/frontend/store/dataForm/dataFormSlice.js"
 import { AppDispatch, RootState } from '@/frontend/store/store.js';
+
+import Table from '@/frontend/tables/birthdays/Table.js';
 import { promise_delay } from '@/lib/main_util';
 
 const BirthdayForm = lazy(() => import("@/frontend/components/forms/BirthdayForm"))
@@ -60,7 +61,7 @@ const OtherFunctions = () => {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="outline" className='h-full ml-auto' size="icon">
+                <Button variant="outline" className='h-full ml-auto' size={"sm"}>
                     <Ellipsis className='h-4 w-4'/>
                     <span className="hidden sm:inline ml-2">Weitere Funktionen</span>
                 </Button>
@@ -91,9 +92,7 @@ const AddButton = () => {
             aria-label="add-birthdays"
             size="icon"
             onClick={() => 
-                dispatch(changeDataInitial({
-                    open: true,
-                }))
+                dispatch(openAdd())
             }
         >
             <MdAdd className='h-4 w-4'/>

@@ -30,7 +30,7 @@ import { initTauri } from "../backend/init";
 import init from "./init";
 import { promise_delay } from "@/lib/main_util";
 import ToastProvider from "./contexts/toastContext";
-import ConfirmProvider from "./contexts/alertContext";
+import ConfirmProvider from "./contexts/confirmContext";
 
 const MyBirthdays = lazy(() => promise_delay(() => import("./pages/MyBirthdays"), 0));
 const Settings = lazy(() => promise_delay(() => import("./pages/Settings/Settings"), 0));

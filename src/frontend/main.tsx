@@ -1,8 +1,9 @@
+import "./index.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
-import { store } from "./store/store";
+import "@/database/db";
 import { Provider } from "react-redux";
+import { store } from "./store/store";
 import App from "@/frontend/App";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(

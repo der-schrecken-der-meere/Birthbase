@@ -1,7 +1,6 @@
 import { Decimal } from "decimal.js"
 import type { StorageSize } from "../frontend/tables/storagesize/columns";
-import { db } from "../database/dexie_db";
-import { ModuleNamespace } from "vite/types/hot.js";
+import { db } from "../database/database_exports";
 
 export function calcAge (birthDate: Date, currentDate: Date) {
     let age = currentDate.getFullYear() - birthDate.getFullYear();
@@ -196,4 +195,52 @@ const promise_delay = <T>(file: () => Promise<T>, delay: number): Promise<T>  =>
     }))
 }
 
-export { storageSize, StorageType, toSmallestByteType, objIsEmpty, Format, getAllStorages, strict_OR, str_replace, promise_delay }
+const getPercentage = (total: number, part: number) => (100 * part / total);
+
+const stringSliceToJSON = (str: string, afterFull: (str: string) => void): false|string => {
+    let start = 0;
+    const stack: string[] = [];
+    const bracketPairs = {
+        '}': '{',
+        ']': '['
+    }
+
+    const length = str.length;
+
+    if (length === 0) return "";
+    if (!strict_OR<string>(str[0], "{", "[")) return false;
+
+    for (let i = 0; i < length; i++) {
+        if (str[i] === "{" || str[i] === "[") {
+            if (stack.length === 0) start = i;
+            stack.push(str[i]);
+        } else if (str[i] === "}" || str[i] === "]") {
+            if (stack.pop() !== bracketPairs[str[i] as ("]"|"}")]) {
+                return false;
+            }
+            if (stack.length === 0) {
+                afterFull(str.slice(start, i + 1));
+                start = i + 1;
+            }
+        }
+    }
+
+    return str.slice(start);
+}
+
+const asArray = <T>(element: any): T[] => {
+    if (Array.isArray(element)) return element;
+    return [element];
+}
+
+const concatArrayFast = <T>(arr1: T[], arr2: T[]): T[] => {
+    let newArray = [];
+    newArray.push(...arr1, ...arr2);
+    return newArray;
+}
+
+const capitalize = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+export { asArray, concatArrayFast, storageSize, StorageType, toSmallestByteType, objIsEmpty, Format, getAllStorages, strict_OR, str_replace, promise_delay, getPercentage, stringSliceToJSON, capitalize }
