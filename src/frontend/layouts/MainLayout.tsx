@@ -5,7 +5,6 @@ import {
 } from 'react'
 import Navbar, { MobileNavbar } from '../components/Navbar'
 import { Outlet } from 'react-router-dom'
-import { Toaster } from '../components/ui/toaster'
 import { useSelector } from 'react-redux'
 import { type RootState } from '../store/store'
 import { isTauri } from '../../globals/constants/environment'
@@ -31,7 +30,6 @@ const MainLayout = () => {
                     h-screen w-screen text-sans text-main-text
                     grid grid-rows-[minmax(0,1fr)_max-content] 
                     md:grid-rows-1 md:grid-cols-[13.75rem_minmax(0,1fr)]
-                    min-w-[300px]
                 `}
             >
                 <main className="relative md:col-start-2 md:col-end-3 md:row-start-1">
@@ -41,7 +39,6 @@ const MainLayout = () => {
                     >
                         <Outlet context={{ mainRef }}/>
                     </div>
-                    <Toaster/>
                 </main>
                 <div className="md:col-start-1 md:col-end-2 shadow-[0_0_10px_-5px_hsl(var(--primary))]">
                     <Navbar

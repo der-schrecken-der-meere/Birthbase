@@ -9,7 +9,7 @@ module.exports = {
     './index.html',
   ],
   prefix: "",
-  theme: {    
+  theme: {
     fontFamily: {
       "sans": ["Inter", "sans-serif"]
     },

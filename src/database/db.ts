@@ -97,12 +97,14 @@ class DexieDB extends Dexie implements I_Birthbase {
                 Array.isArray(record) ? record.map(e => e.id) : null;
             this.transaction("rw", this[table], async () => {
                 if (Array.isArray(record)) {
-                    await (this[table].where("id").anyOf(ids as number[]) as Collection<T>).modify((v, r) => {
+                    const a = await (this[table].where("id").anyOf(ids as number[]) as Collection<T>).modify((v, r) => {
                         r.value = record.find((value) => value.id === v.id) as T
                     })
+                    if (a === 0) throw Error("No element was found");
                 } else {
                     const { id, ..._record } = record;
-                    await (this[table] as Dexie.Table<any, number>).update(record.id, _record);
+                    const a = await (this[table] as Dexie.Table<any, number>).update(record.id, _record);
+                    if (a === 0) throw Error("No element was found");
                 }
             })
             .then(() => {

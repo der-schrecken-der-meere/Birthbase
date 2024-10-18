@@ -24,8 +24,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { cn } from '@/lib/utils';
-import { Toast, useToast } from '@/frontend/components/ui/use-toast';
-import { useRef } from 'react';
+import { useToastNotification } from '@/frontend/contexts/toastContext';
 
 const Notifications = () => {
     return (
@@ -36,10 +35,10 @@ const Notifications = () => {
                 rightElement={<NotificationSwitch/>}
             >
                 <div className='flex items-center gap-2'>
-                    Benachrichtigungen
+                    <span className='overflow-hidden text-ellipsis whitespace-pre'>Benachrichtigungen</span>
                     {!isTauri && (
                         <Popover>
-                            <PopoverTrigger><Info size={16} /></PopoverTrigger>
+                            <PopoverTrigger className='flex-shrink-0'><Info size={16} /></PopoverTrigger>
                             <PopoverContent className="text-sm" side="bottom">
                                 Diese Berechtigung kann nur über den Browser geändert werden.
                                 <br />
@@ -110,16 +109,11 @@ const RememberInput = ({
 }: {
     className?: string,
 }) => {
-
-    const { toast } = useToast();
-
-    const toastConfig = useRef<Toast>({
-        duration: 1000
-    });
-
     const dispatch = useDispatch<AppDispatch>();
 
-    const remember = useSelector((state: RootState) => state.notification.remember);
+    const { setErrorNotification, setSuccessNotification } = useToastNotification();
+    const remember = useSelector((state: RootState) => state.remember.remember);
+    const error = useSelector((state: RootState) => state.remember.error);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -129,17 +123,22 @@ const RememberInput = ({
     })
 
     const onSubmit = async (v: z.infer<typeof formSchema>) => {
-        try {
-            dispatch(setIDBRemember(v.remember));
-            toastConfig.current.title = "Erfolgreich"
-        } catch (e) {
-            toastConfig.current.variant = "destructive";
-            toastConfig.current.title = "Fehlgeschlagen";
-            toastConfig.current.description = <>{e as string}</>;
-        } finally {
-            toast(toastConfig.current);
+        dispatch(setIDBRemember(v.remember));
+        if (error) {
+            setErrorNotification({
+                title: "Fehler",
+                description: (
+                    <>
+                        <span>Erinnerung konnte nicht geändert werde</span>
+                        <span>Fehler: {error}</span>
+                    </>
+                )
+            })
+            return;
         }
-        
+        setSuccessNotification({
+            title: "Erinnerung wurde geändert"
+        })
     }
 
     return (

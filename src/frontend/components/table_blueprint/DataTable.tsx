@@ -39,6 +39,7 @@ interface DataTableProps<TData, TValue> {
     footerElements?: (table: T_Table<TData>) => React.ReactNode;
     headerElements?: (table: T_Table<TData>) => React.ReactNode;
     defaultSorting?: SortingState;
+    noDataFoundText?: string;
 }
 export const DataTable = <TData, TValue>({
     className,
@@ -52,6 +53,7 @@ export const DataTable = <TData, TValue>({
     footerElements,
     headerElements,
     defaultSorting,
+    noDataFoundText = "Keine Daten gefunden."
 }: DataTableProps<TData, TValue>) => {
     let config = useMemo<TableOptions<TData>>(() => {
         let _config: TableOptions<TData> = {
@@ -143,7 +145,7 @@ export const DataTable = <TData, TValue>({
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    Keine Daten gefunden.
+                                    {noDataFoundText}
                                 </TableCell>
                             </TableRow>
                         )}

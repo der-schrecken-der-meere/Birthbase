@@ -60,15 +60,16 @@ const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">>> =
                 <div className='flex items-center py-4'>
                     <ValueFilter
                         table={table}
+                        className="w-60 min-w-40 mr-2"
                         columnId="Nachname"
                         placeholder="Nachname..."
                     />
                     <DataTableViewOptions
-                        className="hidden sm:flex"
+                        className="hidden @xs:flex"
                         table={table}
                     />
                     <MobileTableOptions
-                        className="flex sm:hidden"
+                        className="flex @xs:hidden"
                         table={table}
                     />
                 </div>
@@ -77,12 +78,12 @@ const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">>> =
                 <div className="flex items-center justify-between py-2 mt-auto h-12">
                     <div className="flex items-center lg:space-x-8 ml-auto">
                         <RowsPerPage
-                            className="hidden sm:flex"
+                            className="hidden @lg:flex"
                             rowsPerPage={[5, 10, 20, 30, 40, 50]}
                             table={table}
                         />
                         <CurrentPage
-                            className="w-[120px]"
+                            className="w-[120px] hidden @xs:block"
                             str="Seite $1 von $2"
                             table={table}
                         />

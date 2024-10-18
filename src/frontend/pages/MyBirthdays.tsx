@@ -7,7 +7,6 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger
@@ -42,14 +41,14 @@ const OtherFunctionDialog = lazy(() => promise_delay(() => import("./../componen
 const MyBirthdays = () => {
     return (
         <PageWrapper docTitle='Birthbase - Meine Geburtstage' title='Meine Geburtstage'>
-            <div className='flex'>
-                <Label className="inline-flex w-max items-center gap-4 text-base font-light">
-                    Geburtstag erstellen
+            <div className='flex items-center'>
+                <Label className="inline-flex w-max items-center gap-4 text-base font-light mr-2">
+                    <span>Geburtstag erstellen</span>
                     <AddButton/>
                 </Label>
                 <OtherFunctions/>
             </div>
-            <Table/>
+            <Table className='flex-shrink' />
             <DialogWindow/>
         </PageWrapper>
     )
@@ -61,9 +60,9 @@ const OtherFunctions = () => {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="outline" className='h-full ml-auto' size={"sm"}>
+                <Button variant="outline" className='h-8 ml-auto px-2' size={"sm"}>
                     <Ellipsis className='h-4 w-4'/>
-                    <span className="hidden sm:inline ml-2">Weitere Funktionen</span>
+                    <span className="hidden @sm:inline ml-2">Weitere Funktionen</span>
                 </Button>
             </DialogTrigger>
             <DialogContent
@@ -88,7 +87,7 @@ const AddButton = () => {
 
     return (
         <Button
-            className='h-8 w-8'
+            className='h-8 w-8 flex-shrink-0'
             aria-label="add-birthdays"
             size="icon"
             onClick={() => 
@@ -149,9 +148,6 @@ const DialogWindow = () => {
                     }>
                         <BirthdayForm/>
                     </Suspense>
-
-                    <DialogFooter>
-                    </DialogFooter>
                 {/* </ScrollArea> */}
             </DialogContent>
         </Dialog>

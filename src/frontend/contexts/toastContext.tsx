@@ -8,8 +8,8 @@ type toastConfig = {
 }
 
 interface ToastContext {
-    setErrorNotification: (toastConfig: toastConfig) => void;
-    setSuccessNotification: (toastConfig: toastConfig) => void;
+    setErrorNotification: (toastConfig: Partial<toastConfig>) => void;
+    setSuccessNotification: (toastConfig: Partial<toastConfig>) => void;
 }
 
 const ToastContext = createContext<ToastContext>({
@@ -30,6 +30,7 @@ const ToastProvider = ({
             variant: "destructive",
             duration: 3000,
         } }
+        console.log(config);
         toast(config);
     }, []);
 

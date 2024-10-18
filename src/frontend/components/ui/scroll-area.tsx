@@ -13,7 +13,7 @@ const ScrollArea = React.forwardRef<
     if (viewportRef.current) {
       const e = viewportRef.current.children;
       if (e.length > 0) {
-        (e[0] as HTMLDivElement).className = "w-full !min-w-0";
+        (e[0] as HTMLDivElement).className = "w-full !min-w-0 h-full";
       }
     }
   });
