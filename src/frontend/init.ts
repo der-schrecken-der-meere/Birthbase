@@ -1,8 +1,8 @@
 import { __INI_APP_SETTINGS__, db } from "@/database/database_exports";
-import { setIDBNotificationPermission } from "./store/notification/notificationSlice";
+import { setPermission } from "./store/notification/notificationSlice";
 import { AppDispatch } from "./store/store";
 import { createData } from "./store/data/dataSlice";
-import { isTauri } from "@/globals/constants/environment";
+import { onPermissionChange } from "@/apis/tauri_notification";
 
 const init = async (dispatch: AppDispatch) => {
     await notifications(dispatch);
@@ -10,15 +10,7 @@ const init = async (dispatch: AppDispatch) => {
 }
 
 const notifications = async (dispatch: AppDispatch) => {
-    if (!isTauri) {
-        const perm = await navigator.permissions.query({
-            name: "notifications",
-        });
-
-        perm.onchange = () => {
-            dispatch(setIDBNotificationPermission(perm.state));
-        }
-    }
+    onPermissionChange((state) => dispatch(setPermission(state)));
 }
 
 const birthdayData = async (dispatch: AppDispatch) => {

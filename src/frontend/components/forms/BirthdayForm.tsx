@@ -58,6 +58,7 @@ import { db } from "@/database/database_exports";
 import { Birthday } from '@/database/tables/birthday';
 import { useToastNotification } from '@/frontend/contexts/toastContext';
 import { useConfirm } from '@/frontend/contexts/confirmContext';
+import { Checkbox } from '../ui/checkbox';
 
 const formSchema = z.object({
     id: z.number(),
@@ -81,6 +82,7 @@ const formSchema = z.object({
     .max(new Date(), {
         message: "Datum liegt in der Zukunft",
     }),
+    marked: z.coerce.boolean(),
 });
 
 type T_Form = z.infer<typeof formSchema>
@@ -104,6 +106,7 @@ const BirthdayForm = () => {
             firstname: birthday.name.first,
             lastname: birthday.name.last,
             date: birthday.date as unknown as Date,
+            marked: false,
         }
     });
 
@@ -126,6 +129,7 @@ const BirthdayForm = () => {
                     last: data.lastname,
                 },
                 date: data.date.toISOString(),
+                marked: data.marked,
             }}
             console.log(method, newObj);
             switch (methodRef.current) {
@@ -244,44 +248,66 @@ const BirthdayForm = () => {
                     render={({field}) => (
                         <FormItem>
                             <FormLabel>Datum</FormLabel>
-                                <Popover modal>
-                                    <PopoverTrigger asChild>
-                                        <FormControl>
-                                            <Button
-                                                variant="outline"
-                                                className={`w-full justify-start text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                                            >
-                                                {field.value ? (
-                                                    format(field.value, "dd-MM-yyyy")
-                                                ) : (
-                                                    <span>Datum auswählen</span>
-                                                )}
-                                                <MdCalendarMonth size={16} opacity={0.5} />
-                                            </Button>
-                                        </FormControl>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar
-                                            locale={de}
-                                            fromYear={1900}
-                                            toYear={new Date().getFullYear()}
-                                            captionLayout="dropdown-buttons"
-                                            fixedWeeks={true}
-                                            className=""
-                                            mode="single"
-                                            selected={field.value}
-                                            onSelect={field.onChange}
-                                            disabled={(date) => 
-                                                date > new Date() || date < new Date("1900-01-01")
-                                            }
-                                            initialFocus
-                                        />
-                                    </PopoverContent>
-                                </Popover>
+                            <Popover modal>
+                                <PopoverTrigger asChild>
+                                    <FormControl>
+                                        <Button
+                                            variant="outline"
+                                            className={`w-full justify-start text-left font-normal ${!field.value && "text-muted-foreground"}`}
+                                        >
+                                            {field.value ? (
+                                                format(field.value, "dd-MM-yyyy")
+                                            ) : (
+                                                <span>Datum auswählen</span>
+                                            )}
+                                            <MdCalendarMonth size={16} opacity={0.5} />
+                                        </Button>
+                                    </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        locale={de}
+                                        fromYear={1900}
+                                        toYear={new Date().getFullYear()}
+                                        captionLayout="dropdown-buttons"
+                                        fixedWeeks={true}
+                                        className=""
+                                        mode="single"
+                                        selected={field.value}
+                                        onSelect={field.onChange}
+                                        disabled={(date) => 
+                                            date > new Date() || date < new Date("1900-01-01")
+                                        }
+                                        initialFocus
+                                    />
+                                </PopoverContent>
+                            </Popover>
                             <FormDescription>
                                 Das Datum des Geburtstages
                             </FormDescription>
                             <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="marked"
+                    render={({field}) => (
+                        <FormItem className='flex items-start space-x-3 space-y-0'>
+                            <FormControl>
+                                <Checkbox
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                                <FormLabel>
+                                    Auf der Startseite anzeigen
+                                </FormLabel>
+                                <FormDescription>
+                                    Zeigt den Geburtstag an, wenn er kurz bevorsteht
+                                </FormDescription>
+                            </div>
                         </FormItem>
                     )}
                 />

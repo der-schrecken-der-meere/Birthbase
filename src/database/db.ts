@@ -30,6 +30,9 @@ class DexieDB extends Dexie implements I_Birthbase {
         this.version(3).stores({
             settings: "++id, mode, color, permission.notification, remember",
         })
+        this.version(4).stores({
+            settings: "++id, mode, color, remember",
+        })
     }
     create<K extends keyof I_Birthbase, T extends getInsert<K>>(table: K, record: Omit<T, "id">): Promise<T>;
     create<K extends keyof I_Birthbase, T extends getInsert<K>>(table: K, record: Omit<T, "id">[]): Promise<T[]>;
@@ -153,7 +156,7 @@ class DexieDB extends Dexie implements I_Birthbase {
             try {
                 const settingsArray = await this.read("settings");
                 const settings = await (async () => {
-                    const _settings = await getDefaultSettings();
+                    const _settings = getDefaultSettings();
                     if (settingsArray.length === 0) {
                         const { id, ...updatedSettings } = ({ ..._settings, ...updates } as Settings);
                         const newSettings = this.create("settings", updatedSettings);

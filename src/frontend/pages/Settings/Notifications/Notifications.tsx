@@ -2,8 +2,7 @@ import PageWrapper from '@/frontend/components/PageWrapper';
 import { CollapsibleNavEntry, NavigationEntry } from '../Settings'
 import { useDispatch, useSelector } from 'react-redux';
 import { Switch } from '@/frontend/components/ui/switch';
-import { requestPermission } from '@tauri-apps/plugin-notification';
-import { setIDBNotificationPermission, setIDBRemember } from '@/frontend/store/notification/notificationSlice';
+import { setPermission, setIDBRemember } from '@/frontend/store/notification/notificationSlice';
 import { isTauri } from "@/globals/constants/environment";
 import {
     Bell,
@@ -25,6 +24,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { cn } from '@/lib/utils';
 import { useToastNotification } from '@/frontend/contexts/toastContext';
+import { requestPermission } from '@/apis/tauri_notification';
 
 const Notifications = () => {
     return (
@@ -69,27 +69,33 @@ const Notifications = () => {
 
 const NotificationSwitch = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const not = useSelector((state: RootState) => state.notification.permission);
+    const permission = useSelector((state: RootState) => state.notification.value);
+    const { setErrorNotification } = useToastNotification();
 
     const onChange = (v: boolean) => {
-        if (isTauri) {
-            if (not === "default") {
-                requestPermission().then(e => dispatch(setIDBNotificationPermission(e ? "granted" : "denied")));
+        (async () => {
+            if (v && permission === "default") {
+                const result = await requestPermission();
+                if (result !== "unsupported") {
+                    dispatch(setPermission(result));
+                } else {
+                    setErrorNotification({
+                        title: "Das Feature ist leider nicht in der aktuellen Version verfügbar",
+                    })
+                }
             } else {
-                dispatch(setIDBNotificationPermission(!v ? "denied" : "granted"));
+                dispatch(setPermission(v ? "granted" : "denied"));
             }
-        } else {
-            Notification.requestPermission();
-        }
+        })();
     }
 
-    const disabled = isTauri ? false : (not !== "default");
+    const disabled = permission === "default" ? false : true;
 
     return (
         <Switch 
             aria-label="notification-toggle"
             disabled={disabled}
-            checked={not === "granted" ? true : false}
+            checked={permission === "granted" ? true : false}
             onCheckedChange={onChange}
         />
     )

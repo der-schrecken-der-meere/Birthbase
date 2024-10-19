@@ -46,7 +46,7 @@ const MyBirthdays = () => {
                     <span>Geburtstag erstellen</span>
                     <AddButton/>
                 </Label>
-                <OtherFunctions/>
+                {/* <OtherFunctions/> */}
             </div>
             <Table className='flex-shrink' />
             <DialogWindow/>

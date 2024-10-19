@@ -52,6 +52,12 @@ const BirthdayList = () => {
             try {
                 const _birthdays = await db.getSortedBirthdays(remember, 10);
                 setBirthdays(_birthdays);
+                if (Notification.permission === "granted" && _birthdays.length > 0) {
+                    const n = new Notification("Hallo", {
+                        "icon": "/icon.ico",
+                        "body": `Es stehen ${birthdays.length} Geburstag/e kurz bevor`,
+                    })
+                }
             } catch (e) {
                 setErrorNotification({
                     title: "Ist ein Fehler aufgetreten",

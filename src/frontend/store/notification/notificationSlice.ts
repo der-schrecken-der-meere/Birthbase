@@ -1,6 +1,6 @@
 import { isTauri } from "@/globals/constants/environment";
 import { __INI_APP_SETTINGS__, db } from "@/database/database_exports";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { isPermissionGranted } from '@tauri-apps/plugin-notification';
 
 interface RTKAsyncState {
@@ -8,8 +8,8 @@ interface RTKAsyncState {
     loading: boolean;
 }
 
-interface NotificationState extends RTKAsyncState {
-    permission: NotificationPermission;
+interface NotificationState {
+    value: NotificationPermission;
 }
 
 interface RememberState extends RTKAsyncState {
@@ -23,9 +23,7 @@ if (isTauri) {
 }
 
 const initialState: NotificationState = {
-    permission: permissionGranted,
-    error: null,
-    loading: false,
+    value: permissionGranted,
 };
 
 const initialStateRemember: RememberState = {
@@ -33,24 +31,6 @@ const initialStateRemember: RememberState = {
     error: null,
     loading: false,
 }
-
-const setIDBNotificationPermission = createAsyncThunk<
-    NotificationPermission,
-    PermissionState, 
-    {
-        rejectValue: any
-    }
->(
-    "notification/setIDBPermission",
-    async (permission, { rejectWithValue }) => {
-        try {
-            const res = await db.storeSettings({"permissions": {"notification": permission === "prompt" ? "default" : permission}});
-            return res.permissions.notification;
-        } catch (e) {
-            throw rejectWithValue(e);
-        }
-    }
-)
 
 const setIDBRemember = createAsyncThunk<
     number,
@@ -74,22 +54,10 @@ const notificationSlice = createSlice({
     name: "notification",
     initialState,
     reducers: {
-
+        setPermission: (data, action: PayloadAction<NotificationPermission>) => {
+            data.value = action.payload;
+        }
     },
-    extraReducers: (builder) => {
-        builder.addCase(setIDBNotificationPermission.fulfilled, (state, action) => {
-            state.permission = action.payload;
-            state.loading = false;
-        })
-        .addCase(setIDBNotificationPermission.pending, (state) => {
-            state.error = null
-            state.loading = true;
-        })
-        .addCase(setIDBNotificationPermission.rejected, (state, action) => {
-            state.error = action.payload;
-            state.loading = false;
-        })
-    }
 })
 
 const rememberSlice = createSlice({
@@ -118,5 +86,6 @@ const rememberSlice = createSlice({
 const rememberReducer = rememberSlice.reducer;
 const notificationReducer = notificationSlice.reducer;
 
-export { setIDBNotificationPermission, setIDBRemember }
+export const { setPermission } = notificationSlice.actions;
+export { setIDBRemember }
 export { rememberReducer, notificationReducer };
