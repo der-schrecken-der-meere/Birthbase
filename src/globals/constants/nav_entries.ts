@@ -1,78 +1,95 @@
-import MdOutlineSettings from "@/components/icons/MdOutlineSettings";
-import React, { type ReactElement } from "react";
+import { FunctionComponent } from "react";
+import { PageLinks } from "./links";
 import {
-    MdOutlineCottage,
-    MdOutlineCelebration
-} from "react-icons/md";
+    Bell,
+    CalendarClock,
+    HardDrive,
+    House,
+    Info,
+    Languages,
+    Monitor,
+    PartyPopper,
+    Settings
+} from "lucide-react";
 
-type NavEntry = {
-    href: string,
-    ariaLabel: string,
-    text: string,
-    className?: string,
-    id?: string,
-}
-type NavSection = NavEntry & {
-    icon: (size?: number|string) => ReactElement<any>,
-    entries?: NavEntry[],
-}
+type LinkEntry = {
+    title: string,
+    url: PageLinks,
+    icon: FunctionComponent,
+    search?: string[],
+    shortcut?: string,
+};
 
-const navigationList: NavSection[] = [
+const c_main_links: LinkEntry[] = [
     {
-        text: "Home",
-        href: "/",
-        ariaLabel: "Go to the entry site",
-        id: "home",
-        icon: (size = 40) => React.createElement(MdOutlineCottage, {size}),
+        title: "Startseite",
+        url: PageLinks.HOME,
+        icon: House,
+        search: [
+            "home"
+        ],
     },
     {
-        text: "Meine Geburtstage",
-        href: "/my_birthdays?col=Datum&sort=desc",
-        ariaLabel: "Go to your birthday site",
-        id: "my_birthdays",
-        icon: (size = 40) => React.createElement(MdOutlineCelebration, {size}),
+        title: "Meine Geburtstage",
+        url: PageLinks.MY_BIRTHDAYS_PARAMS,
+        icon: PartyPopper,
     },
     {
-        className: "mt-auto",
-        text: "Einstellungen",
-        href: "/settings",
-        ariaLabel: "Go to the settings site",
-        id: "settings",
-        icon: (size = 40) => React.createElement(MdOutlineSettings, {size}),
-        entries: [
-            {
-                text: "Aussehen",
-                href: "/appearance",
-                ariaLabel: "Go to the appearance section of the settings site"
-            },
-            {
-                text: "Benachrichtigungen",
-                href: "/notifications",
-                ariaLabel: "Go to the notification section of the settings site"
-            },
-            {
-                text: "Speicher",
-                href: "/storage",
-                ariaLabel: "Go to the storage section of the settings site"
-            },
-            {
-                text: "Datum und Uhrzeit",
-                href: "/time",
-                ariaLabel: "Go to the time section of the settings site"
-            },
-            {
-                text: "Sprache",
-                href: "/language",
-                ariaLabel: "Go to the language section of the settings site"
-            },
-            {
-                text: "Info",
-                href: "/info",
-                ariaLabel: "Go to the appearance section of the settings site"
-            }
-        ]
+        title: "Einstellungen",
+        url: PageLinks.SETTINGS,
+        icon: Settings,
+        shortcut: "⌘E",
+    },
+    {
+        title: "Benachrichtigungen",
+        url: PageLinks.NOTIFICATIONS,
+        icon: Bell,
+        shortcut: "⌘P",
     }
-]
+];
+const main_links = Object.freeze(c_main_links);
 
-export type { NavEntry, NavSection };
-export default navigationList;
+const c_settings_links: LinkEntry[] = [
+    {
+        title: "Aussehen",
+        url: PageLinks.SETTINGS_APPEARANCE,
+        icon: Monitor,
+        search: [
+            "Modus",
+            "Akzentfarbe",
+        ],
+    },
+    {
+        title: "Benachrichtigungen",
+        url: PageLinks.SETTINGS_NOTIFICATION,
+        icon: Bell,
+    },
+    {
+        title: "Speicher",
+        url: PageLinks.SETTINGS_STORAGE,
+        icon: HardDrive,
+        search: [
+            "Verfügbarer Speicher",
+            "Speicher leeren",
+        ],
+    },
+    {
+        title: "Datum und Zeit",
+        url: PageLinks.SETTINGS_TIME,
+        icon: CalendarClock,
+    },
+    {
+        title: "Sprache",
+        url: PageLinks.SETTINGS_LANGUAGE,
+        icon: Languages,
+    },
+    {
+        title: "Info",
+        url: PageLinks.SETTINGS_INFO,
+        icon: Info,
+    },
+];
+const settings_links = Object.freeze(c_settings_links);
+
+export type { LinkEntry };
+export { main_links, settings_links };

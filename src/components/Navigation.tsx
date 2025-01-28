@@ -1,4 +1,4 @@
-import { CSSProperties, Fragment, HTMLAttributes, useCallback } from 'react';
+import { CSSProperties, Fragment, HTMLAttributes, useCallback, useMemo } from 'react';
 import { GoBackInHistory } from './History';
 import { CustomSidebarTrigger } from './Sidebar';
 import { BreadcrumbDisplayProps, BreadcrumbProps, useNavbar } from '../hooks/useNavbar';
@@ -9,10 +9,11 @@ import { Link, LinkProps, NavLink } from 'react-router-dom';
 import { ScrollArea, ScrollBar } from './ui/scroll-area';
 import { AddBirthdayButton, MobileAddBirthdayButton } from './AddBirthdayButton';
 import { Button } from './ui/button';
-import { Bell, House, PartyPopper, Settings } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { get_notifications_query } from '@/features/latest_notifications/query';
 import { PageLinks } from '@/globals/constants/links';
 import { useSidebar } from './ui/sidebar';
+import { LinkEntry, main_links } from '@/globals/constants/nav_entries';
 
 const BreadcrumbListItem = ({
     type,
@@ -125,39 +126,46 @@ const MobileNavbar = ({
     ...props
 }: HTMLAttributes<HTMLDivElement>) => {
 
+    const arr_nav_entries = useMemo(() => {
+        const findLink = (page_link: PageLinks) => {
+            return main_links.find((link) => link.url === page_link) as LinkEntry;
+        };
+        const entries: ((LinkEntry & { invisible?: boolean })|null)[] = Array.from(
+            { length: 5 },
+            (_, i) => {
+                switch (i) {
+                    case 0:
+                        return findLink(PageLinks.HOME);
+                    case 1:
+                        return findLink(PageLinks.MY_BIRTHDAYS_PARAMS);
+                    case 3:
+                        return {...findLink(PageLinks.NOTIFICATIONS), ...{ invisible: true }};
+                    case 4:
+                        return findLink(PageLinks.SETTINGS);
+                    default:
+                        return null;
+                }
+            }
+        );
+        return entries;
+    }, []);
+
     return (
         <div className={cn("flex items-center justify-between", className)} {...props}>
-            {/* Home */}
-            <MobileNavbarLink
-                to={PageLinks.HOME}
-            >
-                <House/>
-                {/* Startseite */}
-            </MobileNavbarLink>
-            {/* My Birthdays */}
-            <MobileNavbarLink
-                to={PageLinks.MY_BIRTHDAYS_PARAMS}
-            >
-                <PartyPopper/>
-                {/* Geburtstage */}
-            </MobileNavbarLink>
-            {/* Add Birthday */}
-            <MobileAddBirthdayButton className="h-10"/>
-            {/* Placeholder */}
-            <MobileNavbarLink
-                to={PageLinks.HOME}
-                className="pointer-events-none invisible"
-            >
-                <Bell/>
-                {/* Benachrichtigungen */}
-            </MobileNavbarLink>
-            {/* Settings */}
-            <MobileNavbarLink
-                to={PageLinks.SETTINGS}
-            >
-                <Settings/>
-                {/* Einstellungen */}
-            </MobileNavbarLink>
+            {arr_nav_entries.map((entry) => {
+                if (entry) {
+                    return (
+                        <MobileNavbarLink
+                            key={entry.url}
+                            to={entry.url}
+                            className={entry.invisible ? "pointer-events-none invisible" : ""}
+                        >
+                            <entry.icon/>
+                        </MobileNavbarLink>
+                    );
+                }
+                return <MobileAddBirthdayButton key={"addBirthday"} className="h-10"/>;
+            })}
         </div>
     )
 };

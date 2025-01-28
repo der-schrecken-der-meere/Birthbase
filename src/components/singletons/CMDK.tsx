@@ -1,14 +1,5 @@
 import {
-    Monitor,
-    Calendar,
-    Settings,
-    Bell,
-    HardDrive,
-    CalendarClock,
-    Languages,
-    Info,
     Power,
-    Home,
 } from "lucide-react";
 // import {
 //     LuHome
@@ -25,7 +16,7 @@ import {
     CommandShortcut,
 } from "../ui/command";
 
-import { useEffect, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 
 import { Link } from "react-router-dom";
 
@@ -37,6 +28,7 @@ import { ScrollArea } from "../ui/scroll-area";
 
 import { primitive_strict_or } from "@/lib/functions/logic/or";
 import { PageLinks } from "@/globals/constants/links";
+import { main_links, settings_links } from "@/globals/constants/nav_entries";
 
 const CMDK = () => {
 
@@ -65,92 +57,31 @@ const CMDK = () => {
                 <ScrollArea className="h-[300px]">
                     <CommandEmpty>Keine Übereinstimmungen gefunden.</CommandEmpty>
                     <CommandGroup heading="Links">
-                        <CommandItem asChild>
-                            <Link
-                                to={PageLinks.HOME}
+                        {main_links.map((link) => (
+                            <SearchEntry
+                                key={link.url}
+                                to={link.url}
                                 onClick={onClick}
-                            >
-                                <Home className="mr-2 h-4 w-4" />
-                                <span>Startseite<span className="hidden">Home</span></span>
-                            </Link>
-                        </CommandItem>
-                        <CommandItem asChild>
-                            <Link
-                                to={PageLinks.MY_BIRTHDAYS_PARAMS}
-                                onClick={onClick}
-                            >
-                                <Calendar className="mr-2 h-4 w-4" />
-                                <span>Meine Geburtstage</span>
-                            </Link>
-                        </CommandItem>
-                        <CommandItem asChild>
-                            <Link
-                                to={PageLinks.SETTINGS}
-                                onClick={onClick}
-                            >
-                                <Settings className="mr-2 h-4 w-4" />
-                            <span>Einstellungen</span>
-                            <CommandShortcut>⌘E</CommandShortcut>
-                            </Link>
-                        </CommandItem>
+                                Icon={link.icon}
+                                title={link.title}
+                                hidden={link.search}
+                                shortcut={link.shortcut}
+                            />
+                        ))}
                     </CommandGroup>
                     <CommandSeparator />
                     <CommandGroup heading="Einstellungen">
-                        <CommandItem asChild>
-                            <Link
-                                to={PageLinks.SETTINGS_APPEARANCE}
+                        {settings_links.map((link) => (
+                            <SearchEntry
+                                key={link.url}
+                                to={link.url}
                                 onClick={onClick}
-                            >
-                                <Monitor className="mr-2 h-4 w-4" />
-                                <span>Aussehen<span className="hidden">Modus,Akzentfarbe</span></span>
-                            </Link>
-                        </CommandItem>
-                        <CommandItem asChild>
-                            <Link
-                                to={PageLinks.SETTINGS_NOTIFICATION}
-                                onClick={onClick}
-                            >
-                                <Bell className="mr-2 h-4 w-4" />
-                                <span>Benachrichtigungen</span>
-                            </Link>
-                        </CommandItem>
-                        <CommandItem asChild>
-                            <Link
-                                to={PageLinks.SETTINGS_STORAGE}
-                                onClick={onClick}
-                            >
-                                <HardDrive className="mr-2 h-4 w-4" />
-                                <span>Speicher<span className="hidden">Verfügbarer Speicher,Speicher leeren</span></span>
-                            </Link>
-                        </CommandItem>
-                        <CommandItem asChild>
-                            <Link
-                                to={PageLinks.SETTINGS_TIME}
-                                onClick={onClick}
-                                onPointerDown={onClick}
-                            >
-                                <CalendarClock className="mr-2 h-4 w-4" />
-                                <span>Datum und Uhrzeit</span>
-                            </Link>
-                        </CommandItem>
-                        <CommandItem asChild>
-                            <Link
-                                to={PageLinks.SETTINGS_LANGUAGE}
-                                onClick={onClick}
-                            >
-                                <Languages className="mr-2 h-4 w-4" />
-                                <span>Sprache</span>
-                            </Link>
-                        </CommandItem>
-                        <CommandItem asChild>
-                            <Link
-                                to={PageLinks.SETTINGS_INFO}
-                                onClick={onClick}
-                            >
-                                <Info className="mr-2 h-4 w-4" />
-                                <span>Info</span>
-                            </Link>
-                        </CommandItem>
+                                Icon={link.icon}
+                                title={link.title}
+                                hidden={link.search}
+                                shortcut={link.shortcut}
+                            />
+                        ))}
                     </CommandGroup>
                     {!isTauri() ? null : 
                        <>
@@ -176,6 +107,40 @@ const CMDK = () => {
                 </ScrollArea>
             </CommandList>
         </CommandDialog>
+    );
+};
+
+type SearchEntryProps = {
+    to: PageLinks,
+    onClick: () => void,
+    Icon: FunctionComponent<{ className: string }>,
+    title: string,
+    hidden?: string[],
+    shortcut?: string,
+};
+
+const SearchEntry = ({
+    to,
+    Icon,
+    onClick,
+    title,
+    hidden,
+    shortcut,
+}: SearchEntryProps) => {
+    return (
+        <CommandItem asChild>
+            <Link
+                to={to}
+                onClick={onClick}
+            >
+                <Icon className="mr-2 h-4 w-4" />
+                <span>
+                    {title}
+                    {(hidden && hidden.length > 0) && <span className="hidden">{hidden.join(", ")}</span>}
+                </span>
+                {shortcut && <CommandShortcut>{shortcut}</CommandShortcut>}
+            </Link>
+        </CommandItem>
     );
 };
 
