@@ -1,6 +1,11 @@
 import { isTauri } from "@tauri-apps/api/core";
-import { isPermissionGranted, requestPermission as _requestPermission } from "@tauri-apps/plugin-notification";
-import * as NotificationAPI from "./notification";
+import {
+    isPermissionGranted as tauri_is_permission_granted,
+    requestPermission as tauri_request_permission,
+    sendNotification as tauri_send_notification,
+    type Options
+} from "@tauri-apps/plugin-notification";
+import { GlobalErrors } from "@/globals/constants/errors";
 
 /**
  * Request permission for displaying notifications
@@ -15,20 +20,24 @@ import * as NotificationAPI from "./notification";
  * "unsupported" - This feature is not supported by the system.
  * 
  */
-const requestPermission = (): Promise<NotificationPermission|"unsupported"> => {
-    return new Promise(async (resolve) => {
-        try {
-            if (!isTauri()) {
-                const result = NotificationAPI.requestPermission()
-                resolve(result);
+const request_notification_permission = async (): Promise<NotificationPermission|GlobalErrors.UNSUPPORTED> => {
+    try {
+        if (!isTauri()) {
+            if (!window?.Notification) {
+                return Promise.resolve(GlobalErrors.UNSUPPORTED);
             }
-            const result = await _requestPermission();
-            resolve(result);
-        } catch (e) {
-            resolve("unsupported");
+            if (!Notification?.requestPermission) {
+                return Promise.resolve(GlobalErrors.UNSUPPORTED);
+            }
+            const str_permission = await Notification.requestPermission();
+            return Promise.resolve(str_permission);
         }
-    });
-}
+        const str_permission = await tauri_request_permission();
+        return Promise.resolve(str_permission);
+    } catch (error) {
+        return Promise.resolve(GlobalErrors.UNSUPPORTED);
+    }
+};
 
 /**
  * Gets the current permission for sending notifications
@@ -43,20 +52,44 @@ const requestPermission = (): Promise<NotificationPermission|"unsupported"> => {
  * "unsupported" - This feature is not supported by the system.
  * 
  */
-const currentPermission = (): Promise<NotificationPermission|"unsupported"> => {
-    return new Promise(async (resolve) => {
-        try {
-            if (!isTauri()) {
-                const result = NotificationAPI.currentPermission();
-                resolve(result);
+const get_notification_permission = async (): Promise<NotificationPermission|GlobalErrors.UNSUPPORTED> => {
+    try {
+        if (!isTauri()) {
+            if (Notification?.permission) {
+                return Promise.resolve(Notification.permission);
             }
-            const result = await isPermissionGranted();
-            resolve(result ? "granted" : "denied");
-        } catch (e) {
-            resolve("unsupported");
+            // @ts-ignore It's possible in older version that permissions is not available
+            if (navigator?.permissions.query) {
+                return Promise.resolve(GlobalErrors.UNSUPPORTED);
+            };
+            const obj_permission = await navigator.permissions.query({ name: "notifications" });
+            return Promise.resolve(obj_permission.state === "prompt" ? "default": obj_permission.state);
         }
-    });
-}
+        const bool_permission = await tauri_is_permission_granted();
+        return Promise.resolve(bool_permission ? "granted": "denied");
+    } catch (error) {
+        return Promise.resolve(GlobalErrors.UNSUPPORTED);
+    }
+};
+
+/**
+ * Triggers the callback when the user changes the permission for notifications 
+ * @returns - A promise resolving to void or:
+ * 
+ * "unsupported" - This feature is not supported by the system.
+ * 
+ */
+const on_notification_permission_change = async (
+    callback: (state: NotificationPermission) => void
+): Promise<void|GlobalErrors.UNSUPPORTED> => {
+    if (!navigator?.permissions?.query) {
+        return Promise.resolve(GlobalErrors.UNSUPPORTED);
+    }
+    const obj_permission = await navigator.permissions.query({ name: "notifications" });
+    obj_permission.onchange = () => callback(
+        obj_permission.state === "prompt" ? "default" : obj_permission.state
+    );
+};
 
 /**
  * Sends a notification. 
@@ -70,15 +103,28 @@ const currentPermission = (): Promise<NotificationPermission|"unsupported"> => {
  * "unsupported" - This feature is not supported by the system.
  * 
  */
-const send = NotificationAPI.send;
+const send_notification = async (options: Options): Promise<void | "denied" | GlobalErrors.UNSUPPORTED> => {
+    let str_permission = await get_notification_permission();
+    if (str_permission !== "granted") {
+        str_permission = await request_notification_permission();
+    }
+    if (str_permission === "default") {
+        str_permission = "denied";
+    }
+    if (str_permission !== "granted") {
+        return Promise.resolve(str_permission);
+    }
+    if (!isTauri()) {
+        const { title, ...obj_options } = options;
+        new Notification(options.title, obj_options);
+        return Promise.resolve();
+    }
+    tauri_send_notification(options);
+};
 
-/**
- * Triggers the callback when the user changes the permission for notifications 
- * @returns - A promise resolving to void or:
- * 
- * "unsupported" - This feature is not supported by the system.
- * 
- */
-const onPermissionChange = NotificationAPI.onPermissionChange;
-
-export { currentPermission, requestPermission, onPermissionChange, send };
+export {
+    get_notification_permission,
+    request_notification_permission,
+    on_notification_permission_change,
+    send_notification
+};

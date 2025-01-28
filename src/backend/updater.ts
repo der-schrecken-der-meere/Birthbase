@@ -1,7 +1,7 @@
-import { AppDispatch, RootState } from "@/frontend/store/store";
+import { AppDispatch, RootState } from "@/store/store";
 import { check } from "@tauri-apps/plugin-updater"
 import { relaunch } from "@tauri-apps/plugin-process"
-import { startDownload, updateProgress, finishDownload } from "@/frontend/store/update/updateSlice";
+import { startDownload, updateProgress, finishDownload } from "@/store/update/updateSlice";
 import { UseSelector } from "react-redux";
 
 /**

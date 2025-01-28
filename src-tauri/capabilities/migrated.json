@@ -7,14 +7,19 @@
   ],
   "permissions": [
     "notification:default",
-    "updater:default",
     "core:app:allow-version",
     "core:app:allow-tauri-version",
     "os:allow-arch",
     "os:allow-os-type",
     "os:allow-platform",
     "process:allow-restart",
+    "process:allow-exit",
     "sql:default",
-    "fs:default"
+    "fs:default",
+    {
+      "identifier": "fs:scope-appdata-recursive",
+      "allow": [{ "path": "$APPCONFIG/*" }]
+    },
+    "updater:default"
   ]
 }

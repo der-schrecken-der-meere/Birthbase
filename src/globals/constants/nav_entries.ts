@@ -1,4 +1,4 @@
-import MdOutlineSettings from "@/frontend/components/icons/MdOutlineSettings";
+import MdOutlineSettings from "@/components/icons/MdOutlineSettings";
 import React, { type ReactElement } from "react";
 import {
     MdOutlineCottage,
@@ -13,7 +13,7 @@ type NavEntry = {
     id?: string,
 }
 type NavSection = NavEntry & {
-    icon: (size?: number|string) => ReactElement,
+    icon: (size?: number|string) => ReactElement<any>,
     entries?: NavEntry[],
 }
 

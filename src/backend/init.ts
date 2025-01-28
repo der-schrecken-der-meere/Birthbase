@@ -6,9 +6,9 @@ import {
     getVersion
 } from "@tauri-apps/api/app"
 import { Platform, platform as _platform } from "@tauri-apps/plugin-os";
-import { setAppInfo, setUpdateInfo, UpdateInfo } from "@/frontend/store/tauri/tauriSlice";
-import { AppDispatch } from "@/frontend/store/store";
-import { strict_OR } from "@/lib/main_util";
+import { setAppInfo, setUpdateInfo, UpdateInfo } from "@/store/tauri/tauriSlice";
+import { AppDispatch } from "@/store/store";
+import { primitive_strict_or } from "@/lib/functions/logic/or";
 
 const initTauri = async (dispatch: AppDispatch) => {
     const platform = _platform();
@@ -23,7 +23,7 @@ const initTauri = async (dispatch: AppDispatch) => {
     }))
 
     // Updater is only supported on these platforms
-    if (strict_OR<Platform>(platform, "windows", "linux", "macos")) await updater(dispatch);
+    if (primitive_strict_or<Platform>(platform, "windows", "linux", "macos")) await updater(dispatch);
 }
 
 const updater = async (dispatch: AppDispatch) => {

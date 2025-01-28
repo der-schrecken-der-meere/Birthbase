@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Allow: /my_birthdays
+Allow: /notifications
 Allow: /settings
 Allow: /settings/appearance
 Allow: /settings/notifications

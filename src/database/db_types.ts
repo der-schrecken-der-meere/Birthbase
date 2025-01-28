@@ -1,3 +1,5 @@
-export type CoreRecord = {
+type CoreRecord = {
     id: number,
 }
+
+export type { CoreRecord }

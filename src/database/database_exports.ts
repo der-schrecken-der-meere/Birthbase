@@ -1,3 +1,3 @@
-import { db, __INI_APP_SETTINGS__ } from "./db";
+import { db } from "./db";
 
-export { db, __INI_APP_SETTINGS__ };
+export { db };
