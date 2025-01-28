@@ -12,7 +12,6 @@ import { Button } from './ui/button';
 import { Bell, House, PartyPopper, Settings } from 'lucide-react';
 import { get_notifications_query } from '@/features/latest_notifications/query';
 import { PageLinks } from '@/globals/constants/links';
-import { useSidebar } from './ui/sidebar';
 
 const BreadcrumbListItem = ({
     type,
@@ -100,7 +99,7 @@ const HorizontalNavbar = ({
                 >
                     <Bell className='w-4 h-4'/>
                     {notification_data.length > 0 && (
-                        <div className='bg-primary w-2 h-2 rounded-full absolute right-1 bottom-1 outline outline-offset-0 outline-[3px] outline-background'></div>
+                        <div className='bg-primary w-2 h-2 rounded-full absolute right-1 bottom-1 outline-offset-0 outline-3 outline-background'></div>
                     )}
                 </Link>
             </Button>
@@ -162,16 +161,16 @@ const MobileNavbarLink = ({
 }: LinkProps) => {
     return (
         <Button
-            asChild
             variant="ghost"
             size="icon"
             className={cn('flex flex-col gap-1 items-center text-xs font-light', className)}
         >
-            <Link
+            <NavLink
                 to={to}
+                className={({ isActive }) => cn(isActive ? "text-primary" : "")}
             >
                 {children}
-            </Link>
+            </NavLink>
         </Button>
     )
 };
