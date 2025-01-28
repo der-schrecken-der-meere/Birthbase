@@ -12,6 +12,7 @@ import { Button } from './ui/button';
 import { Bell, House, PartyPopper, Settings } from 'lucide-react';
 import { get_notifications_query } from '@/features/latest_notifications/query';
 import { PageLinks } from '@/globals/constants/links';
+import { useSidebar } from './ui/sidebar';
 
 const BreadcrumbListItem = ({
     type,
@@ -50,6 +51,8 @@ const HorizontalNavbar = ({
 
     const { pageTitle, breadcrumbs } = useNavbar({});
 
+    const { isMobile } = useSidebar();
+
     const { data: notification_data } = get_notifications_query();
 
     const renderBreadcrumbs = useCallback((breadcrumbs?: BreadcrumbDisplayProps[]) => {
@@ -75,17 +78,22 @@ const HorizontalNavbar = ({
                 size="icon"
                 className='w-7 h-7'
             />
-            <ScrollArea className='flex-1'>
-                <Breadcrumb className='px-1'>
-                    <BreadcrumbList className='flex-nowrap'>
-                        {renderBreadcrumbs(breadcrumbs)}
-                        <BreadcrumbItem>
-                            <BreadcrumbPage className='text-xl font-medium whitespace-pre text-ellipsis overflow-hidden flex-1'>{pageTitle}</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
-                <ScrollBar orientation="horizontal" />
-            </ScrollArea>
+            {isMobile
+                ? <div className='whitespace-pre text-ellipsis overflow-hidden flex-1'>{pageTitle}</div>
+                : (
+                    <ScrollArea className='flex-1'>
+                        <Breadcrumb className='px-1'>
+                            <BreadcrumbList className='flex-nowrap'>
+                                {renderBreadcrumbs(breadcrumbs)}
+                                <BreadcrumbItem>
+                                    <BreadcrumbPage className='text-xl font-medium flex-1'>{pageTitle}</BreadcrumbPage>
+                                </BreadcrumbItem>
+                            </BreadcrumbList>
+                        </Breadcrumb>
+                        <ScrollBar orientation="horizontal" />
+                    </ScrollArea>
+                )
+            }
             <AddBirthdayButton className='hidden @md:flex'/>
             <Button
                 asChild
