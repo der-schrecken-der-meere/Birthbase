@@ -36,6 +36,7 @@ import { isTauri } from "@tauri-apps/api/core";
 import { ScrollArea } from "../ui/scroll-area";
 
 import { primitive_strict_or } from "@/lib/functions/logic/or";
+import { PageLinks } from "@/globals/constants/links";
 
 const CMDK = () => {
 
@@ -66,7 +67,7 @@ const CMDK = () => {
                     <CommandGroup heading="Links">
                         <CommandItem asChild>
                             <Link
-                                to="/"
+                                to={PageLinks.HOME}
                                 onClick={onClick}
                             >
                                 <Home className="mr-2 h-4 w-4" />
@@ -75,7 +76,7 @@ const CMDK = () => {
                         </CommandItem>
                         <CommandItem asChild>
                             <Link
-                                to="/my_birthdays"
+                                to={PageLinks.MY_BIRTHDAYS_PARAMS}
                                 onClick={onClick}
                             >
                                 <Calendar className="mr-2 h-4 w-4" />
@@ -84,7 +85,7 @@ const CMDK = () => {
                         </CommandItem>
                         <CommandItem asChild>
                             <Link
-                                to="/settings"
+                                to={PageLinks.SETTINGS}
                                 onClick={onClick}
                             >
                                 <Settings className="mr-2 h-4 w-4" />
@@ -97,7 +98,7 @@ const CMDK = () => {
                     <CommandGroup heading="Einstellungen">
                         <CommandItem asChild>
                             <Link
-                                to="/settings/appearance"
+                                to={PageLinks.SETTINGS_APPEARANCE}
                                 onClick={onClick}
                             >
                                 <Monitor className="mr-2 h-4 w-4" />
@@ -106,7 +107,7 @@ const CMDK = () => {
                         </CommandItem>
                         <CommandItem asChild>
                             <Link
-                                to="/settings/notifications"
+                                to={PageLinks.SETTINGS_NOTIFICATION}
                                 onClick={onClick}
                             >
                                 <Bell className="mr-2 h-4 w-4" />
@@ -115,7 +116,7 @@ const CMDK = () => {
                         </CommandItem>
                         <CommandItem asChild>
                             <Link
-                                to="/settings/storage"
+                                to={PageLinks.SETTINGS_STORAGE}
                                 onClick={onClick}
                             >
                                 <HardDrive className="mr-2 h-4 w-4" />
@@ -124,7 +125,7 @@ const CMDK = () => {
                         </CommandItem>
                         <CommandItem asChild>
                             <Link
-                                to="/settings/time"
+                                to={PageLinks.SETTINGS_TIME}
                                 onClick={onClick}
                                 onPointerDown={onClick}
                             >
@@ -134,7 +135,7 @@ const CMDK = () => {
                         </CommandItem>
                         <CommandItem asChild>
                             <Link
-                                to="/settings/language"
+                                to={PageLinks.SETTINGS_LANGUAGE}
                                 onClick={onClick}
                             >
                                 <Languages className="mr-2 h-4 w-4" />
@@ -143,7 +144,7 @@ const CMDK = () => {
                         </CommandItem>
                         <CommandItem asChild>
                             <Link
-                                to="/settings/info"
+                                to={PageLinks.SETTINGS_INFO}
                                 onClick={onClick}
                             >
                                 <Info className="mr-2 h-4 w-4" />
