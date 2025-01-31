@@ -48,7 +48,7 @@
   "bundle": {
     "active": true,
     "category": "Utility",
-    "createUpdaterArtifacts": true,
+    "createUpdaterArtifacts": false,
     "icon": [
       "icons/icon.ico"
     ],

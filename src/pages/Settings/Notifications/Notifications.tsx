@@ -122,7 +122,7 @@ const Notifications = () => {
                             icon={<Bell/>}
                             rightElement={
                                 <Switch 
-                                    aria-label="Benachrichtigungen aus- oder einschalten"
+                                    aria-label="Benachrichtigungen ein- oder ausschalten"
                                     checked={value}
                                     onCheckedChange={onChange}
                                     {...props}

@@ -66,6 +66,7 @@ import {
 } from '@/lib/utils';
 import { main_links, settings_links } from '@/globals/constants/nav_entries';
 import { PageLinks } from '@/globals/constants/links';
+import { ButtonProps } from 'react-day-picker';
 
 const AppSidebar = () => {
 
@@ -209,7 +210,7 @@ const SidebarEntry = ({
     );
 }
 
-const CustomSidebarTrigger = () => {
+const CustomSidebarTrigger = (props: ButtonProps) => {
     // const { toggleSidebar, open, isMobile } = useSidebar();
 
     // if (!isMobile)
@@ -229,7 +230,7 @@ const CustomSidebarTrigger = () => {
     //     );
 
     // return (<SidebarTrigger className='absolute right-0 top-0 z-50'/>)
-    return <SidebarTrigger Icon={Menu}/>
+    return <SidebarTrigger {...props} Icon={Menu}/>
 }
 
 export { AppSidebar, CustomSidebarTrigger };

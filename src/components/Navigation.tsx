@@ -73,14 +73,14 @@ const HorizontalNavbar = ({
             className={cn("flex items-center border-b-[0px] py-2 gap-2 @container", className)}
             {...props}
         >
-            <CustomSidebarTrigger/>
+            <CustomSidebarTrigger className='h-7 w-7'/>
             <GoBackInHistory
                 variant="ghost"
                 size="icon"
                 className='w-7 h-7'
             />
             {isMobile
-                ? <div className='whitespace-pre text-ellipsis overflow-hidden flex-1'>{pageTitle}</div>
+                ? <div className='whitespace-pre text-ellipsis overflow-hidden text-xl flex-1'>{pageTitle}</div>
                 : (
                     <ScrollArea className='flex-1'>
                         <Breadcrumb className='px-1'>
@@ -106,7 +106,7 @@ const HorizontalNavbar = ({
                 <Link
                     to={PageLinks.NOTIFICATIONS}
                 >
-                    <Bell className='w-4 h-4'/>
+                    <Bell className='w-5 h-5'/>
                     {notification_data.length > 0 && (
                         <div className='bg-primary w-2 h-2 rounded-full absolute right-1 bottom-1 outline-offset-0 outline-3 outline-background'></div>
                     )}

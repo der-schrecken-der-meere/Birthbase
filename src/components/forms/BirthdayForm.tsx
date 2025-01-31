@@ -251,7 +251,7 @@ const BirthdayForm = () => {
                             <FormItem>
                                 <FormLabel>Vorname</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Max" {...field}/>
+                                    <Input placeholder="Max" className='text-sm' {...field}/>
                                 </FormControl>
                                 <FormDescription>
                                     Der Vorname der Person
@@ -267,7 +267,7 @@ const BirthdayForm = () => {
                             <FormItem>
                                 <FormLabel>Nachname</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Mustermann" {...field}/>
+                                    <Input placeholder="Mustermann" className='text-sm' {...field}/>
                                 </FormControl>
                                 <FormDescription>
                                     Der Nachname der Person
