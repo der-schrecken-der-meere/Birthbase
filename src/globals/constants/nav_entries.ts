@@ -7,6 +7,7 @@ import {
     House,
     Info,
     Languages,
+    LayoutDashboard,
     Monitor,
     PartyPopper,
     Settings
@@ -88,6 +89,11 @@ const c_settings_links: LinkEntry[] = [
         url: PageLinks.SETTINGS_INFO,
         icon: Info,
     },
+    {
+        title: "App",
+        url: PageLinks.SETTINGS_APP,
+        icon: LayoutDashboard,
+    }
 ];
 const settings_links = Object.freeze(c_settings_links);
 

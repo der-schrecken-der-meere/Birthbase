@@ -54,6 +54,7 @@ const Info = lazy(() => delay_promise(() => import("../pages/Settings/Info/Info"
 const Storage = lazy(() => delay_promise(() => import("../pages/Settings/Storage/Storage"), 0));
 const Time = lazy(() => delay_promise(() => import("../pages/Settings/Time/Time"), 0));
 const Language = lazy(() => delay_promise(() => import("../pages/Settings/Language/Language"), 0));
+const SettingsApp = lazy(() => delay_promise(() => import("../pages/Settings/App/App"), 0));
 
 const App = () => {
     const isBooting = useSelector((state: RootState) => state.app.isBooting);
@@ -158,6 +159,16 @@ const App = () => {
                                     <></>
                                 }>
                                     <Language/>
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path={PageLinks.SETTINGS_APP}
+                            element={
+                                <Suspense fallback={
+                                    <></>
+                                }>
+                                    <SettingsApp/>
                                 </Suspense>
                             }
                         />

@@ -40,7 +40,7 @@ const MainLayout = () => {
             <SidebarProvider className='h-svh'>
                 <AppSidebar />
                 <main className='relative @container w-full flex flex-col *:px-4 h-full'>
-                    <HorizontalNavbar className='shrink-0' />
+                    <HorizontalNavbar className='shrink-0 border-b' />
                     <div className='flex-1 w-full flex flex-col overflow-hidden py-2 max-w-[100vw] md:max-w-[1024px] md:mx-auto @container'>
                         <Outlet />
                     </div>
@@ -53,7 +53,7 @@ const MainLayout = () => {
                             <Updater/>
                         </Suspense>
                     }
-                    <MobileNav className='shrink-0 h-14 shadow-lg shadow-foreground border-t' />
+                    <MobileNav className='shrink-0 h-14 border-t' />
                 </main>
             </SidebarProvider>
         </>

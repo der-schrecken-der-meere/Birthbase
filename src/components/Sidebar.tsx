@@ -4,20 +4,11 @@ import { get_notifications_query } from '@/features/latest_notifications/query';
 
 // Icons
 import {
-    Bell,
-    CalendarClock,
     ChevronUp,
     Ellipsis,
-    HardDrive,
-    House,
-    Info,
-    Languages,
     Menu,
-    Monitor,
-    PartyPopper,
     Power,
     Search,
-    Settings,
 } from 'lucide-react';
 import {
     Logo
@@ -73,81 +64,8 @@ import {
 import {
     cn
 } from '@/lib/utils';
+import { main_links, settings_links } from '@/globals/constants/nav_entries';
 import { PageLinks } from '@/globals/constants/links';
-
-
-type Link = {
-    id: any,
-    title: string,
-    url: string,
-    icon: FunctionComponent
-};
-
-const mainLinks: Link[] = [
-    {
-        title: "Startseite",
-        url: PageLinks.HOME,
-        id: "home",
-        icon: House,
-    },
-    {
-        title: "Meine Geburtstage",
-        url: PageLinks.MY_BIRTHDAYS_PARAMS,
-        id: "my_birthdays",
-        icon: PartyPopper,
-    },
-    {
-        title: "Einstellungen",
-        url: PageLinks.SETTINGS,
-        id: "settings",
-        icon: Settings,
-    },
-    {
-        title: "Benachrichtigungen",
-        url: PageLinks.NOTIFICATIONS,
-        id: "notifications",
-        icon: Bell,
-    }
-];
-
-const settingsLinks: Link[] = [
-    {
-        title: "Aussehen",
-        url: PageLinks.SETTINGS_APPEARANCE,
-        id: "appearance",
-        icon: Monitor,
-    },
-    {
-        title: "Benachrichtigungen",
-        url: PageLinks.SETTINGS_NOTIFICATION,
-        id: "notifications",
-        icon: Bell,
-    },
-    {
-        title: "Speicher",
-        url: PageLinks.SETTINGS_STORAGE,
-        id: "storage",
-        icon: HardDrive,
-    },
-    {
-        title: "Datum und Zeit",
-        url: PageLinks.SETTINGS_TIME,
-        id: "time",
-        icon: CalendarClock,
-    },
-    {
-        title: "Sprache",
-        url: PageLinks.SETTINGS_LANGUAGE,
-        id: "language",
-        icon: Languages,
-    },
-    {
-        title: "Info",
-        url: PageLinks.SETTINGS_INFO,
-        id: "info",
-        icon: Info,
-    },
-];
 
 const AppSidebar = () => {
 
@@ -187,14 +105,14 @@ const AppSidebar = () => {
                     <SidebarGroupLabel>Hauptmenü</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {mainLinks.map((link) => {
+                            {main_links.map((link) => {
                                 const props: SidebarEntryProps & {key: Key} = {
-                                    key: link.id,
+                                    key: link.url,
                                     url: link.url,
                                     Icon: link.icon,
                                     title: link.title,
                                 };
-                                if (link.id === "notifications" /*&& notification_data.length !== 0*/) {
+                                if (link.url === PageLinks.NOTIFICATIONS && notification_data.length !== 0) {
                                     props.badge = notification_data.length;
                                 }
 
@@ -207,9 +125,9 @@ const AppSidebar = () => {
                     <SidebarGroupLabel>Einstellungen</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {settingsLinks.map((link) => (
+                            {settings_links.map((link) => (
                                 <SidebarEntry
-                                    key={link.id}
+                                    key={link.url}
                                     url={link.url}
                                     Icon={link.icon}
                                     title={link.title}

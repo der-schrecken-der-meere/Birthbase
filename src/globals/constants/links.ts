@@ -10,6 +10,7 @@ enum PageLinks {
     SETTINGS_TIME = "/settings/time",
     SETTINGS_LANGUAGE = "/settings/language",
     SETTINGS_INFO = "/settings/info",
+    SETTINGS_APP = "/settings/app",
 };
 
 export { PageLinks };
