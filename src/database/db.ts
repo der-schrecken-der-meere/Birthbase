@@ -284,6 +284,16 @@ class DexieDB extends Dexie implements Birthbase {
             }
         })
     };
+
+    clear = async <K extends keyof Birthbase>(table: K) => {
+        this.transaction("rw", this[table], async () => {
+            await this[table].clear();
+            Promise.resolve();
+        })
+        .catch(error => {
+            Promise.reject(error);
+        });
+    };
 }
 
 const db = new DexieDB();

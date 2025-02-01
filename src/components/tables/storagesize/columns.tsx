@@ -1,15 +1,15 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { Checkbox } from "@/frontend/components/ui/checkbox"
+import { Checkbox } from "@/components/ui/checkbox"
 import type Decimal from "decimal.js"
 
-export type StorageSize = {
+type StorageSize = {
     name: string,
     size: string,
     raw: Decimal,
     fn: () => void
 }
 
-export const columns: ColumnDef<StorageSize>[] = [
+const columns: ColumnDef<StorageSize>[] = [
     {
         accessorKey: "select",
         header: ({ table }) => (
@@ -43,4 +43,7 @@ export const columns: ColumnDef<StorageSize>[] = [
         },
         header: "Größe",
     }
-]
+];
+
+export type { StorageSize };
+export { columns };

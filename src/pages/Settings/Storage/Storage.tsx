@@ -1,21 +1,22 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { NavigationEntry } from '../Settings'
 import { Progress } from "@/components/ui/progress"
 import { Separator } from '@/components/ui/separator'
 import { byte_format } from '@/lib/formats/storage'
-import StorageSize from "@/components/tables/storagesize/StorageSize"
+// import Table from "@/components/tables/storagesize/Table"
 import { useNavbar } from '@/hooks/useNavbar'
 import { SettingsLayoutBreadcrumbs } from '@/components/layouts/SettingsLayout'
+import { to_smallest_byte_type } from '@/lib/functions/storage/unit'
+import { calc_app_storage_size } from '@/lib/functions/storage/calculations'
+import { Button } from '@/components/ui/button'
+import { Trash2 } from 'lucide-react'
+import { useConfirmDialog } from '@/hooks/useConfirmDialog'
+import { clear_app_storage } from '@/lib/functions/storage/clear'
 // import { toSmallestByteType } from '@/lib/functions/storage/unit'
 
-type StorageCapacity = {
-    available: string;
-    used: string;
-    value: number;
-}
-
 const Storage = () => {
-    const [value, setValue] = useState<StorageCapacity>({available: "0", used: "0", value: 0});
+    const [value, setValue] = useState<StorageEstimate>({usage: 0, quota: 0});
+    const { setConfirm } = useConfirmDialog();
 
     useNavbar({
         pageTitle: "Speicher",
@@ -23,40 +24,53 @@ const Storage = () => {
     });
 
     useEffect(() => {
-        // (async () => {
-        //     try {
-        //         const res = await navigator.storage.estimate();
-        //         setValue(() => {
-        //             const available = toSmallestByteType(res?.quota as number);
-        //             const used = toSmallestByteType(res?.usage as number);
+        (async () => {
+            const obj_size = await calc_app_storage_size();
+            setValue(obj_size);
+        })()
+    }, []);
 
-        //             return {
-        //                 available: byte_format("de", available.u, available.v),
-        //                 used: byte_format("de", used.u, used.v),
-        //                 value: (res?.usage as number) / (res?.quota as number) * 100
-        //             }
-        //         });
-        //     } catch (error) {
-        //         console.error(error)
-        //     }
-        // })()
-    }, [])
+    const onDeleteClick = useCallback(() => {
+        setConfirm({
+            title: "Sind Sie sich wirklich sicher?",
+            description: "Alle Daten werden gelöscht. Unter anderem die App-Einstellungen, Geburtstage und Benachrichtigungen.",
+            onConfirm: async () => {
+                await clear_app_storage();
+            },
+        });
+    }, []);
+
+    const storage_size_to_string = useCallback((value: number) => {
+        const obj_size = to_smallest_byte_type(value);
+        return byte_format("de", obj_size.u, obj_size.v);
+    }, []);
+
+    const calc_usage_quota_ratio = useCallback((usage: number, quota: number) => {
+        return usage / quota * 100;
+    }, []);
 
     return (
         <>
             <NavigationEntry>
-                <div className='flex items-center mb-auto'>
-                    <div>Belegter Speicher</div>
-                    <div className='ml-auto text-sm text-muted-foreground'>
-                        {value.used}/{value.available} belegt
-                    </div>
+                <div className='text-sm text-muted-foreground'>
+                    {storage_size_to_string(value.usage as number)}/{storage_size_to_string(value.quota as number)} belegt
                 </div>
-                <Progress value={value.value} className="w-full h-2 mt-2"/>
+                <Progress value={calc_usage_quota_ratio(value.usage as number, value.quota as number)} className="w-full h-2 mt-2"/>
             </NavigationEntry>
             <Separator/>
-            <NavigationEntry>
-                <StorageSize/>
-            </NavigationEntry>
+            <NavigationEntry
+                className='mt-auto flex'
+                rightElement={
+                    <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={onDeleteClick}
+                    >
+                        <Trash2 className='w-4 h-4 mr-1'/>
+                        Speicher leeren
+                    </Button>
+                }
+            />
         </>
     )
 }
