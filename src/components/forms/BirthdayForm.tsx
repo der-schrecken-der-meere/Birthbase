@@ -282,7 +282,7 @@ const BirthdayForm = () => {
                         render={({field}) => (
                             <FormItem>
                                 <FormLabel>Datum</FormLabel>
-                                <Popover modal>
+                                <Popover>
                                     <PopoverTrigger asChild>
                                         <FormControl>
                                             <Button
@@ -299,7 +299,7 @@ const BirthdayForm = () => {
                                             </Button>
                                         </FormControl>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="start" sticky="always">
+                                    <PopoverContent className="w-auto p-0" align="start" >
                                         <Calendar
                                             locale={de}
 
