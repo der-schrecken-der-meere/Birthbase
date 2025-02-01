@@ -84,9 +84,6 @@ const BirthdayForm = () => {
             lastname: z.string({
                 required_error: "Nachname muss gefüllt sein",
                 invalid_type_error: "Nachname muss ein String sein",
-            })
-            .min(3, {
-                message: "Nachname muss mindestens 3 Buchstaben haben",
             }),
             date: z.coerce.date({
                 message: "Falsches Datumsformat",
