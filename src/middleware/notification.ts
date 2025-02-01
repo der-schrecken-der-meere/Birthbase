@@ -1,4 +1,4 @@
-import { add_notifications_model, del_notifications_model, upd_notifications_model } from "@/database/tables/notifications/db_model";
+import { add_notifications_model, clear_notifications_model, del_notifications_model, upd_notifications_model } from "@/database/tables/notifications/db_model";
 import { Notification } from "@/database/tables/notifications/notifications";
 
 const add_notification_middleware = async (notification: Notification): Promise<Notification> => {
@@ -28,8 +28,17 @@ const del_notification_middleware = async (notification: Notification): Promise<
     }
 };
 
+const clear_notification_middleware = async () => {
+    try {
+        return await clear_notifications_model();
+    } catch (e) {
+        return Promise.reject(e);
+    }
+};
+
 export {
     add_notification_middleware,
     upd_notification_middleware,
     del_notification_middleware,
+    clear_notification_middleware,
 };

@@ -12,6 +12,7 @@ import {
     add_birthday_middleware,
     upd_birthday_middleware,
     del_birthday_middleware,
+    clear_birthday_middleware,
 } from "@/middleware/birthday";
 
 
@@ -87,7 +88,19 @@ const del_birthday_query = () => {
             });
         }
     })
-}
+};
+
+const clear_birthday_query = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async () => {
+            return clear_birthday_middleware();
+        },
+        onSuccess: () => {
+            queryClient.setQueryData<Birthday[]>([c_query_key], () => []);
+        }
+    })
+};
 
 export {
     get_birthday_query,
@@ -95,4 +108,5 @@ export {
     add_birthday_query,
     upd_birthday_query,
     del_birthday_query,
+    clear_birthday_query,
 };

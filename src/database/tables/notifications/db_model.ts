@@ -65,10 +65,15 @@ const get_notifications_model = () => {
     return db.get(TABLES.NOTIFICATIONS);
 };
 
+const clear_notifications_model = () => {
+    return db.clear(TABLES.NOTIFICATIONS);
+};
+
 export {
     add_notifications_model,
     del_notifications_model,
     upd_notifications_model,
     get_notification_model,
     get_notifications_model,
-}
+    clear_notifications_model,
+};

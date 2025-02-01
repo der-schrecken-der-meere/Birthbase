@@ -1,6 +1,6 @@
 import { get_settings_model } from "@/database/tables/settings/db_model";
 import { get_default_settings, Settings } from "@/database/tables/settings/settings";
-import { set_settings_middleware, unset_settings_middleware } from "@/middleware/settings";
+import { clear_settings_middleware, set_settings_middleware, unset_settings_middleware } from "@/middleware/settings";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // Constants
@@ -47,8 +47,21 @@ const set_settings_query = () => {
     });
 };
 
+const clear_settings_query = () => {
+    const obj_query_client = useQueryClient();
+    return useMutation({
+        mutationFn: () => {
+            return clear_settings_middleware();
+        },
+        onSuccess: (default_settings) => {
+            obj_query_client.setQueryData<Settings>([c_query_key], () => default_settings)
+        }
+    });
+};
+
 export {
     set_settings_query,
     get_settings_query,
     unset_settings_query,
+    clear_settings_query,
 };

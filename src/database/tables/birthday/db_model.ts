@@ -68,4 +68,15 @@ const get_birthdays_model = () => {
     return db.get(TABLES.BIRTHDAYS);
 };
 
-export { get_birthday_model, get_birthdays_model, add_birthdays_model, upd_birthdays_model, del_birthdays_model };
+const clear_birthday_model = () => {
+    return db.clear(TABLES.BIRTHDAYS);
+};
+
+export {
+    get_birthday_model,
+    get_birthdays_model,
+    add_birthdays_model,
+    upd_birthdays_model,
+    del_birthdays_model,
+    clear_birthday_model,
+};

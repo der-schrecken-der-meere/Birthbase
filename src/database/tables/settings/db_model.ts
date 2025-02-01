@@ -1,4 +1,4 @@
-import { db } from "@/database/db";
+import { db, TABLES } from "@/database/db";
 import { get_default_settings, type Settings } from "./settings";
 import { has_property } from "@/lib/functions/object/hasProperty";
 
@@ -14,20 +14,20 @@ const set_settings_model = async (settings: Partial<Settings>) => {
     }
     try {
         // Get all available configs
-        const settingsArray = await db.get("settings");
-        const defaultSettings = await get_default_settings();
+        const settingsArray = await db.get(TABLES.SETTINGS);
+        const defaultSettings = get_default_settings();
         // If no configs exist
         if (settingsArray.length === 0) {
             // Combine values from default config and passed config
             const newSettings = { ...defaultSettings, ...settings };
             // Create new config
-            const res = await db.add("settings", newSettings);
+            const res = await db.add(TABLES.SETTINGS, newSettings);
             return Promise.resolve(res);
         }
         // Combine values from default config, first config and passed config
         const newSettings = { ...defaultSettings, ...settingsArray[0], ...settings };
         // Update first config of array
-        const res = db.upd("settings", newSettings);
+        const res = db.upd(TABLES.SETTINGS, newSettings);
         return Promise.resolve(res);
     } catch (e) {
         return Promise.reject(e);
@@ -42,16 +42,16 @@ const set_settings_model = async (settings: Partial<Settings>) => {
 const unset_settings_model = async () => {
     try {
         // Get all available configs
-        const settingsArray = await db.get("settings");
+        const settingsArray = await db.get(TABLES.SETTINGS);
         const defaultSettings = await get_default_settings();
         // If no configs exist
         if (settingsArray.length === 0) {
             // Create new default config
-            const res = await db.add("settings", defaultSettings);
+            const res = await db.add(TABLES.SETTINGS, defaultSettings);
             return Promise.resolve(res);
         }
         const newSettings = { ...settingsArray[0], ...defaultSettings };
-        const res = db.upd("settings", newSettings);
+        const res = db.upd(TABLES.SETTINGS, newSettings);
         return Promise.resolve(res);
     } catch (e) {
         return Promise.reject(e);
@@ -66,7 +66,7 @@ const unset_settings_model = async () => {
 const get_settings_model = async () => {
     try {
         // Get all available configs
-        const settingsArray = await db.get("settings");
+        const settingsArray = await db.get(TABLES.SETTINGS);
         const defaultSettings = get_default_settings();
         // If no configs exist
         if (settingsArray.length === 0) {
@@ -79,4 +79,13 @@ const get_settings_model = async () => {
     }
 };
 
-export { set_settings_model, unset_settings_model, get_settings_model };
+const clear_settings_model = async () => {
+    return db.clear(TABLES.SETTINGS);
+}
+
+export {
+    set_settings_model,
+    unset_settings_model,
+    get_settings_model,
+    clear_settings_model,
+};

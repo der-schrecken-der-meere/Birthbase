@@ -1,5 +1,5 @@
-import { get_settings_model, set_settings_model, unset_settings_model } from "@/database/tables/settings/db_model";
-import { Settings } from "@/database/tables/settings/settings";
+import { clear_settings_model, get_settings_model, set_settings_model, unset_settings_model } from "@/database/tables/settings/db_model";
+import { get_default_settings, Settings } from "@/database/tables/settings/settings";
 import { change_color } from "@/features/manage_settings/appearance/color";
 import { change_mode } from "@/features/manage_settings/appearance/mode";
 import { change_notification } from "@/features/manage_settings/notifications/notification";
@@ -38,4 +38,21 @@ const unset_settings_middleware = async () => {
     }
 };
 
-export { set_settings_middleware, unset_settings_middleware };
+const clear_settings_middleware = async () => {
+    try {
+        await clear_settings_model();
+        const default_settings: Settings = { ...get_default_settings(), ...{ id: -1 }};
+        change_mode(default_settings.mode);
+        change_color(default_settings.color);
+        change_notification(default_settings.notification);
+        return default_settings;
+    } catch (e) {
+        Promise.reject(e);
+    }
+};
+
+export {
+    set_settings_middleware,
+    unset_settings_middleware,
+    clear_settings_middleware,
+};

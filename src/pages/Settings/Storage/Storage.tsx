@@ -12,11 +12,18 @@ import { Button } from '@/components/ui/button'
 import { Trash2 } from 'lucide-react'
 import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 import { clear_app_storage } from '@/lib/functions/storage/clear'
+import { clear_notification_query } from '@/features/latest_notifications/query'
+import { clear_birthday_query } from '@/features/manage_birthdays/query'
+import { clear_settings_query } from '@/features/manage_settings/query'
 // import { toSmallestByteType } from '@/lib/functions/storage/unit'
 
 const Storage = () => {
     const [value, setValue] = useState<StorageEstimate>({usage: 0, quota: 0});
     const { setConfirm } = useConfirmDialog();
+
+    const { mutate: clear_notifications } = clear_notification_query();
+    const { mutate: clear_birthdays } = clear_birthday_query();
+    const { mutate: clear_settings } = clear_settings_query();
 
     useNavbar({
         pageTitle: "Speicher",
@@ -33,9 +40,12 @@ const Storage = () => {
     const onDeleteClick = useCallback(() => {
         setConfirm({
             title: "Sind Sie sich wirklich sicher?",
-            description: "Alle Daten werden gelöscht. Unter anderem die App-Einstellungen, Geburtstage und Benachrichtigungen.",
-            onConfirm: async () => {
-                await clear_app_storage();
+            description: "Alle App-Einstellungen, Geburtstage und Benachrichtigungen werden gelöscht.",
+            onConfirm: () => {
+                clear_app_storage();
+                clear_notifications();
+                clear_birthdays();
+                clear_settings();
             },
         });
     }, []);

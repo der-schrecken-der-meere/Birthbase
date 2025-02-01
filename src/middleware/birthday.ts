@@ -1,5 +1,5 @@
 import { Birthday } from "@/database/tables/birthday/birthdays";
-import { add_birthdays_model, upd_birthdays_model, del_birthdays_model } from "@/database/tables/birthday/db_model";
+import { add_birthdays_model, upd_birthdays_model, del_birthdays_model, clear_birthday_model } from "@/database/tables/birthday/db_model";
 import { add_birthday_notification, del_birthday_notification, upd_birthday_notification } from "@/features/notify/notification";
 
 const add_birthday_middleware = async (birthday: Birthday): Promise<Birthday> => {
@@ -32,8 +32,17 @@ const del_birthday_middleware = async (birthday: Birthday): Promise<number> => {
     }
 };
 
+const clear_birthday_middleware = async () => {
+    try {
+        return await clear_birthday_model();
+    } catch (e) {
+        return Promise.reject(e);
+    }
+};
+
 export {
     add_birthday_middleware,
     upd_birthday_middleware,
     del_birthday_middleware,
+    clear_birthday_middleware,
 };

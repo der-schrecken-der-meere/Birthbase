@@ -2,7 +2,7 @@ import { get_notification_model, get_notifications_model } from "@/database/tabl
 import { add_sorted_notifications, del_sorted_notifications, get_sorted_notifications, upd_sorted_notifications } from "./sort";
 import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Notification } from "@/database/tables/notifications/notifications";
-import { add_notification_middleware, del_notification_middleware, upd_notification_middleware } from "@/middleware/notification";
+import { add_notification_middleware, clear_notification_middleware, del_notification_middleware, upd_notification_middleware } from "@/middleware/notification";
 
 // Constants
 const c_query_key = "notifications";
@@ -83,6 +83,18 @@ const del_notification_query = () => {
     });
 };
 
+const clear_notification_query = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async () => {
+            await clear_notification_middleware();
+        },
+        onSuccess: () => {
+            queryClient.setQueryData<Notification[]>([c_query_key], () => []);
+        }
+    })
+};
+
 export {
     get_notification_query,
     get_notifications_query,
@@ -90,4 +102,5 @@ export {
     add_notification_query_client,
     upd_notification_query,
     del_notification_query,
+    clear_notification_query,
 };
