@@ -1,15 +1,21 @@
+import { calc_days_until_next_birthday } from "@/lib/functions/birthdays/calculations";
 import type { Birthday } from "../../database/tables/birthday/birthdays";
 import {
     add_sorted_array,
     upd_sorted_array,
     del_sorted_array
 } from "../../lib/functions/array/sort";
+import { date_to_iso_with_tz } from "@/lib/functions/date/timezone";
 
 /**
  * Adds a new birhtday to a sorted array
  */
 const add_sorted_birthdays = (sortedArray: Birthday[], birthday: Birthday) => {
-    return add_sorted_array(sortedArray, birthday, (v) => birthday.date <= v.date);
+    const str_cur_date = date_to_iso_with_tz(new Date());
+    return add_sorted_array(sortedArray, birthday, (v) => {
+        return calc_days_until_next_birthday(birthday.date, str_cur_date) <= calc_days_until_next_birthday(v.date, str_cur_date);
+        // birthday.date <= v.date
+    });
 };
 
 /**
