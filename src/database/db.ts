@@ -10,6 +10,7 @@ import { date_to_iso_with_tz } from "../lib/functions/date/timezone.ts";
 import { calc_days_until_next_birthday } from "@/lib/functions/birthdays/calculations.ts";
 import { ISODateFullTZ } from "@/lib/types/date.ts";
 import { Notification } from "./tables/notifications/notifications.ts";
+import { format_date_to_iso_midnight } from "@/lib/intl/date.ts";
 
 type DexieTable<T extends {id: number}> = Dexie.Table<T, number>;
 
@@ -92,7 +93,7 @@ class DexieDB extends Dexie implements Birthbase {
         })
         .upgrade(async trans => {
             return trans.table(TABLES.BIRTHDAYS).toCollection().modify((birthday: Birthday) => {
-                birthday.date = date_to_iso_with_tz(new Date(birthday.date));
+                birthday.date = format_date_to_iso_midnight("de", "Europe/Berlin", new Date(birthday.date));
             });
         });
         this.version(7).stores({
@@ -105,6 +106,11 @@ class DexieDB extends Dexie implements Birthbase {
         });
         this.version(8).stores({
             notifications: "++id,timestamp",
+        });
+        this.version(9).upgrade(async trans => {
+            return trans.table(TABLES.BIRTHDAYS).toCollection().modify((birthday: Birthday) => {
+                birthday.date = format_date_to_iso_midnight("de", "Europe/Berlin", new Date(birthday.date))
+            });
         });
     }
     add<K extends keyof Birthbase, T extends getInsert<K>>(table: K, record: Omit<T, "id">): Promise<T>;

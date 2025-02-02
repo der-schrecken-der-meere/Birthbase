@@ -24,8 +24,26 @@ type ISODate = `${string}-${string}-${string}`;
 
 type ISODateFull = `${ISODate}${ISOTime}`;
 
-type ISODateFullTZ = `${ISODateFull}${"+"|"-"}${HourMinuteString}`;
+type ISOMidnightFullTZ = `${ISODate}T00:00:00.000${TimeZone}`;
 
-type TimeZone = string & {};
+type TimeZone = `${"+"|"-"}${HourMinuteString}`;
 
-export type { Millisecond, Second, Minute, Hour, HourMinute, HourMinuteString, Day, Month, Year, ISODate, ISOTime, ISODateFull, ISODateFullTZ, TimeZone };
+type ISODateFullTZ = `${ISODateFull}${TimeZone}`;
+
+export type {
+    Millisecond,
+    Second,
+    Minute,
+    Hour,
+    HourMinute,
+    HourMinuteString,
+    Day,
+    Month,
+    Year,
+    ISODate,
+    ISOTime,
+    ISODateFull,
+    ISODateFullTZ,
+    TimeZone,
+    ISOMidnightFullTZ,
+};

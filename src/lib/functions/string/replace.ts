@@ -2,7 +2,7 @@
  * Returns a string with new values in the placeholders
  * 
  * @example
- * let newStr = replace("Hello $0", "World"); // newStr is "Hello World"
+ * let newStr = replace("Hello $1", "World"); // newStr is "Hello World"
  * 
  * @param str A string containing placeholders
  * @param values An Array of placeholder values
@@ -12,8 +12,6 @@ const replace = (str: string, ...values: Array<number|string>) => {
     // Extracts all $<number> and parse them into a number
     const placeholders = (str.match(regex) || []);
     const index = placeholders.map(reg => +reg.substring(1)-1);
-    // If there are less placeholders than values then Error 
-    if (placeholders.length < values.length) return false;
     // Checks if there is an actual value for the placeholder
     for (const n of index) {
         if (n >= values.length || n < 0) return false;

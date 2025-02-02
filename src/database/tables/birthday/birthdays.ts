@@ -1,5 +1,6 @@
 import { date_to_iso_with_tz } from "@/lib/functions/date/timezone";
-import type { ISODateFullTZ } from "@/lib/types/date";
+import { format_date_to_iso_midnight } from "@/lib/intl/date";
+import type { ISODateFullTZ, ISOMidnightFullTZ } from "@/lib/types/date";
 
 type Remember = ISODateFullTZ[];
 
@@ -14,7 +15,7 @@ type NoIDBirthday = {
         first: string,
         last: string,
     },
-    date: ISODateFullTZ,
+    date: ISOMidnightFullTZ,
     marked: boolean,
     remember: Remember,
 };
@@ -29,7 +30,7 @@ const getDefaultBirthday = (): Birthday => ({
         first: "",
         last: "",
     },
-    date: date_to_iso_with_tz(new Date()),
+    date: format_date_to_iso_midnight("de", "Europe/Berlin"),
     marked: false,
     remember: [],
 });
