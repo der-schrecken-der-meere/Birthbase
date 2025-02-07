@@ -1,4 +1,4 @@
-import { FunctionComponent, HTMLAttributes, ReactNode, useMemo } from "react";
+import { CSSProperties, FunctionComponent, HTMLAttributes, ReactNode, useMemo } from "react";
 import { GoBackInHistory } from "../History";
 import { CustomSidebarTrigger } from "../Sidebar";
 import { UpperNavbarProps } from "./Navigation";
@@ -7,7 +7,7 @@ import { PageLinks } from "@/globals/constants/links";
 import { cn } from "@/lib/utils";
 import { MobileAddBirthdayButton } from "../AddBirthdayButton";
 import { LinkProps, NavLink } from "react-router-dom";
-import { Button } from "../ui/button";
+import { buttonVariants } from "../ui/button";
 import { get_notifications_query } from "@/features/latest_notifications/query";
 
 const MobileUpperNavbar = ({
@@ -44,7 +44,7 @@ const NotificationIcon = ({
         <div className="relative">
             <Icon/>
             {notification_data.length > 0 && (
-                <div className='bg-primary w-2 h-2 rounded-full absolute right-1 bottom-1 outline-offset-0 outline-3 outline-background'></div>
+                <div className='bg-[hsl(var(--text))] w-2 h-2 rounded-full absolute right-1 bottom-1 outline-offset-0 outline-3 outline-[hsl(var(--bg))]'></div>
             )}
         </div>
     );
@@ -107,18 +107,16 @@ const MobileNavbarLink = ({
     className,
 }: LinkProps) => {
     return (
-        <Button
-            variant="ghost"
-            size="icon"
-            className={cn('flex flex-col gap-1 items-center text-xs font-light', className)}
+        <NavLink
+            to={to}
+            className={({ isActive }) => cn(buttonVariants({ variant: "ghost", size: "icon" }), isActive && "bg-primary text-primary-foreground", className)}
+            style={({ isActive }) => ({
+                "--bg": isActive ? "var(--primary)" : "var(--background)",
+                "--text": isActive ? "var(--primary-foreground)" : "var(--primary)",
+            }) as CSSProperties}
         >
-            <NavLink
-                to={to}
-                className={({ isActive }) => cn(isActive ? "text-primary" : "")}
-            >
-                {children}
-            </NavLink>
-        </Button>
+            {children}
+        </NavLink>
     )
 };
 
