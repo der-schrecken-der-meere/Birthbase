@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button, ButtonProps } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Notification } from "@/database/tables/notifications/notifications";
 import { del_notification_query, get_notifications_query, upd_notification_query } from "@/features/latest_notifications/query";
@@ -10,10 +10,38 @@ import { format_number_to_relative_time } from "@/lib/intl/date";
 import { get_relative_time_string } from "@/lib/functions/date/relative_time";
 import { cn } from "@/lib/utils";
 import { BellRing, Eye, Info, LucideProps, Mailbox, PartyPopper, Trash2 } from "lucide-react";
-import { ForwardRefExoticComponent, useCallback, useEffect, } from "react";
+import { ForwardRefExoticComponent, useCallback, useEffect, useMemo, useState, } from "react";
 import { NotificationType } from "@/features/notify/notify";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PopoverTriggerProps } from "@radix-ui/react-popover";
+
+type FilterButtonProps = {
+    onClick: () => void;
+    text: string;
+    active: boolean;
+    filter?: NotificationType;
+};
+
+const FilterButton = ({
+    onClick,
+    active,
+    children,
+    text,
+    className,
+    ...props
+}: FilterButtonProps & ButtonProps) => {
+    return (
+        <Button
+            size="sm"
+            variant="outline"
+            onClick={onClick}
+            className={cn(active && "bg-accent", className)}
+            {...props}
+        >
+            {text}
+        </Button>
+    );
+};
 
 const Notifications = () => {
 
@@ -37,6 +65,9 @@ const Notifications = () => {
     const { mutate: delete_notification } = del_notification_query();
     const { mutate: update_notification } = upd_notification_query();
     const { setErrorNotification } = useAppToast();
+
+    const [ filter, setFilter ] = useState<NotificationType | null>(null);
+    const [ active, setActive ] = useState(0);
 
     const onDelete = useCallback((notification: Notification) => {
         delete_notification(
@@ -67,6 +98,45 @@ const Notifications = () => {
         );
     }, []);
 
+    const filter_buttons = useMemo<FilterButtonProps[]>(() => [
+        {
+            active: true,
+            text: "Alle",
+            onClick: () => {
+                console.log("Alle");
+                setFilter(null);
+                setActive(0);
+            },
+        },
+        {
+            active: false,
+            text: "Geburtstage",
+            onClick: () => {
+                console.log("Geburtstage");
+                setFilter(NotificationType.BIRTHDAY);
+                setActive(1);
+            },
+        },
+        {
+            active: false,
+            text: "Erinnerungen",
+            onClick: () => {
+                console.log("Erinnerungen");
+                setFilter(NotificationType.BIRTHDAY_REMINDER);
+                setActive(2);
+            },
+        },
+        {
+            active: false,
+            text: "Infos",
+            onClick: () => {
+                console.log("Infos");
+                setFilter(NotificationType.INFO);
+                setActive(3);
+            },
+        }
+    ], []);
+
     useEffect(() => {
         if (isError) {
             setErrorNotification({
@@ -82,26 +152,51 @@ const Notifications = () => {
         )
     }
 
+    const filtered_data = filter === null
+        ? data
+        : data.filter(notification => notification.type === filter);
+
     return (
-        <ScrollArea className="h-full">
-            {data.length === 0
-                ? <div className="h-full flex flex-col justify-center items-center text-center margin-auto rounded-md text-muted-foreground text-sm"><Mailbox className="w-20 h-20"/>Sie haben keine ungelesenen Benachrichtigungen</div>
-                : <div className="space-y-2 w-full table table-fixed">
-                    {data.map((notification) => (
-                        <NotificationMessage
-                            key={notification.id}
-                            muted={notification.read}
-                            notification={notification}
-                            onDelete={onDelete}
-                            onRead={onRead}
-                        >
-                            {notification.text}
-                        </NotificationMessage>
+        <>
+            <ScrollArea className="shrink-0 mb-2 table-fixed">
+                <div className="flex gap-2">
+                    {filter_buttons.map((filter_button, index) => (
+                        <FilterButton
+                            key={`${index}-${filter_button.text}`}
+                            onClick={filter_button.onClick}
+                            active={index === active}
+                            text={filter_button.text}
+                        />
                     ))}
                 </div>
-            }
-            {/* <div className="h-[10000px]"></div> */}
-        </ScrollArea>
+                <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+            <ScrollArea className="h-full">
+                {filtered_data.length === 0
+                    ? (
+                        <div className="h-full flex flex-col justify-center items-center text-center margin-auto rounded-md text-muted-foreground text-sm">
+                            <Mailbox className="w-20 h-20"/>
+                            Sie haben keine ungelesenen Benachrichtigungen
+                        </div>
+                    ) : (
+                        <div className="space-y-4 w-full table table-fixed mr-2">
+                            {filtered_data.map((notification) => (
+                                <NotificationMessage
+                                    key={notification.id}
+                                    muted={notification.read}
+                                    notification={notification}
+                                    onDelete={onDelete}
+                                    onRead={onRead}
+                                >
+                                    {notification.text}
+                                </NotificationMessage>
+                            ))}
+                        </div>
+                    )
+                }
+                {/* <div className="h-[10000px]"></div> */}
+            </ScrollArea>
+        </>
     );
 };
 
@@ -151,7 +246,7 @@ const NotificationMessage = ({
     return (
         <Popover>
             <PopoverTrigger
-                className={cn("w-full flex rounded-lg border-[1px] p-3 gap-4 bg-secondary items-stretch", notification.read && "text-muted-foreground", className)}
+                className={cn("w-full flex rounded-lg border-[1px] p-3 gap-4 bg-secondary items-stretch", notification.read && "text-muted-foreground bg-transparent", className)}
                 {...props}
             >
                 {/* Text */}

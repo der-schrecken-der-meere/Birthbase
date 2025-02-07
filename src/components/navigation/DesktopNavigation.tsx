@@ -77,7 +77,7 @@ const DesktopUpperNavbar = ({
                     <BreadcrumbList className='flex-nowrap'>
                         {renderBreadcrumbs(breadcrumbs)}
                         <BreadcrumbItem>
-                            <BreadcrumbPage className='text-xl font-medium flex-1'>{pageTitle}</BreadcrumbPage>
+                            <BreadcrumbPage className='text-xl flex-1'>{pageTitle}</BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
