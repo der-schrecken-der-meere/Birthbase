@@ -24,9 +24,8 @@ enum Action {
 
 enum NotificationType {
     BIRTHDAY,
-    INFO,
     BIRTHDAY_REMINDER,
-    WORKER_SETTINGS,
+    INFO,
 };
 
 // Variables
@@ -83,6 +82,7 @@ const on_message = async (e: MessageEvent<NotificationResponse>) => {
             ...get_default_notification(),
             ...{
                 text: notification.body,
+                type: notification.type,
             },
         });
         add_notification_query_client(obj_notification, queryClient);

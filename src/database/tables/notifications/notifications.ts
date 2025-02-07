@@ -1,9 +1,11 @@
 import { CoreRecord } from "@/database/db_types";
+import { NotificationType } from "@/features/notify/notify";
 
 type NoIDNotification = {
     text: string,
     read: boolean,
     timestamp: number,
+    type: NotificationType,
 };
 
 type PartialIDNotification = NoIDNotification & Partial<CoreRecord>;
@@ -16,6 +18,7 @@ const get_default_notification = (): Notification => {
         read: false,
         text: "",
         timestamp: Date.now(),
+        type: NotificationType.BIRTHDAY,
     };
 };
 

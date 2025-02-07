@@ -52,6 +52,7 @@ type NotificationResponse = {
     /** Describing text of the error */
     error?: string,
     notifications?: {
+        type: NotificationType,
         title: string,
         body: string,
     }[],
@@ -100,7 +101,6 @@ self.onmessage = (e: MessageEvent<NotificationRequest>) => {
             break;
         case NotificationType.INFO:
         case NotificationType.BIRTHDAY_REMINDER:
-        case NotificationType.WORKER_SETTINGS:
     }
 };
 
@@ -189,12 +189,10 @@ const send_notifications = async (mqTypes: MessageQueueType<NotificationType, Bi
                 break;
             case NotificationType.BIRTHDAY_REMINDER:
                 break;
-            case NotificationType.WORKER_SETTINGS:
-                break;
         };
     }
     notifications = notifications.flat();
-    self.postMessage({ notifications: notifications });
+    self.postMessage({ notifications });
 };
 
 const create_birthday_notifications = (birthday_items: BirthdayItem[]): Options[] => {
@@ -203,6 +201,7 @@ const create_birthday_notifications = (birthday_items: BirthdayItem[]): Options[
         return {
             title: "Geburtstag",
             body: notification_text,
+            type: NotificationType.BIRTHDAY,
         };
     });
 };
@@ -213,4 +212,3 @@ setInterval(() => {
 }, 1_000);
 
 export type { NotificationRequest, BirthdayRequest, NotificationResponse, ID };
-export { NotificationType, Action };
