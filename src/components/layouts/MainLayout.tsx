@@ -21,7 +21,8 @@ import useShortcuts from '../../hooks/useShortcuts';
 import { useDeviceSize } from '../../hooks/useDeviceSize';
 
 import { SidebarProvider, useSidebar } from '../ui/sidebar';
-import { HorizontalNavbar, MobileNavbar } from '../Navigation';
+import { UpperNavbar } from '../navigation/Navigation';
+import { MobileLowerNavbar } from '../navigation/MobileNavigation'
 import { Test_overlay } from '../test/test_overlay'
 
 const Updater = lazy(() => import("../../components/tauri/Updater"));
@@ -31,7 +32,7 @@ const MainLayout = () => {
 
     useShortcuts();
 
-    useDeviceSize({});
+    // useDeviceSize({});
 
     return (
         <>
@@ -40,7 +41,7 @@ const MainLayout = () => {
             <SidebarProvider className='h-svh'>
                 <AppSidebar />
                 <main className='relative @container w-full flex flex-col *:px-4 h-full'>
-                    <HorizontalNavbar className='shrink-0 border-b' />
+                    <UpperNavbar className='shrink-0 border-b' />
                     <div className='flex-1 w-full flex flex-col overflow-hidden py-2 max-w-[100vw] md:max-w-[1024px] md:mx-auto @container'>
                         <Outlet />
                     </div>
@@ -65,7 +66,7 @@ const MobileNav = (props: HTMLAttributes<HTMLDivElement>) => {
     const { isMobile } = useSidebar();
 
     return (isMobile
-        ? <MobileNavbar {...props} />
+        ? <MobileLowerNavbar {...props} />
         : null
     );
 };

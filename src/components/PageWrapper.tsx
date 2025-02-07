@@ -7,7 +7,7 @@ import { ScrollArea, ScrollBar } from './ui/scroll-area';
 import { Skeleton } from './ui/skeleton';
 import { CustomSidebarTrigger } from './Sidebar';
 import { GoBackInHistory } from './History';
-import { HorizontalNavbar } from './Navigation';
+import { HorizontalNavbar } from './navigation/Navigation';
 
 interface I_PageWrapper {
     /** The Titel of the page */
