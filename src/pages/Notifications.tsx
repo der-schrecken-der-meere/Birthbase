@@ -6,7 +6,7 @@ import { del_notification_query, get_notifications_query } from "@/features/late
 import { PageLinks } from "@/globals/constants/links";
 import { useAppToast } from "@/hooks/useAppToast";
 import { useNavbar } from "@/hooks/useNavbar";
-import { format_number_to_relative_time } from "@/lib/formats/date";
+import { format_number_to_relative_time } from "@/lib/intl/date";
 import { get_relative_time_string } from "@/lib/functions/date/relative_time";
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";

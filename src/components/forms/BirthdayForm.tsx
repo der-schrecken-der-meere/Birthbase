@@ -62,9 +62,8 @@ import { add_birthday_query, upd_birthday_query } from '@/features/manage_birthd
 // Util functions
 import { useDeleteBirthdays } from '@/hooks/useDeleteBirthday';
 import { useBirthdayForm } from '@/hooks/useBirthdayForm';
-import { ISODateFullTZ } from '@/lib/types/date';
-import { date_to_iso_with_tz } from '@/lib/functions/date/timezone';
 import { cn } from '@/lib/utils';
+import { format_date_to_iso_midnight } from '@/lib/intl/date';
 
 type FormMethod = "create"|"update"|"delete"|"read";
 
@@ -113,6 +112,8 @@ const BirthdayForm = () => {
     })
 
     const { mutate: update } = upd_birthday_query();
+
+    console.log(data.date);
 
     const form = useForm<T_Form>({
         resolver: zodResolver(formSchema),
@@ -177,6 +178,7 @@ const BirthdayForm = () => {
         if (methodRef.current === "read") {
             return
         }
+        console.log(new Date(+data.date));
         try {
             const newObj: Birthday = {...getDefaultBirthday(), ...{
                 id: data.id,
@@ -184,9 +186,11 @@ const BirthdayForm = () => {
                     first: data.firstname,
                     last: data.lastname,
                 },
-                date: date_to_iso_with_tz(data.date),
+                date: format_date_to_iso_midnight("de", "Europe/Berlin", data.date),
                 marked: data.marked,
             }}
+
+            console.log(newObj, data.date, format_date_to_iso_midnight("de", "Europe/Berlin", new Date(newObj.date)));
 
             switch (methodRef.current) {
                 case "create":

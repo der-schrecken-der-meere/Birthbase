@@ -1,8 +1,8 @@
 import { get_settings_model } from "@/database/tables/settings/db_model";
 import type { Settings } from "@/database/tables/settings/settings";
-import { set_notification_worker } from "@/features/notify/notification";
 import { change_color } from "@/features/manage_settings/appearance/color";
 import { change_mode } from "@/features/manage_settings/appearance/mode";
+import { set_notification_worker } from "@/features/notify/notify";
 import { QueryClient } from "@tanstack/react-query";
 
 const queryClient = new QueryClient(

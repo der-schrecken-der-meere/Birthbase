@@ -9,6 +9,17 @@ const add_sorted_array = <T>(arr: T[], new_element: T, cb: (value: T) => boolean
 };
 
 /**
+ * Returns the reference of the inserted object
+ * 
+ * @param arr Reference of the array
+ */
+const add_sorted_array_ref = <T>(arr: T[], new_element: T, cb: (value: T) => boolean) => {
+    const n_index = find_sorted_array_index(arr, cb);
+    arr.splice(n_index, 0, new_element);
+    return arr[n_index];
+};
+
+/**
  * Returns a new array with the changed element.
  */
 const upd_sorted_array = <T>(arr: T[], index: number, new_element: T, cb: (value: T) => boolean) => {
@@ -42,6 +53,7 @@ const find_sorted_array_index = <T>(arr: T[], cb: (value: T) => boolean) => {
 
 export {
     add_sorted_array,
+    add_sorted_array_ref,
     upd_sorted_array,
     del_sorted_array,
     find_sorted_array_index,

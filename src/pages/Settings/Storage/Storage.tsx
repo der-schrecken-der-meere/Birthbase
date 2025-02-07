@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { NavigationEntry } from '../Settings'
 import { Progress } from "@/components/ui/progress"
 import { Separator } from '@/components/ui/separator'
-import { byte_format } from '@/lib/formats/storage'
+import { byte_format } from '@/lib/intl/storage'
 // import Table from "@/components/tables/storagesize/Table"
 import { useNavbar } from '@/hooks/useNavbar'
 import { SettingsLayoutBreadcrumbs } from '@/components/layouts/SettingsLayout'
