@@ -24,7 +24,7 @@ const UpperNavbar = ({
 
     return (
         <div
-            className={cn("flex items-center border-b-[0px] py-2 gap-2 @container", className)}
+            className={cn("flex items-center border-b-[0px] py-2 gap-2 not-md:px-2 @container", className)}
             {...props}
         >
             {isMobile

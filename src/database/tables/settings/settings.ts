@@ -15,7 +15,7 @@ interface Settings extends CoreRecord {
 const get_default_settings = (): Omit<Settings, "id"> => {
 
     return {
-        color: "purple",
+        color: "gray",
         mode: "system",
         remember: 14,
         notification: false,
