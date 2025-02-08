@@ -12,6 +12,7 @@ type NotificationFilter = {
 type NotificationFilterChache = {
     data: Notification[],
     filters: NotificationFilter,
+    not_read: number,
 };
 
 // Constants
@@ -34,10 +35,12 @@ const initialize_filters = (): NotificationFilter => {
 const initialize_structure = (
     data: Notification[] = [],
     filters: NotificationFilter = initialize_filters(),
+    not_read: number = 0,
 ): NotificationFilterChache => {
     return {
         data,
         filters,
+        not_read,
     };
 };
 
@@ -64,12 +67,15 @@ const get_notifications_query = () => {
             // Sort notifications
             const arr_sorted = get_sorted_notifications(res);
 
+            let not_read = 0;
+
             // Fill filters
             arr_sorted.forEach((notification, index) => {
                 obj_filters[notification.type].push(index);
+                if (!notification.read) not_read += 1;
             });
 
-            return initialize_structure(arr_sorted, obj_filters);
+            return initialize_structure(arr_sorted, obj_filters, not_read);
         },
         initialData: initialize_structure(),
     });
@@ -91,7 +97,7 @@ const get_notification_query = (id: number) => {
 const add_notification_query_client = (notification: Notification, queryClient: QueryClient) => {
     queryClient.setQueryData<NotificationFilterChache>([c_query_key], (old_data) => {
         if (!old_data) return initialize_structure([notification]);
-        const { data, filters } = old_data;
+        const { data, filters, not_read } = old_data;
 
         const arr_sorted = add_sorted_notifications(data, notification);
 
@@ -122,7 +128,7 @@ const add_notification_query_client = (notification: Notification, queryClient: 
             filters[notification.type] = [...first_section, notification_index, ...second_section];
         }
 
-        return initialize_structure(arr_sorted, filters);
+        return initialize_structure(arr_sorted, filters, not_read + 1);
     });
 };
 
@@ -147,9 +153,10 @@ const upd_notification_query = () => {
         onSuccess: (new_birthday) => {
             queryClient.setQueryData<NotificationFilterChache>([c_query_key], (old_data) => {
                 if (!old_data) return initialize_structure([new_birthday]);
-                const { data, filters } = old_data;
+                const { data, filters, not_read } = old_data;
                 const sorted_arr = upd_sorted_notifications(data, new_birthday);
-                return initialize_structure(sorted_arr, filters);
+                const factor = new_birthday.read ? -1 : 0;
+                return initialize_structure(sorted_arr, filters, not_read + factor);
             });
         }
     });
@@ -164,7 +171,9 @@ const del_notification_query = () => {
         onSuccess: (notification_id) => {
             queryClient.setQueryData<NotificationFilterChache>([c_query_key], (old_data) => {
                 if (!old_data) return initialize_structure();
-                const { data, filters } = old_data;
+                const { data, filters, not_read } = old_data;
+
+                const old_notification = data.find(notification => notification.id === notification_id);
 
                 const notification_index = data.findIndex(notification => notification.id === notification_id);
                 const sorted_arr = del_sorted_notifications(data, notification_id);
@@ -183,7 +192,10 @@ const del_notification_query = () => {
                         filters[notification_type] = [...first_section, ...second_section];
                     }
                 }
-                return initialize_structure(sorted_arr, filters);
+
+                const factor = old_notification?.read ? 0 : -1;
+
+                return initialize_structure(sorted_arr, filters, not_read + factor);
             });
         }
     });
