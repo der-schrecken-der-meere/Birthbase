@@ -51,7 +51,7 @@ const split_filter_array = (
 ): [number[], number[]] => {
     const dc_arr_filter = [...arr_filter];
     const first_section = dc_arr_filter.slice(0, index + 1);
-    const second_section = dc_arr_filter.slice(index + 1).map(index => index + map_factor);
+    const second_section = dc_arr_filter.slice(index + 1).map(i => i + map_factor);
     return [first_section, second_section];
 };
 
@@ -185,7 +185,7 @@ const del_notification_query = () => {
                     const filter_index = arr_filter_indices.findIndex(index => index === notification_index);
 
                     if (filter_index !== -1) {
-                        const [first_section, second_section] = split_filter_array(arr_filter_indices, filter_index, -1);
+                        const [first_section, second_section] = split_filter_array(arr_filter_indices, filter_index - 1, -1);
                         // Delete the first element (Index of the deleted notification)
                         second_section.shift();
 
