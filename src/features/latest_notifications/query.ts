@@ -41,6 +41,17 @@ const initialize_structure = (
     };
 };
 
+const split_filter_array = (
+    arr_filter: number[],
+    index: number,
+    map_factor: number
+): [number[], number[]] => {
+    const dc_arr_filter = [...arr_filter];
+    const first_section = dc_arr_filter.slice(0, index + 1);
+    const second_section = dc_arr_filter.slice(index + 1).map(index => index + map_factor);
+    return [first_section, second_section];
+};
+
 const get_notifications_query = () => {
     return useQuery({
         queryKey: [c_query_key],
@@ -95,18 +106,20 @@ const add_notification_query_client = (notification: Notification, queryClient: 
 
         let filter_type = filters[notification.type];
         if (nearst_notification_index === -1) {
+
             // No type sibbling was found, so just push into the array
-            filter_type.push(notification_index);
+            filters[notification.type] = [notification_index, ...filter_type.map(index => index + 1)];
         } else {
             // Index of the sorted array
             const sibbling_index = reversed_array.length - 1 - nearst_notification_index;
+
             // Position of the sibbling index
             const filter_index = filter_type.findIndex(n => n === sibbling_index);
+
             // Devide the array at the found position and
             // put the index of the new notification in between
-            const first_section = filter_type.slice(0, filter_index + 1);
-            const second_section = filter_type.slice(filter_index + 1).map(index => index + 1);
-            filter_type = [...first_section, notification_index, ...second_section];
+            const [first_section, second_section] = split_filter_array(filter_type, filter_index, 1);
+            filters[notification.type] = [...first_section, notification_index, ...second_section];
         }
 
         return initialize_structure(arr_sorted, filters);
@@ -152,16 +165,22 @@ const del_notification_query = () => {
             queryClient.setQueryData<NotificationFilterChache>([c_query_key], (old_data) => {
                 if (!old_data) return initialize_structure();
                 const { data, filters } = old_data;
-                const index = data.findIndex(notification => notification.id === notification_id);
+
+                const notification_index = data.findIndex(notification => notification.id === notification_id);
                 const sorted_arr = del_sorted_notifications(data, notification_id);
-                if (index !== -1) {
-                    let arr_filter_indices = filters[data[index].type];
-                    const filter_index = arr_filter_indices.findIndex(notification_index => notification_index === index);
+
+                if (notification_index !== -1) {
+
+                    const notification_type = data[notification_index].type;
+                    let arr_filter_indices = filters[notification_type];
+                    const filter_index = arr_filter_indices.findIndex(index => index === notification_index);
+
                     if (filter_index !== -1) {
-                        let arr_parts = arr_filter_indices.slice(filter_index + 1);
-                        arr_parts = arr_parts.map(index => index - 1);
-                        arr_filter_indices.splice(filter_index, 1);
-                        arr_filter_indices = [...arr_filter_indices, ...arr_parts];
+                        const [first_section, second_section] = split_filter_array(arr_filter_indices, filter_index, -1);
+                        // Delete the first element (Index of the deleted notification)
+                        second_section.shift();
+
+                        filters[notification_type] = [...first_section, ...second_section];
                     }
                 }
                 return initialize_structure(sorted_arr, filters);

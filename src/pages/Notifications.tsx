@@ -2,7 +2,7 @@ import { Button, ButtonProps } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Notification } from "@/database/tables/notifications/notifications";
-import { del_notification_query, get_notifications_query, upd_notification_query } from "@/features/latest_notifications/query";
+import { add_notification_query_client, del_notification_query, get_notifications_query, upd_notification_query } from "@/features/latest_notifications/query";
 import { PageLinks } from "@/globals/constants/links";
 import { useAppToast } from "@/hooks/useAppToast";
 import { useNavbar } from "@/hooks/useNavbar";
@@ -14,6 +14,7 @@ import { ForwardRefExoticComponent, useCallback, useEffect, useMemo, useState, }
 import { NotificationType } from "@/features/notify/notify";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PopoverTriggerProps } from "@radix-ui/react-popover";
+import { queryClient } from "@/frontend/pre_react_init";
 
 type FilterButtonProps = {
     onClick: () => void;
@@ -148,7 +149,7 @@ const Notifications = () => {
         )
     }
 
-    const filtered_data = filter === null
+    const filtered_data = (filter === null)
         ? data.data
         : data.filters[filter].map((index) => {
             return data.data[index];

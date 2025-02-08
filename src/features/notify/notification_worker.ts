@@ -203,8 +203,8 @@ const create_birthday_notifications = (birthday_items: BirthdayItem[]): Options[
 };
 
 // Logging
-setInterval(() => {
-    console.log(queue.queue, timeout);
-}, 1_000);
+// setInterval(() => {
+//     console.log(queue.queue, timeout);
+// }, 1_000);
 
 export type { NotificationRequest, BirthdayRequest, NotificationResponse, ID };
