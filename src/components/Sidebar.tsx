@@ -113,8 +113,8 @@ const AppSidebar = () => {
                                     Icon: link.icon,
                                     title: link.title,
                                 };
-                                if (link.url === PageLinks.NOTIFICATIONS && notification_data.length !== 0) {
-                                    props.badge = notification_data.length;
+                                if (link.url === PageLinks.NOTIFICATIONS && notification_data.data.length !== 0) {
+                                    props.badge = notification_data.data.length;
                                 }
 
                                 return createElement(SidebarEntry, props);

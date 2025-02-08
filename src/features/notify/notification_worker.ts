@@ -73,7 +73,6 @@ self.onmessage = (e: MessageEvent<NotificationRequest>) => {
 
     switch (request.new_type) {
         case NotificationType.BIRTHDAY:
-            console.log("Workers computes birthday notification");
             const {
                 action,
                 old_timestamp,
@@ -123,7 +122,6 @@ const compute_birthday_item = (
 
     switch (action) {
         case Action.ADD:
-            console.log("Worker adds birthday notification")
             queue.add_notification(
                 new_timestamp as Exclude<typeof new_timestamp, null>,
                 new_type as Exclude<typeof new_type, null>,
@@ -131,7 +129,6 @@ const compute_birthday_item = (
             );
             break;
         case Action.DEL:
-            console.log("Worker deletes birthday notification")
             queue.del_notification(
                 old_timestamp as Exclude<typeof old_timestamp, null>,
                 old_type as Exclude<typeof old_type, null>,
@@ -139,7 +136,6 @@ const compute_birthday_item = (
             );
             break;
         case Action.UPD:
-            console.log("Worker updates birthday notification")
             queue.upd_notification(
                 old_timestamp as Exclude<typeof new_timestamp, null>,
                 new_timestamp as Exclude<typeof old_timestamp, null>,

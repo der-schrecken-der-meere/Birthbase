@@ -21,8 +21,6 @@ const get_next_birthday = (
 
     obj_birth.setFullYear(obj_now.getFullYear());
 
-    console.log(obj_now, obj_birth);
-
     if (obj_now > obj_birth) {
         obj_birth.setFullYear(obj_now.getFullYear() + 1);
     }
@@ -32,8 +30,6 @@ const get_next_birthday = (
 
 const add_birthday_middleware = async (birthday: Birthday): Promise<Birthday> => {
     try {
-
-        console.log(birthday.date);
 
         birthday.date = format_date_to_iso_midnight(locale, timezone, new Date(birthday.date));
 

@@ -113,8 +113,6 @@ const BirthdayForm = () => {
 
     const { mutate: update } = upd_birthday_query();
 
-    console.log(data.date);
-
     const form = useForm<T_Form>({
         resolver: zodResolver(formSchema),
         defaultValues: (() => {
@@ -178,7 +176,6 @@ const BirthdayForm = () => {
         if (methodRef.current === "read") {
             return
         }
-        console.log(new Date(+data.date));
         try {
             const newObj: Birthday = {...getDefaultBirthday(), ...{
                 id: data.id,
@@ -189,9 +186,7 @@ const BirthdayForm = () => {
                 date: format_date_to_iso_midnight("de", "Europe/Berlin", data.date),
                 marked: data.marked,
             }}
-
-            console.log(newObj, data.date, format_date_to_iso_midnight("de", "Europe/Berlin", new Date(newObj.date)));
-
+            
             switch (methodRef.current) {
                 case "create":
                     add(newObj, {

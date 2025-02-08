@@ -43,7 +43,7 @@ const NotificationIcon = ({
     return (
         <div className="relative">
             <Icon/>
-            {notification_data.length > 0 && (
+            {notification_data.data.length > 0 && (
                 <div className='bg-[hsl(var(--text))] w-2 h-2 rounded-full absolute right-1 bottom-1 outline-offset-0 outline-3 outline-[hsl(var(--bg))]'></div>
             )}
         </div>

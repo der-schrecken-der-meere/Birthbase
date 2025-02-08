@@ -31,13 +31,13 @@ const UpperNavbar = ({
                 ? (
                     <MobileUpperNavbar
                         pageTitle={pageTitle}
-                        notifications={notification_data.length}
+                        notifications={notification_data.data.length}
                     />
                 )
                 : (
                     <DesktopUpperNavbar
                         pageTitle={pageTitle}
-                        notifications={notification_data.length}
+                        notifications={notification_data.data.length}
                         breadcrumbs={breadcrumbs}
                     />
                 )

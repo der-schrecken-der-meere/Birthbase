@@ -14,7 +14,7 @@ const get_sorted_notifications = (array: Notification[]) => {
  * Adds a new notification to a sorted array
  */
 const add_sorted_notifications = (sortedArray: Notification[], notification: Notification) => {
-    return add_sorted_array(sortedArray, notification, (v) => notification.timestamp <= v.timestamp);
+    return add_sorted_array(sortedArray, notification, (v) => notification.timestamp >= v.timestamp);
 };
 
 /**
@@ -32,7 +32,7 @@ const upd_sorted_notifications = (sortedArray: Notification[], newNotification: 
         cpySortedArray[oldNotificationIndex] = newNotification;
         return cpySortedArray;
     }
-    return upd_sorted_array(sortedArray, oldNotificationIndex, newNotification, (v) => newNotification.timestamp <= v.timestamp);
+    return upd_sorted_array(sortedArray, oldNotificationIndex, newNotification, (v) => newNotification.timestamp >= v.timestamp);
 };
 
 /**

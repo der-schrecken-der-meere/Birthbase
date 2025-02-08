@@ -103,7 +103,6 @@ const Notifications = () => {
             active: true,
             text: "Alle",
             onClick: () => {
-                console.log("Alle");
                 setFilter(null);
                 setActive(0);
             },
@@ -112,7 +111,6 @@ const Notifications = () => {
             active: false,
             text: "Geburtstage",
             onClick: () => {
-                console.log("Geburtstage");
                 setFilter(NotificationType.BIRTHDAY);
                 setActive(1);
             },
@@ -121,7 +119,6 @@ const Notifications = () => {
             active: false,
             text: "Erinnerungen",
             onClick: () => {
-                console.log("Erinnerungen");
                 setFilter(NotificationType.BIRTHDAY_REMINDER);
                 setActive(2);
             },
@@ -130,7 +127,6 @@ const Notifications = () => {
             active: false,
             text: "Infos",
             onClick: () => {
-                console.log("Infos");
                 setFilter(NotificationType.INFO);
                 setActive(3);
             },
@@ -153,21 +149,25 @@ const Notifications = () => {
     }
 
     const filtered_data = filter === null
-        ? data
-        : data.filter(notification => notification.type === filter);
+        ? data.data
+        : data.filters[filter].map((index) => {
+            return data.data[index];
+        });
 
     return (
         <>
             <ScrollArea className="shrink-0 mb-2 table-fixed">
                 <div className="flex gap-2">
-                    {filter_buttons.map((filter_button, index) => (
-                        <FilterButton
-                            key={`${index}-${filter_button.text}`}
-                            onClick={filter_button.onClick}
-                            active={index === active}
-                            text={filter_button.text}
-                        />
-                    ))}
+                    {filter_buttons.map((filter_button, index) => {
+                        return (
+                            <FilterButton
+                                key={`${index}-${filter_button.text}`}
+                                onClick={filter_button.onClick}
+                                active={index === active}
+                                text={filter_button.text}
+                            />
+                        );
+}                   )}
                 </div>
                 <ScrollBar orientation="horizontal" />
             </ScrollArea>
@@ -283,7 +283,7 @@ const NotificationMessage = ({
                     <Button
                         onClick={() => onRead(notification)}
                         size="sm"
-                        variant="secondary"
+                        variant="outline"
                     >
                         <Eye className="w-4 h-4 mr-2"/>
                         Als gelesen markieren
@@ -292,7 +292,7 @@ const NotificationMessage = ({
                 <Button
                     onClick={() => onDelete(notification)}
                     size="sm"
-                    variant="secondary"
+                    variant="outline"
                 >
                     <Trash2 className="w-4 h-4 mr-2"/>
                     Löschen
