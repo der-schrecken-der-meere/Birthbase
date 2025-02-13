@@ -44,6 +44,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
+      - name: Fix problem with @tauri-apps/api / -cli
+        run: |
+          npm i @tauri-apps/api
+          npm i -D @tauri-apps/cli
+
       - name: Install frontend
         run: |
           npm install
