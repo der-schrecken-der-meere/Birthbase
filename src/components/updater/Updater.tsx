@@ -4,7 +4,7 @@ import { Progress } from '../ui/progress';
 import { Button, ButtonProps } from '../ui/button';
 import { DialogClose } from '../ui/dialog';
 import { Suspense, useCallback, useEffect, useState } from 'react';
-import { mock_check_update, mock_update } from '@/features/updater/test/update';
+// import { mock_check_update, mock_update } from '@/features/updater/test/update';
 import { use_update_store } from '@/hooks/use_update_store';
 import { ProgressProps } from '@radix-ui/react-progress';
 import { use_app_store } from '@/hooks/use_app_store';
@@ -14,6 +14,7 @@ import { Skeleton } from '../ui/skeleton';
 import { LinuxMacUpdater } from './LinuxMacUpdater';
 import { get_settings_query } from '@/features/manage_settings/query';
 import { create_toast, ToastType } from '@/hooks/use_app_toast';
+import { check_update, install_update } from '@/features/updater/updater';
 
 const UpdaterProgress = ({
     value,
@@ -33,7 +34,7 @@ const CheckUpdate = ({
 }: ButtonProps) => {
     const onCheckClick = useCallback(() => {
         (async () => {
-            await mock_check_update();
+            await check_update();
         })();
     }, []);
 
@@ -59,7 +60,7 @@ const DownloadUpdate = ({
 
     const onDownloadClick = useCallback(() => {
         (async () => {
-            await mock_update(os_type, relaunch);
+            await install_update(os_type, relaunch);
         })();
     }, [relaunch]);
 
