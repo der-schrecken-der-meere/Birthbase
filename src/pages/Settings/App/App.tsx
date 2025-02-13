@@ -1,5 +1,4 @@
 import { SettingsLayoutBreadcrumbs } from "@/components/layouts/SettingsLayout";
-import { useNavbar } from "@/hooks/useNavbar";
 import { isTauri } from "@tauri-apps/api/core";
 import { SettingsFormElement, SettingsFormPageWrapper } from "../Settings";
 import { FormField } from "@/components/ui/form";
@@ -12,6 +11,7 @@ import { primitive_strict_or } from "@/lib/functions/logic/or";
 import { OsType, type } from "@tauri-apps/plugin-os";
 import { Switch } from "@/components/ui/switch";
 import { Rocket } from "lucide-react";
+import { update_navbar } from "@/hooks/use_app_navbar";
 
 const formSchema = z.object({
     autostart: z.coerce.boolean(),
@@ -21,7 +21,7 @@ type AppForm = z.infer<typeof formSchema>;
 
 const App = () => {
 
-    useNavbar({
+    update_navbar({
         pageTitle: "App",
         breadcrumbDisplay: SettingsLayoutBreadcrumbs,
     });

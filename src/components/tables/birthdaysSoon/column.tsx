@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { current_date_to_iso } from "@/lib/functions/date/timezone";
 
-export const getColumns = (removeElement: (id: number|string) => void): ColumnDef<Birthday>[] => [
+export const getColumns = (): ColumnDef<Birthday>[] => [
     {
         id: "Datenanzeige",
         cell: ({ row }) => {
@@ -74,13 +74,12 @@ export const getColumns = (removeElement: (id: number|string) => void): ColumnDe
         accessorFn: (data) => {
             return data;
         },
-        cell: ({ cell }) => {
+        cell: () => {
             return (
                 <Button
                     variant="ghost"
                     className='ml-auto'
                     size="icon"
-                    onClick={() => removeElement((cell.getValue() as Birthday).id)}
                 >
                     <EyeOff className='h-4 w-4' />
                 </Button>

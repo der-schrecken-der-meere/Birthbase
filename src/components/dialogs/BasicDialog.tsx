@@ -29,7 +29,7 @@ const BasicDialog: React.FC<DialogProps & I_BasicDialog> = ({
             >
                 <DialogHeader className={!headerVisibility ? "hidden" : ""}>
                     <DialogTitle>{title}</DialogTitle>
-                    <DialogDescription>{description}</DialogDescription>
+                    <DialogDescription className='flex flex-col'>{description}</DialogDescription>
                 </DialogHeader>
                 {children}
             </DialogContent>

@@ -1,11 +1,6 @@
-import { useSelector } from 'react-redux'
-
 import { ListItem, SelectAsRadio, SelectShortend, SettingsFormElement, SettingsFormPageWrapper } from '../Settings';
 
-import { getMediaScreen } from '@/store/mediaType/mediaTypeSlice'
-
 import { Separator } from '@/components/ui/separator'
-import { RootState } from '@/store/store';
 
 import { PaintbrushVertical, Palette } from 'lucide-react';
 import { z } from 'zod';
@@ -16,12 +11,13 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { FormField } from '@/components/ui/form';
 import { cn } from '@/lib/utils';
 import { Settings } from '@/database/tables/settings/settings';
-import { useAppToast } from '@/hooks/useAppToast';
-import { useNavbar } from '@/hooks/useNavbar';
 import { SettingsLayoutBreadcrumbs } from '@/components/layouts/SettingsLayout';
 
 import { get_settings_query, set_settings_query } from '@/features/manage_settings/query';
 import { obj_is_empty } from '@/lib/functions/object/empty';
+import { useSidebar } from '@/components/ui/sidebar';
+import { create_toast, ToastType } from '@/hooks/use_app_toast';
+import { update_navbar } from '@/hooks/use_app_navbar';
 
 const formSchema = z.object({
     mode: z.enum(["dark", "light", "system"], {
@@ -36,21 +32,19 @@ type AppearanceForm = z.infer<typeof formSchema>
 
 const Appearance = () => {
 
-    useNavbar({
+    update_navbar({
         pageTitle: "Aussehen",
         breadcrumbDisplay: SettingsLayoutBreadcrumbs,
     });
-
-    const { setErrorNotification, setSuccessNotification } = useAppToast();
     const { data, isError, error, isFetching } = get_settings_query();
     const { mutate: update } = set_settings_query();
 
     useEffect(() => {
         if (isError) {
-            setErrorNotification({
+            create_toast({
                 title: "Fehler beim Anzeigen der Einstellungen",
                 description: JSON.stringify(error),
-            });
+            }, ToastType.ERROR);
         }
     }, [isError, error]);
 
@@ -73,21 +67,19 @@ const Appearance = () => {
             new_settings.mode = data.mode;
         }
 
-        console.log(new_settings)
-
         if (!obj_is_empty(new_settings)) {
             update(new_settings, {
                 onSuccess: () => {
-                    setSuccessNotification({
+                    create_toast({
                         title: "Erfolgreich",
                         description: "Die Einstellungen wurden aktualisiert",
-                    });
+                    }, ToastType.SUCCESS);
                 },
                 onError: (error) => {
-                    setErrorNotification({
+                    create_toast({
                         title: "Fehler beim Speichern der Einstellungen",
                         description: JSON.stringify(error), 
-                    });
+                    }, ToastType.ERROR);
                 },
             });
         }
@@ -169,10 +161,7 @@ const ModeSelect = ({
     defaultValue: string,
     onValueChange: (value: string) => void,
 }) => {
-    const lg = useSelector((state: RootState) => {
-        const screens = state.mediaType.screens;
-        return getMediaScreen("md", screens)?.value.isActive;
-    });
+    const { isMobile } = useSidebar();
 
     const listitems: ListItem[] = useMemo(() => [
         {
@@ -194,7 +183,7 @@ const ModeSelect = ({
     const placeholder = "Modus";
 
     return (
-        !lg ? (
+        isMobile ? (
             <SelectAsRadio
                 title={placeholder}
                 radioItems={listitems}
@@ -234,10 +223,7 @@ const ColorSelect = ({
     defaultValue: string,
     onValueChange: (value: string) => void,
 }) => {
-    const lg = useSelector((state: RootState) => {
-        const screens = state.mediaType.screens;
-        return getMediaScreen("md", screens)?.value.isActive;
-    });
+    const { isMobile } = useSidebar();
 
     const listitems: ListItem[] = [
         {item: <ColorSelectEntry text='Blau' className='blue' />, value: "blue", displayText: "Blau" },
@@ -250,7 +236,7 @@ const ColorSelect = ({
     const placeholder = "Farbe"
 
     return (
-        !lg ? (
+        isMobile ? (
             <SelectAsRadio
                 title={placeholder}
                 radioItems={listitems}

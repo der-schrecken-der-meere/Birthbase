@@ -20,4 +20,6 @@ type ByteUnit = "byte"|"kilobyte"|"megabyte"|"gigabyte"|"terabyte"|"petabyte";
 
 type StorageUnit = BitUnit|ByteUnit;
 
-export type { Digit, Decimal, Centi, Milli, _0_59, Range, StorageUnit, BitUnit, ByteUnit };
+type VersionNumber = `${number}.${number}.${number}`;
+
+export type { Digit, Decimal, Centi, Milli, _0_59, Range, StorageUnit, BitUnit, ByteUnit, VersionNumber };

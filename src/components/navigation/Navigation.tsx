@@ -1,10 +1,10 @@
 import { HTMLAttributes } from 'react';
-import { useNavbar } from '../../hooks/useNavbar';
 import { cn } from '@/lib/utils';
 import { get_notifications_query } from '@/features/latest_notifications/query';
 import { useSidebar } from '../ui/sidebar';
 import { MobileUpperNavbar } from './MobileNavigation';
 import { DesktopUpperNavbar } from './DesktopNavigation';
+import { use_app_navbar } from '@/hooks/use_app_navbar';
 
 type UpperNavbarProps = {
     pageTitle: string,
@@ -16,7 +16,8 @@ const UpperNavbar = ({
     ...props
 } : HTMLAttributes<HTMLDivElement>) => {
 
-    const { pageTitle, breadcrumbs } = useNavbar({});
+    const page_title = use_app_navbar((state) => state.page_title);
+    const bread_crumbs = use_app_navbar((state) => state.bread_crumbs);
 
     const { isMobile } = useSidebar();
 
@@ -30,15 +31,15 @@ const UpperNavbar = ({
             {isMobile
                 ? (
                     <MobileUpperNavbar
-                        pageTitle={pageTitle}
+                        pageTitle={page_title}
                         notifications={notification_data.not_read}
                     />
                 )
                 : (
                     <DesktopUpperNavbar
-                        pageTitle={pageTitle}
+                        pageTitle={page_title}
                         notifications={notification_data.not_read}
-                        breadcrumbs={breadcrumbs}
+                        breadcrumbs={bread_crumbs}
                     />
                 )
             }

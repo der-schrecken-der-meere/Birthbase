@@ -2,7 +2,6 @@ import { CSSProperties, Fragment, useCallback } from "react";
 import { GoBackInHistory } from "../History";
 import { CustomSidebarTrigger } from "../Sidebar";
 import { Breadcrumb, BreadcrumbEllipsis, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "../ui/breadcrumb";
-import { BreadcrumbDisplayProps, BreadcrumbProps } from "@/hooks/useNavbar";
 import { Link, NavLink } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
@@ -11,6 +10,7 @@ import { Button } from "../ui/button";
 import { PageLinks } from "@/globals/constants/links";
 import { Bell } from "lucide-react";
 import { UpperNavbarProps } from "./Navigation";
+import { BreadcrumbDisplayProps, BreadcrumbProps } from "@/hooks/use_app_navbar";
 
 const BreadcrumbListItem = ({
     type,

@@ -8,31 +8,24 @@ import { Outlet } from 'react-router-dom'
 
 import { AppSidebar } from '../Sidebar'
 
-import { useSelector } from 'react-redux'
-import { type RootState } from '../../store/store'
-
 import { isTauri } from '@tauri-apps/api/core';
 
-
-
-import { CMDK } from '../../components/singletons/CMDK';
-
 import useShortcuts from '../../hooks/useShortcuts';
-import { useDeviceSize } from '../../hooks/useDeviceSize';
 
 import { SidebarProvider, useSidebar } from '../ui/sidebar';
 import { UpperNavbar } from '../navigation/Navigation';
 import { MobileLowerNavbar } from '../navigation/MobileNavigation'
 import { Test_overlay } from '../test/test_overlay'
+import { use_update_store } from '@/hooks/use_update_store'
+import { CMDK } from '../singletons/CMDK';
 
-const Updater = lazy(() => import("../../components/tauri/Updater"));
+const Updater = lazy(() => import("../updater/Updater"));
 
 const MainLayout = () => {
-    const updateState = useSelector((state: RootState) => state.tauri.updateInfo.updateState);
+
+    const update_available = use_update_store((state) => state.available);
 
     useShortcuts();
-
-    // useDeviceSize({});
 
     return (
         <>
@@ -45,11 +38,7 @@ const MainLayout = () => {
                     <div className='flex-1 w-full flex flex-col overflow-hidden py-2 max-w-[100vw] md:max-w-[1024px] md:mx-auto @container'>
                         <Outlet />
                     </div>
-                    {/* <CustomSidebarTrigger /> */}
-                    {/* <div ref={mainRef} className='h-full max-w-[100vw] md:max-w-[1024px] md:mx-auto'> */}
-                        {/* <Outlet context={{ mainRef }}/> */}
-                    {/* </div> */}
-                    {(isTauri() && updateState === "available") && 
+                    {update_available && 
                         <Suspense fallback={null}>
                             <Updater/>
                         </Suspense>

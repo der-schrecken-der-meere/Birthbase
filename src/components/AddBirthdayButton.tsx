@@ -1,9 +1,7 @@
 import { Plus } from "lucide-react";
-import { useBirthdayForm } from "../hooks/useBirthdayForm";
 import { Button, ButtonProps } from "./ui/button";
-import { Label } from "./ui/label";
-import { LabelProps } from "@radix-ui/react-label";
 import { cn } from "@/lib/utils";
+import { open_birthday_form_create } from "@/hooks/use_birthday_form";
 
 const BasicAddBirthdayButton = ({
     children,
@@ -11,13 +9,12 @@ const BasicAddBirthdayButton = ({
     onClick,
     ...props
 }: ButtonProps) => {
-    const { openBirthdayFormAdd } = useBirthdayForm();
 
     return (
         <Button
             className={cn("h-7", className)}
             aria-label="Geburtstag erstellen"
-            onClick={openBirthdayFormAdd}
+            onClick={open_birthday_form_create}
             {...props}
         >
             <Plus className="h-4 w-4"/>

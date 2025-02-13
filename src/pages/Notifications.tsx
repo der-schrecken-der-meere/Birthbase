@@ -4,8 +4,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Notification } from "@/database/tables/notifications/notifications";
 import { add_notification_query_client, del_notification_query, get_notifications_query, upd_notification_query } from "@/features/latest_notifications/query";
 import { PageLinks } from "@/globals/constants/links";
-import { useAppToast } from "@/hooks/useAppToast";
-import { useNavbar } from "@/hooks/useNavbar";
 import { format_number_to_relative_time } from "@/lib/intl/date";
 import { get_relative_time_string } from "@/lib/functions/date/relative_time";
 import { cn } from "@/lib/utils";
@@ -15,6 +13,8 @@ import { NotificationType } from "@/features/notify/notify";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PopoverTriggerProps } from "@radix-ui/react-popover";
 import { queryClient } from "@/frontend/pre_react_init";
+import { create_toast, ToastType } from "@/hooks/use_app_toast";
+import { update_navbar } from "@/hooks/use_app_navbar";
 
 type FilterButtonProps = {
     onClick: () => void;
@@ -46,7 +46,7 @@ const FilterButton = ({
 
 const Notifications = () => {
 
-    useNavbar({
+    update_navbar({
         docTitle: "Birthbase - Benachrichtigungen",
         pageTitle: "Benachrichtigungen",
         breadcrumbDisplay: [
@@ -65,7 +65,6 @@ const Notifications = () => {
     const { data, isFetching, error, isError } = get_notifications_query();
     const { mutate: delete_notification } = del_notification_query();
     const { mutate: update_notification } = upd_notification_query();
-    const { setErrorNotification } = useAppToast();
 
     const [ filter, setFilter ] = useState<NotificationType | null>(null);
     const [ active, setActive ] = useState(0);
@@ -75,10 +74,10 @@ const Notifications = () => {
             notification,
             {
                 onError: (error) => {
-                    setErrorNotification({
+                    create_toast({
                         title: "Fehler beim Löschen der Benachrichtigung",
                         description: JSON.stringify(error),
-                    })
+                    }, ToastType.ERROR);
                 },
             }
         );
@@ -90,10 +89,10 @@ const Notifications = () => {
             new_notification,
             {
                 onError: (error) => {
-                    setErrorNotification({
+                    create_toast({
                         title: "Fehler beim Löschen der Benachrichtigung",
                         description: JSON.stringify(error),
-                    })
+                    }, ToastType.ERROR);
                 },
             }
         );
@@ -136,10 +135,10 @@ const Notifications = () => {
 
     useEffect(() => {
         if (isError) {
-            setErrorNotification({
+            create_toast({
                 title: "Fehler beim Anzeigen der Benachrichtigungen",
                 description: JSON.stringify(error),
-            })
+            }, ToastType.ERROR);
         }
     }, [isError, error]);
 

@@ -12,23 +12,6 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// React Icons
-import { MdCalendarMonth } from "react-icons/md";
-
-// React Loader
-import { TailSpin } from "react-loader-spinner";
-
-// React Redux
-// import {
-//     useDispatch,
-//     useSelector
-// } from 'react-redux';
-// import {
-//     FormMethod,
-//     close,
-// } from "@/frontend/store/dataForm/dataFormSlice";
-// import { RootState } from '@/frontend/store/store';
-
 // Shadcn UI
 import { Button, ButtonProps } from '../ui/button';
 import { Calendar } from '../ui/calendar';
@@ -53,7 +36,6 @@ import { Checkbox } from '../ui/checkbox';
 import { Birthday, getDefaultBirthday } from '@/database/tables/birthday/birthdays';
 
 // Hooks
-import { useAppToast } from '../../hooks/useAppToast';
 // import { useDeleteBirthdays } from '@/components/hooks/useDeleteBirthday';
 
 // Queries
@@ -61,16 +43,17 @@ import { add_birthday_query, upd_birthday_query } from '@/features/manage_birthd
 
 // Util functions
 import { useDeleteBirthdays } from '@/hooks/useDeleteBirthday';
-import { useBirthdayForm } from '@/hooks/useBirthdayForm';
 import { cn } from '@/lib/utils';
 import { format_date_to_iso_midnight } from '@/lib/intl/date';
+import { create_toast, ToastType } from '@/hooks/use_app_toast';
+import { BirthdayFormMode, use_birthday_form } from '@/hooks/use_birthday_form';
+import { CalendarDays } from 'lucide-react';
+import { PulseLoader } from 'react-spinners';
 
 type FormMethod = "create"|"update"|"delete"|"read";
 
 const BirthdayForm = () => {
     const formSchema = useMemo(() => {
-        // const curDate = new Date();
-        // curDate.setHours(23, 59, 59, 999);
         return z.object({
             id: z.number(),
             firstname: z.string({
@@ -86,20 +69,17 @@ const BirthdayForm = () => {
             }),
             date: z.coerce.date({
                 message: "Falsches Datumsformat",
-            })
-            // .max(curDate, {
-            //     message: "Datum liegt in der Zukunft",
-            // })
-            ,
+            }),
             marked: z.coerce.boolean(),
         });
     }, []);
 
     type T_Form = z.infer<typeof formSchema>
 
-    // const dispatch = useDispatch();
-    const { setErrorNotification, setSuccessNotification } = useAppToast();
-    const { close, operation, data, setOperation } = useBirthdayForm();
+    const set_open = use_birthday_form((state) => state.set_open);
+    const set_operation = use_birthday_form((state) => state.set_operation);
+    const operation = use_birthday_form((state) => state.operation);
+    const birthday = use_birthday_form((state) => state.birthday);
 
     const { mutate: add } = add_birthday_query();
 
@@ -107,7 +87,7 @@ const BirthdayForm = () => {
 
     const { deleteBirthday } = useDeleteBirthdays({
         onSuccess: () => {
-            close();
+            set_open(false);
         }
     })
 
@@ -117,11 +97,11 @@ const BirthdayForm = () => {
         resolver: zodResolver(formSchema),
         defaultValues: (() => {
             return {
-                id: data.id,
-                firstname: data.name.first,
-                lastname: data.name.last,
-                date: data.date as unknown as Date,
-                marked: data.marked,
+                id: birthday.id,
+                firstname: birthday.name.first,
+                lastname: birthday.name.last,
+                date: birthday.date as unknown as Date,
+                marked: birthday.marked,
             };
         })(),
         // disabled: operation === "read",
@@ -140,12 +120,12 @@ const BirthdayForm = () => {
     }, []);
 
     const onReadClick = useCallback(() => {
-        setOperation("update");
+        set_operation(BirthdayFormMode.UPDATE);
         methodRef.current = "read";
     }, []);
 
     const Buttons = useMemo(() => {
-        if (operation === "create") {
+        if (operation === BirthdayFormMode.CREATE) {
             return (
                 <SubmitButton isSubmitting={form.formState.isSubmitting} onClick={onAddClick}>
                     Hinzufügen
@@ -154,7 +134,7 @@ const BirthdayForm = () => {
         }
         return (
             <>
-                {operation === "read"
+                {operation === BirthdayFormMode.READ
                     ?
                         <SubmitButton isSubmitting={form.formState.isSubmitting} onClick={onReadClick}>
                             Bearbeiten
@@ -191,17 +171,19 @@ const BirthdayForm = () => {
                 case "create":
                     add(newObj, {
                         onSuccess: () => {
-                            setSuccessNotification({
+                            create_toast({
                                 title: "Erfolgreich",
-                                description: "Der Geburstag wurde gespeichert"
-                            })
-                            close();
+                                description: "Der Geburstag wurde gespeichert",
+                                duration: 3_000,
+                            }, ToastType.SUCCESS);
+                            set_open(false);
                         },
                         onError: (error) => {
-                            setErrorNotification({
+                            create_toast({
                                 title: "Fehler beim Speichern des Geburtstages",
                                 description: JSON.stringify(error),
-                            })
+                                duration: 7_500,
+                            }, ToastType.ERROR);
                         }
                     });
                     break;
@@ -211,17 +193,17 @@ const BirthdayForm = () => {
                 case "update":
                     update(newObj, {
                         onSuccess: () => {
-                            setSuccessNotification({
+                            create_toast({
                                 title: "Erfolgreich",
                                 description: "Der Geburtstag wurde geändert",
-                            })
-                            close();
+                            }, ToastType.SUCCESS);
+                            set_open(false);
                         },
                         onError: (error) => {
-                            setErrorNotification({
+                            create_toast({
                                 title: "Fehler beim Ändern des Geburtstages",
                                 description: JSON.stringify(error),
-                            })
+                            }, ToastType.ERROR);
                         },
                     })
                 break;
@@ -239,7 +221,7 @@ const BirthdayForm = () => {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-                <fieldset className="space-y-8" disabled={operation === "read"}>
+                <fieldset className="space-y-8" disabled={operation === BirthdayFormMode.READ}>
                     <FormField
                         control={form.control}
                         name="firstname"
@@ -291,7 +273,7 @@ const BirthdayForm = () => {
                                                 ) : (
                                                     <span>Datum auswählen</span>
                                                 )}
-                                                <MdCalendarMonth size={16} opacity={0.5} />
+                                                <CalendarDays className='ml-1 h-4 w-4 opacity-50' />
                                             </Button>
                                         </FormControl>
                                     </PopoverTrigger>
@@ -383,10 +365,9 @@ const SubmitButton = ({
     return (
         <Button variant={variant} {...props} type="submit" className={cn("min-w-min w-20", className)}>
             {isSubmitting
-                ? <TailSpin
-                    color='currentColor'
-                    height={16}
-                    width={16}
+                ? <PulseLoader
+                    color='hsl(var(--destructive-foreground))'
+                    size="0.5rem"
                 />
                 : children
             }

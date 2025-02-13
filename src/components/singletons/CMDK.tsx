@@ -1,9 +1,6 @@
 import {
     Power,
 } from "lucide-react";
-// import {
-//     LuHome
-// } from "react-icons/lu";
 
 import {
     CommandDialog,

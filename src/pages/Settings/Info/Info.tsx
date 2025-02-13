@@ -1,14 +1,13 @@
-import { NavigationEntry } from '../Settings'
-import { Separator } from '@/components/ui/separator'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/store/store'
-import { useNavbar } from '@/hooks/useNavbar'
-import { SettingsLayoutBreadcrumbs } from '@/components/layouts/SettingsLayout'
-import { isTauri } from '@tauri-apps/api/core'
+import { NavigationEntry } from '../Settings';
+import { Separator } from '@/components/ui/separator';
+import { SettingsLayoutBreadcrumbs } from '@/components/layouts/SettingsLayout';
+import { isTauri } from '@tauri-apps/api/core';
+import { use_app_store } from '@/hooks/use_app_store';
+import { update_navbar } from '@/hooks/use_app_navbar';
 
 const Info = () => {
 
-    useNavbar({
+    update_navbar({
         pageTitle: "Info",
         breadcrumbDisplay: SettingsLayoutBreadcrumbs,
     });
@@ -23,37 +22,37 @@ const Info = () => {
             :
                 null
     );
-}
+};
 
 const Version = () => {
-    const metaData = useSelector((state: RootState) => state.tauri.appInfo.version);
+    const version = use_app_store((state) => state.version);
 
     return (
         <>
             <NavigationEntry
                 caption={"Akuelle Version"}
-                rightElement={`v${metaData}`}
+                rightElement={`v${version}`}
             >
                 App-Version
             </NavigationEntry>
             <Separator/>
         </>
-    )
-}
+    );
+};
 
 const TauriVersion = () => {
-    const metaData = useSelector((state: RootState) => state.tauri.appInfo.tauriVersion);
+    const tauri_version = use_app_store((state) => state.tauri_version);
 
     return (
         <>
             <NavigationEntry
                 caption={"Akuelle Version"}
-                rightElement={`v${metaData}`}
+                rightElement={`v${tauri_version}`}
             >
                 Tauri-Version
             </NavigationEntry>
         </>
-    )
-}
+    );
+};
 
-export default Info
+export default Info;

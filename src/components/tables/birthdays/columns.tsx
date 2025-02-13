@@ -34,8 +34,8 @@ import { Birthday } from '@/database/tables/birthday/birthdays';
 import { calcAge, calc_days_until_next_birthday } from '@/lib/functions/birthdays/calculations';
 import { capitalize } from '@/lib/functions/string/format';
 import { useDeleteBirthdays } from '@/hooks/useDeleteBirthday';
-import { useBirthdayForm } from '@/hooks/useBirthdayForm';
 import { current_date_to_iso } from '@/lib/functions/date/timezone';
+import { open_birthday_form_update } from '@/hooks/use_birthday_form';
 
 export const columns: ColumnDef<Birthday>[] = [
     {
@@ -132,7 +132,6 @@ const AktionDropdown = ({
     cell,
 }: I_ActionDropdown) => {
     const { deleteBirthday } = useDeleteBirthdays({});
-    const { openBirthdayFormUpdate } = useBirthdayForm();
 
     return (
         <DropdownMenu>
@@ -150,7 +149,7 @@ const AktionDropdown = ({
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="flex gap-2" onClick={() => {
-                    openBirthdayFormUpdate(cell);
+                    open_birthday_form_update(cell);
                     // dispatch(openUpdate(obj));
                 }}>
                     Ändern

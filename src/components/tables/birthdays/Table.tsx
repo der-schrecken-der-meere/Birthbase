@@ -2,10 +2,6 @@ import { useEffect, useState } from "react";
 
 // React Router Dom
 
-// React Redux
-// import { useSelector } from "react-redux";
-// import { RootState } from "@/frontend/store/store";
-
 // Tanstack Table
 import { ColumnFiltersState, SortingState, VisibilityState } from "@tanstack/react-table";
 
@@ -20,10 +16,10 @@ import MobileTableOptions   from "../../util/table_blueprint/MobileTableOptions"
 
 import columns from "./columns";
 import { get_birthdays_query } from "@/features/manage_birthdays/query";
-import { useAppToast } from "@/hooks/useAppToast";
 
 import { useTableSortURL } from "../../../hooks/use-tableSortURL";
 import { MyBirthdaysSkeleton } from "@/components/skeletons/MyBirthdaysSkeleton";
+import { create_toast, ToastType } from "@/hooks/use_app_toast";
 
 const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">>> = ({
     className
@@ -32,7 +28,6 @@ const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">>> =
     const { defaultSorting } = useTableSortURL({ columns });
 
     const { isLoading, isError, data, error, isFetching } = get_birthdays_query();
-    const { setErrorNotification } = useAppToast();
     const sortingState = useState<SortingState>([]);
     const columnFilter = useState<ColumnFiltersState>([]);
     const visibility = useState<VisibilityState>({})
@@ -40,10 +35,10 @@ const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">>> =
 
     useEffect(() => {
         if (isError) {
-            setErrorNotification({
+            create_toast({
                 "title": "Fehler beim Laden der Geburtstage",
                 "description": JSON.stringify(error),
-            })
+            }, ToastType.ERROR);
         }
     }, [isError, error]);
 

@@ -3,7 +3,12 @@ import type { Settings } from "@/database/tables/settings/settings";
 import { change_color } from "@/features/manage_settings/appearance/color";
 import { change_mode } from "@/features/manage_settings/appearance/mode";
 import { set_notification_worker } from "@/features/notify/notify";
+import { init_tauri } from "@/init/tauri_init";
+// import { mock_init_tauri } from "@/init/test/tauri_init";
+// import { mock_init_updater } from "@/init/test/updater_init";
+import { init_updater } from "@/init/updater_init";
 import { QueryClient } from "@tanstack/react-query";
+import { isTauri } from "@tauri-apps/api/core";
 
 const queryClient = new QueryClient(
   {
@@ -19,6 +24,10 @@ const queryClient = new QueryClient(
 const pre_react_init = async () => {
   set_notification_worker();
   const settings = await get_settings_model();
+  if (isTauri()) {
+    await init_updater()
+    await init_tauri();
+  }
   setup_settings(settings);
 };
 

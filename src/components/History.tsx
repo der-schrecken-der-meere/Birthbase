@@ -1,7 +1,7 @@
 import { Button, ButtonProps } from './ui/button';
 import { useNavigate } from 'react-router-dom';
-import { LuArrowLeft } from 'react-icons/lu';
 import { useHistory } from '../hooks/useHistory';
+import { ArrowLeft } from 'lucide-react';
 
 interface GoBackInHistoryProps {
     amount?: number;
@@ -20,7 +20,7 @@ const GoBackInHistory = ({
             onClick={() => navigate((amount * -1))}
             {...props}
         >
-            <LuArrowLeft className='w-6 h-6' />
+            <ArrowLeft className='w-6 h-6' />
         </Button>
     );
 };

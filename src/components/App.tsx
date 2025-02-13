@@ -8,42 +8,31 @@ import {
     RouterProvider
 } from "react-router-dom";
 
-// Shadcn UI
-
-// React Redux
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../store/store";
-import { setBooting } from "../store/app/appSlice";
-
 // Pages
 import Home from '../pages/Home';
 import NotFound from "../pages/NotFound";
 
 // Components
 import MainLayout from './layouts/MainLayout';
-import { SettingsEntriesSkeleton } from "./PageWrapper";
 
 // lib
-import { initTauri } from "../backend/init";
-import init from "../frontend/init";
 // import { promise_delay } from "@/lib/main_util";
-import { AppToastProvider } from "./povider/AppToastProvider";
 // import ConfirmProvider from "./contexts/confirmContext";
 // import BirthdayFormProvider from "./contexts/birthdayFormContext";
 import { SettingsLayout } from "./layouts/SettingsLayout";
 import { delay_promise } from "@/lib/functions/promise/delay";
-import { ConfirmDialogProvider } from "./povider/ConfirmDialogProvider";
-import { BirthdayFormProvider } from "./povider/BirthdayFormProvider";
-import { NavbarProvider } from "./povider/NavbarProvider";
-import { useAppToast } from "@/hooks/useAppToast";
 import { isTauri } from "@tauri-apps/api/core";
 import { MyBirthdaysSkeleton } from "./skeletons/MyBirthdaysSkeleton";
 import { PageLinks } from "@/globals/constants/links";
+import { init_tauri } from "@/init/tauri_init";
 
-type ToastError = {
-    description?: string,
-    title: string,
-};
+import { unset_is_booting, use_app_store } from "@/hooks/use_app_store";
+
+import { Toast } from "./singletons/Toast";
+import { ConfirmDialog } from "./singletons/ConfirmDialog";
+import { BirthdayFormDialog } from "./singletons/BirthdayFormDialog";
+import { is_desktop } from "@/lib/functions/logic/desktop";
+import { SettingsEntriesSkeleton } from "./skeletons/SettingsEntriesSkeleton";
 
 const MyBirthdays = lazy(() => delay_promise(() => import("../pages/MyBirthdays"), 0));
 const Settings = lazy(() => delay_promise(() => import("../pages/Settings/Settings"), 0));
@@ -55,31 +44,15 @@ const Storage = lazy(() => delay_promise(() => import("../pages/Settings/Storage
 const Time = lazy(() => delay_promise(() => import("../pages/Settings/Time/Time"), 0));
 const Language = lazy(() => delay_promise(() => import("../pages/Settings/Language/Language"), 0));
 const SettingsApp = lazy(() => delay_promise(() => import("../pages/Settings/App/App"), 0));
+const Update = lazy(() => delay_promise(() => import("../pages/Settings/Update/Update"), 0));
 
 const App = () => {
-    const isBooting = useSelector((state: RootState) => state.app.isBooting);
-    const dispatch = useDispatch<AppDispatch>();
-    const { setErrorNotification } = useAppToast();
+    const is_booting = use_app_store((state) => state.is_booting);
 
     useEffect(() => {
         (async () => {
-            if (isTauri()) await initTauri(dispatch);
-            await init(dispatch);
-
-            dispatch(setBooting(false));
+            unset_is_booting();
         })();
-    }, []);
-
-    useEffect(() => {
-        const onToastError = (e: CustomEvent<ToastError>) => {
-            setErrorNotification(e.detail);
-        };
-
-        window.addEventListener("toast-error", onToastError as EventListener);
-
-        return () => {
-            window.removeEventListener("toast-error", onToastError as EventListener);
-        }
     }, []);
 
     const _router = createBrowserRouter(
@@ -97,7 +70,7 @@ const App = () => {
                     >
                         <Route index element={
                             <Suspense fallback={
-                                <SettingsEntriesSkeleton entries={6}/>
+                                <SettingsEntriesSkeleton entries={8}/>
                             }>
                                 <Settings/>
                             </Suspense>
@@ -172,6 +145,18 @@ const App = () => {
                                 </Suspense>
                             }
                         />
+                        {is_desktop(use_app_store.getState().os_type) && (
+                            <Route
+                                path={PageLinks.SETTINGS_UPDATE}
+                                element={
+                                    <Suspense fallback={
+                                        <></>
+                                    }>
+                                        <Update/>
+                                    </Suspense>
+                                }
+                            />
+                        )}
                     </Route>
                     <Route path={PageLinks.MY_BIRTHDAYS} element={
                         <Suspense fallback={
@@ -197,20 +182,16 @@ const App = () => {
         )
     );
 
-    if (isBooting) return null;
+    if (is_booting) return null;
 
     return (
-        <AppToastProvider>
-            <NavbarProvider>
-                <ConfirmDialogProvider>
-                    <BirthdayFormProvider>
-                        <RouterProvider router={_router}/>
-                    </BirthdayFormProvider>
-                </ConfirmDialogProvider>
-            </NavbarProvider>
-        </AppToastProvider>
+        <>
+            <ConfirmDialog/>
+            <BirthdayFormDialog/>
+            <RouterProvider router={_router}/>
+            <Toast/>
+        </>
     )
 }
 
 export default App;
-export type { ToastError };

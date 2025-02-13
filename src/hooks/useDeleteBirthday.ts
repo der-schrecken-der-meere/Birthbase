@@ -1,8 +1,8 @@
 import { del_birthday_query } from "@/features/manage_birthdays/query";
 import { useCallback } from "react";
-import { useAppToast } from "./useAppToast";
-import { useConfirmDialog } from "./useConfirmDialog";
 import { Birthday } from "@/database/tables/birthday/birthdays";
+import { create_toast, ToastType } from "./use_app_toast";
+import { open_confirm } from "./use_app_confirm";
 
 const useDeleteBirthdays = ({
     onSuccess,
@@ -11,28 +11,26 @@ const useDeleteBirthdays = ({
     onSuccess?: () => void,
     onError?: () => void,
 }) => {
-    const { setErrorNotification, setSuccessNotification } = useAppToast();
     const { mutate: remove } = del_birthday_query();
-    const { setConfirm } = useConfirmDialog();
 
     const deleteBirthday = useCallback((birthday: Birthday) => {
-        setConfirm({
+        open_confirm({
             title: "Sind Sie wirklich sicher?",
             description: "Der Geburtstag wird gelöscht und danach nicht mehr angezeigt.",
-            onConfirm: async () => {
+            on_confirm: async () => {
                 remove(birthday, {
                     onSuccess: () => {
-                        setSuccessNotification({
+                        create_toast({
                             title: "Erfolgreich",
                             description: "Der Geburtstag wurde gelöscht",
-                        })
+                        }, ToastType.SUCCESS);
                         if (onSuccess) onSuccess();
                     },
                     onError: (error) => {
-                        setErrorNotification({
+                        create_toast({
                             title: "Fehler beim Löschen des Geburtstages",
                             description: JSON.stringify(error),
-                        });
+                        }, ToastType.ERROR);
                         if (onError) onError();
                     }
                 })

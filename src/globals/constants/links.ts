@@ -11,6 +11,7 @@ enum PageLinks {
     SETTINGS_LANGUAGE = "/settings/language",
     SETTINGS_INFO = "/settings/info",
     SETTINGS_APP = "/settings/app",
+    SETTINGS_UPDATE = "/settings/update",
 };
 
 export { PageLinks };

@@ -8,15 +8,21 @@ import {
     Info,
     Languages,
     LayoutDashboard,
+    LucideProps,
     Monitor,
     PartyPopper,
+    RefreshCw,
     Settings
 } from "lucide-react";
+import { use_app_store } from "@/hooks/use_app_store";
+import { primitive_strict_or } from "@/lib/functions/logic/or";
+import { OsType } from "@tauri-apps/plugin-os";
+import { is_desktop } from "@/lib/functions/logic/desktop";
 
 type LinkEntry = {
     title: string,
     url: PageLinks,
-    icon: FunctionComponent,
+    icon: FunctionComponent<LucideProps>,
     search?: string[],
     shortcut?: string,
 };
@@ -64,6 +70,10 @@ const c_settings_links: LinkEntry[] = [
         title: "Benachrichtigungen",
         url: PageLinks.SETTINGS_NOTIFICATION,
         icon: Bell,
+        search: [
+            "Erlauben",
+            "Erinngerungen",
+        ]
     },
     {
         title: "Speicher",
@@ -88,13 +98,31 @@ const c_settings_links: LinkEntry[] = [
         title: "Info",
         url: PageLinks.SETTINGS_INFO,
         icon: Info,
+        search: [
+            "Akutelle Version",
+        ]
     },
     {
         title: "App",
         url: PageLinks.SETTINGS_APP,
         icon: LayoutDashboard,
-    }
+        search: [
+            "Autostart"
+        ]
+    },
 ];
+
+if (is_desktop(use_app_store.getState().os_type)) {
+    c_settings_links.push({
+        title: "Update",
+        url: PageLinks.SETTINGS_UPDATE,
+        icon: RefreshCw,
+        search: [
+            "Updatesuche"
+        ]
+    });
+}
+
 const settings_links = Object.freeze(c_settings_links);
 
 export type { LinkEntry };

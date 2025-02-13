@@ -1,4 +1,3 @@
-import { dispatch_toast_error } from "@/lib/events/dispatch";
 import type { NotificationRequest, NotificationResponse } from "./notification_worker";
 import { Birthday } from "@/database/tables/birthday/birthdays";
 import { send_notification } from "@/apis/tauri_notification";
@@ -8,6 +7,7 @@ import { get_default_notification } from "@/database/tables/notifications/notifi
 import { add_notification_query_client } from "@/features/latest_notifications/query";
 import { queryClient } from "@/frontend/pre_react_init";
 import { ISOMidnightFullTZ } from "@/lib/types/date";
+import { create_toast, ToastType } from "@/hooks/use_app_toast";
 
 // Constants
 enum Errors {
@@ -66,10 +66,10 @@ const on_message = async (e: MessageEvent<NotificationResponse>) => {
     const res = e.data;
 
     if (res.error) {
-        dispatch_toast_error({
+        create_toast({
             title: Errors.RUN_ERR,
             description: res.error,
-        });
+        }, ToastType.ERROR);
         return;
     }
 

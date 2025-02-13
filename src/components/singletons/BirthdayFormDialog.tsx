@@ -3,20 +3,22 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { ScrollArea } from "../ui/scroll-area";
 import { Skeleton } from "../ui/skeleton";
 import BirthdayForm from "../forms/BirthdayForm";
-import { useBirthdayForm } from "@/hooks/useBirthdayForm";
+import { BirthdayFormMode, use_birthday_form } from "@/hooks/use_birthday_form";
 
 const BirthdayFormDialog = () => {
 
-    const { open, setOpen, operation } = useBirthdayForm();
+    const open = use_birthday_form((state) => state.open);
+    const operation = use_birthday_form((state) => state.operation);
+    const set_open = use_birthday_form((state) => state.set_open);
 
     const DialogTitleString = useMemo(() => {
-        return operation === "create"
+        return operation === BirthdayFormMode.CREATE
             ? "Geburtstag erstellen"
             : "Geburtstag ändern oder löschen";
     }, [operation]);
 
     const DialogDescriptionString = useMemo(() => {
-        return operation === "create"
+        return operation === BirthdayFormMode.CREATE
             ? "Erstellen Sie einen neuen Geburtstag." + 
                 " Dieser wird nach dem erfolgreichen Erstellen auf der Startseite " +
                 " oder unter \"Meine Geburtstage\" angezeigt."
@@ -26,7 +28,7 @@ const BirthdayFormDialog = () => {
     }, [operation]) 
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={set_open}>
             <DialogContent className="p-0 overflow-hidden">
                 <ScrollArea className="max-h-screen h-full">
                     <div className="p-6">

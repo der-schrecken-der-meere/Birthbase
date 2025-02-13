@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import React, { Fragment, ReactNode, useState } from 'react';
 
 // Custom Components
 
@@ -14,16 +14,6 @@ import {
 import { Label } from "@/components/ui/label"
 import { Separator } from '@/components/ui/separator';
 
-import { 
-    LuChevronRight,
-    LuMonitor,
-    LuBell,
-    LuInfo,
-    LuHardDrive,
-    LuCalendarClock,
-    LuLanguages
-} from "react-icons/lu";
-
 import { NavLink } from 'react-router-dom';
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import { RadioGroupItem, RadioGroup } from '@/components/ui/radio-group';
@@ -32,17 +22,19 @@ import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronRight, ChevronUp } from 'lucide-react';
 import { Form, FormControl, FormItem, FormLabel } from '@/components/ui/form';
 import { DialogTriggerProps } from '@radix-ui/react-dialog';
 import { RadioGroupProps } from '@radix-ui/react-radio-group';
 import { FieldValues, UseFormReturn } from 'react-hook-form';
-import { useNavbar } from '@/hooks/useNavbar';
 import { SettingsLayoutBreadcrumbs } from '@/components/layouts/SettingsLayout';
 import { PageLinks } from '@/globals/constants/links';
+import { settings_links } from '@/globals/constants/nav_entries';
+import { update_navbar } from '@/hooks/use_app_navbar';
 
 const Settings = () => {
-    useNavbar({
+    
+    update_navbar({
         pageTitle: "Einstellungen",
         breadcrumbDisplay: () => {
             const breads = structuredClone(SettingsLayoutBreadcrumbs);
@@ -52,59 +44,27 @@ const Settings = () => {
                     href: PageLinks.HOME,
                 }
             ];
+            breads.length = 1;
             return breads;
         }
     });
 
     return (
         <ScrollArea className='h-full'>
-            <NavigationLink
-                to={"./appearance"}
-                icon={<LuMonitor size={24} />}
-                caption="Modus, Farbe"
-            >
-                Aussehen
-            </NavigationLink>
-            <Separator/>
-            <NavigationLink
-                to={"./notifications"}
-                icon={<LuBell size={24} />}
-                caption="Berechtigung"
-            >
-                Benachrichtigungen
-            </NavigationLink>
-            <Separator/>
-            <NavigationLink
-                to={"./storage"}
-                icon={<LuHardDrive size={24}/>}
-                caption="Speicherverbrauch, Daten löschen"
-            >
-                Speicher
-            </NavigationLink>
-            <Separator/>
-            <NavigationLink
-                to={"./time"}
-                icon={<LuCalendarClock size={24}/>}
-                caption="Zeitzone, akutelle Uhrzeit"
-            >
-                Datum und Uhrzeit
-            </NavigationLink>
-            <Separator/>
-            <NavigationLink
-                to={"./language"}
-                icon={<LuLanguages size={24} />}
-                caption={"Sprache, Land, Region"}
-            >
-                Sprache
-            </NavigationLink>
-            <Separator/>
-            <NavigationLink
-                to={"./info"}
-                icon={<LuInfo size={24}/>}
-                caption={"Über die App"}
-            >
-                Info
-            </NavigationLink>
+            {settings_links.map((link_entry, i) => (
+                <Fragment
+                    key={link_entry.url}
+                >
+                    {i !== 0 && <Separator/>}
+                    <NavigationLink
+                        to={link_entry.url}
+                        icon={<link_entry.icon className="w-6 h-6" />}
+                        caption={!link_entry.search ? "" : link_entry.search.join(", ")}
+                    >
+                        {link_entry.title}
+                    </NavigationLink>
+                </Fragment>
+            ))}
         </ScrollArea>
     )
 }
@@ -166,7 +126,7 @@ const NavigationLink = ({
                 icon={icon}
                 className='rounded-md hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 data-active:bg-accent/50 data-[state=open]:bg-accent/50"'
                 caption={caption}
-                rightElement={<LuChevronRight className='mr-3'/>}
+                rightElement={<ChevronRight size={16} className='mr-3'/>}
             >
                 {children}
             </NavigationLinkCore>
@@ -330,7 +290,7 @@ const SelectAsRadio = ({
         <Drawer>
             <DrawerTrigger {...props} className={cn('flex items-center gap-1', className)}>
                 <span className='text-sm text-muted-foreground'>{radioItems.find((e) => e.value === defaultValue)?.displayText}</span>
-                <LuChevronRight className='text-muted-foreground'></LuChevronRight>
+                <ChevronRight size={16} className='text-muted-foreground'></ChevronRight>
             </DrawerTrigger>
             <DrawerContent className='max-h-[80%] h-full mt-0 px-4 py-2 border-0'>
                 <DrawerHeader className="py-2 px-0">

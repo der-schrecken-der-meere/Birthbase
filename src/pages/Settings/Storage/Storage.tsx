@@ -4,28 +4,27 @@ import { Progress } from "@/components/ui/progress"
 import { Separator } from '@/components/ui/separator'
 import { byte_format } from '@/lib/intl/storage'
 // import Table from "@/components/tables/storagesize/Table"
-import { useNavbar } from '@/hooks/useNavbar'
 import { SettingsLayoutBreadcrumbs } from '@/components/layouts/SettingsLayout'
 import { to_smallest_byte_type } from '@/lib/functions/storage/unit'
 import { calc_app_storage_size } from '@/lib/functions/storage/calculations'
 import { Button } from '@/components/ui/button'
 import { Trash2 } from 'lucide-react'
-import { useConfirmDialog } from '@/hooks/useConfirmDialog'
 import { clear_app_storage } from '@/lib/functions/storage/clear'
 import { clear_notification_query } from '@/features/latest_notifications/query'
 import { clear_birthday_query } from '@/features/manage_birthdays/query'
 import { clear_settings_query } from '@/features/manage_settings/query'
+import { update_navbar } from '@/hooks/use_app_navbar'
+import { open_confirm } from '@/hooks/use_app_confirm'
 // import { toSmallestByteType } from '@/lib/functions/storage/unit'
 
 const Storage = () => {
     const [value, setValue] = useState<StorageEstimate>({usage: 0, quota: 0});
-    const { setConfirm } = useConfirmDialog();
 
     const { mutate: clear_notifications } = clear_notification_query();
     const { mutate: clear_birthdays } = clear_birthday_query();
     const { mutate: clear_settings } = clear_settings_query();
 
-    useNavbar({
+    update_navbar({
         pageTitle: "Speicher",
         breadcrumbDisplay: SettingsLayoutBreadcrumbs,
     });
@@ -38,10 +37,10 @@ const Storage = () => {
     }, []);
 
     const onDeleteClick = useCallback(() => {
-        setConfirm({
+        open_confirm({
             title: "Sind Sie sich wirklich sicher?",
             description: "Alle App-Einstellungen, Geburtstage und Benachrichtigungen werden gelöscht.",
-            onConfirm: () => {
+            on_confirm: () => {
                 clear_app_storage();
                 clear_notifications();
                 clear_birthdays();

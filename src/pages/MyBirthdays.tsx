@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 
 // Shadcn Components
 import { Button } from '@/components/ui/button'
@@ -27,14 +27,14 @@ import { useOutletContext } from 'react-router-dom';
 
 import Table from '@/components/tables/birthdays/Table.js';
 import { delay_promise } from '@/lib/functions/promise/delay';
-import { useNavbar } from '@/hooks/useNavbar';
 import { PageLinks } from '@/globals/constants/links';
+import { update_navbar } from '@/hooks/use_app_navbar';
 
 const OtherFunctionDialog = lazy(() => delay_promise(() => import("../components/dialogs/OtherFunctions"), 0));
 
 const MyBirthdays = () => {
 
-    useNavbar({
+    update_navbar({
         docTitle: "Birthbase - Meine Geburtstage",
         pageTitle: "Meine Geburtstage",
         breadcrumbDisplay: [

@@ -5,28 +5,24 @@ import { CSSProperties, useCallback, useMemo } from "react";
 import { TableBody, TableCell, TableRow } from "../../ui/table";
 import { flexRender, Row } from "@tanstack/react-table";
 import { cn } from "@/lib/utils";
-import { useBirthdayForm } from "@/hooks/useBirthdayForm";
 import { birthdaysToGroups } from "@/lib/functions/birthdays/sorting";
+import { open_birthday_form_read } from "@/hooks/use_birthday_form";
 
 const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">> & {
     data: Birthday[],
-    removeElement: (id: string|number) => void; 
 }> = ({
     className,
     data,
-    removeElement,
 }) => {
 
-    const columns = useMemo(() => getColumns(removeElement), [])
+    const columns = useMemo(() => getColumns(), [])
 
     const groupBirhtdays = useCallback((birthdays: Row<Birthday>[]) => {
         return birthdaysToGroups(birthdays, (d) => d.original.date, "de", "Dieser Monat");
     }, [data]);
 
-    const { openBirthdayFormRead } = useBirthdayForm();
-
     const onRowClick = useCallback((data: Birthday) => {
-        openBirthdayFormRead(data);
+        open_birthday_form_read(data);
     }, []);
 
     return (

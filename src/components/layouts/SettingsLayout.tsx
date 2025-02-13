@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
-import { useNavbar } from "../../hooks/useNavbar";
 import { PageLinks } from "@/globals/constants/links";
+import { update_navbar } from "@/hooks/use_app_navbar";
 
 const SettingsLayoutBreadcrumbs = [
     {
@@ -20,9 +20,8 @@ const SettingsLayoutBreadcrumbs = [
 
 const SettingsLayout = () => {
 
-    useNavbar({
+    update_navbar({
         docTitle: "Birthbase - Einstellungen",
-        breadcrumbDisplay: SettingsLayoutBreadcrumbs
     });
 
     return (

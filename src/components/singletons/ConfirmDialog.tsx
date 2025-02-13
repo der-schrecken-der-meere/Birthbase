@@ -1,30 +1,32 @@
-import { useConfirmDialog } from "@/hooks/useConfirmDialog";
 import { useCallback } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../ui/alert-dialog";
+import { use_app_confirm } from "@/hooks/use_app_confirm";
 
 const ConfirmDialog = () => {
 
-    const { setOpen, open, config } = useConfirmDialog();
+    const open = use_app_confirm((state) => state.open);
+    const set_open = use_app_confirm((state) => state.set_open);
+    const { description, title, on_cancel, on_confirm } = use_app_confirm((state) => state.config);
 
-    const onCancelClick = useCallback(() => {
-        setOpen(false);
-        config.onCancel();
-    }, [config]);
-    const onActionClick = useCallback(() => {
-        setOpen(false);
-        config.onConfirm();
-    }, [config]);
+    const on_cancel_click = useCallback(() => {
+        set_open(false);
+        on_cancel();
+    }, [on_cancel]);
+    const on_action_click = useCallback(() => {
+        set_open(false);
+        on_confirm();
+    }, [on_confirm]);
 
     return (
-        <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialog open={open} onOpenChange={set_open}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>{config.title}</AlertDialogTitle>
-                    <AlertDialogDescription>{config.description}</AlertDialogDescription>
+                    <AlertDialogTitle>{title}</AlertDialogTitle>
+                    <AlertDialogDescription>{description}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel onClick={onCancelClick}>Abbrechen</AlertDialogCancel>
-                    <AlertDialogAction onClick={onActionClick}>Fortfahren</AlertDialogAction>
+                    <AlertDialogCancel onClick={on_cancel_click}>Abbrechen</AlertDialogCancel>
+                    <AlertDialogAction onClick={on_action_click}>Fortfahren</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

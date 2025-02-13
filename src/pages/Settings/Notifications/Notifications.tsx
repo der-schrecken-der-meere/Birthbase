@@ -1,5 +1,4 @@
-import { CollapsibleNavEntry, NavigationEntry, SettingsFormElement, SettingsFormPageWrapper } from '../Settings'
-import { useDispatch, useSelector } from 'react-redux';
+import { CollapsibleNavEntry, SettingsFormElement, SettingsFormPageWrapper } from '../Settings'
 import { Switch } from '@/components/ui/switch';
 import {
     Bell,
@@ -12,21 +11,19 @@ import {
     PopoverTrigger
 } from "@/components/ui/popover";
 import { Separator } from '@/components/ui/separator';
-import { AppDispatch, RootState } from '@/store/store';
 import { Input } from '@/components/ui/input';
 import { FormField } from '@/components/ui/form';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAppToast } from '@/hooks/useAppToast';
-import useSettings from '@/hooks/useSettings';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 import { get_default_settings, Settings } from '@/database/tables/settings/settings';
-import { useNavbar } from '@/hooks/useNavbar';
 import { SettingsLayoutBreadcrumbs } from '@/components/layouts/SettingsLayout';
 import { get_settings_query, set_settings_query } from '@/features/manage_settings/query';
 import { obj_is_empty } from '@/lib/functions/object/empty';
 import { isTauri } from '@tauri-apps/api/core';
+import { create_toast, ToastType } from '@/hooks/use_app_toast';
+import { update_navbar } from '@/hooks/use_app_navbar';
 
 const formSchema = z.object({
     remember: z.coerce.number().gte(1, {
@@ -42,12 +39,10 @@ type NotificationForm = z.infer<typeof formSchema>;
 
 const Notifications = () => {
 
-    useNavbar({
+    update_navbar({
         pageTitle: "Benachrichtigungen",
         breadcrumbDisplay: SettingsLayoutBreadcrumbs,
     });
-
-    const { setErrorNotification, setSuccessNotification } = useAppToast();
     const { data, isError, error, isFetching } = get_settings_query();
     const { mutate: update } = set_settings_query();
 
@@ -78,16 +73,16 @@ const Notifications = () => {
         if (!obj_is_empty(new_settings)) {
             update(new_settings, {
                 onSuccess: () => {
-                    setSuccessNotification({
+                    create_toast({
                         title: "Erfolgreich",
                         description: "Die Einstellungen wurden aktualisiert",
-                    });
+                    }, ToastType.SUCCESS);
                 },
                 onError: (error) => {
-                    setErrorNotification({
+                    create_toast({
                         title: "Fehler beim Speichern der Einstellungen",
                         description: JSON.stringify(error),
-                    });
+                    }, ToastType.ERROR);
                 },
             });
         }
@@ -96,10 +91,10 @@ const Notifications = () => {
 
     useEffect(() => {
         if (isError) {
-            setErrorNotification({
+            create_toast({
                 title: "Fehler beim Anzeigen der Einstellungen",
                 description: JSON.stringify(error),
-            });
+            }, ToastType.ERROR);
         }
     }, [isError, error]);
 
@@ -148,46 +143,8 @@ const Notifications = () => {
                                 )}
                             </div>
                         </SettingsFormElement>
-                        // <CollapsibleNavEntry
-                        //     icon={<AlarmClock/>}
-                        //     caption="Wann Sie vor bevorstehende Geburtstagen erinnert werden"
-                        //     title='Erinnerung'
-                        // >
-                        //     <SettingsFormElement
-                        //         caption={
-                        //             <div className='flex items-center'>
-
-                        //                 <Input type="number" className='w-14 text-right p-1 h-8 mx-1' onChange={(e) => {onChange(+e.target.value)}} defaultValue={value} {...props}/>
-                        //                 <span className='ml-2'>Tag/e vor Geburtstage erinnern</span>
-                        //             </div>
-                        //         }
-                        //     />
-                        // </CollapsibleNavEntry>
                     )}
                 />
-                {/* <NavigationEntry
-                    icon={<Bell/>}
-                    caption={"Erlaubt der App Nachrichten an das System zu senden"}
-                    rightElement={<NotificationSwitch/>}
-                >
-                    <div className='flex items-center gap-2'>
-                        <span className='overflow-hidden text-ellipsis whitespace-pre'>Benachrichtigungen</span>
-                        {!isTauri() && (
-                            <Popover>
-                                <PopoverTrigger className='shrink-0 mr-1'><Info size={16} /></PopoverTrigger>
-                                <PopoverContent className="text-sm" side="bottom">
-                                    Diese Berechtigung kann nur über den Browser geändert werden.
-                                    <br />
-                                    <Separator className="my-2"/>
-                                    <ul className='list-disc list-inside space-y-2'>
-                                        <li>Drücken Sie links oben neben der URL den Info- oder Einstellungsbutton und setzen Sie die Berechtigung</li>
-                                        <li>Ist kein Button zu sehen, müssen Sie den Button auf der rechten Seite drücken</li>
-                                    </ul>
-                                </PopoverContent>
-                            </Popover>
-                        )}
-                    </div>
-                </NavigationEntry> */}
                 <Separator/>
                 <FormField
                     control={form.control}
@@ -211,40 +168,6 @@ const Notifications = () => {
                 />
             </SettingsFormPageWrapper>
     )
-}
-
-const NotificationSwitch = () => {
-    // const dispatch = useDispatch<AppDispatch>();
-    // const permission = useSelector((state: RootState) => state.notification.value);
-    // const { setErrorNotification } = useAppToast();
-
-    const onChange = (v: boolean) => {
-        // (async () => {
-        //     if (v && permission === "default") {
-        //         const result = await requestPermission();
-        //         if (result !== "unsupported") {
-        //             dispatch(setPermission(result));
-        //         } else {
-        //             setErrorNotification({
-        //                 title: "Das Feature ist leider nicht in der aktuellen Version verfügbar",
-        //             })
-        //         }
-        //     } else {
-        //         dispatch(setPermission(v ? "granted" : "denied"));
-        //     }
-        // })();
-    }
-
-    // const disabled = permission === "default" ? false : true;
-
-    return (
-        <Switch 
-            // aria-label="notification-toggle"
-            // disabled={disabled}
-            // checked={permission === "granted" ? true : false}
-            // onCheckedChange={onChange}
-        />
-    )
-}
+};
 
 export default Notifications

@@ -1,9 +1,9 @@
-import { useNavbar } from '@/hooks/useNavbar'
 import { SettingsLayoutBreadcrumbs } from '@/components/layouts/SettingsLayout';
+import { update_navbar } from '@/hooks/use_app_navbar';
 
 const Language = () => {
 
-    useNavbar({
+    update_navbar({
         pageTitle: "Sprache",
         breadcrumbDisplay: SettingsLayoutBreadcrumbs,
     });
