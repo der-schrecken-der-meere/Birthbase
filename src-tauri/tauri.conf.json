@@ -56,7 +56,7 @@
       "appimage": {
         "bundleMediaFramework": false,
         "files": {
-          "/usr/assets": "src-tauri/icons/"
+          "/usr/assets": "./src-tauri/icons/"
         }
       },
       "deb": {
@@ -110,5 +110,5 @@
     }
   },
   "productName": "birthbases",
-  "version": "0.2.0"
+  "version": "0.1.0"
 }
