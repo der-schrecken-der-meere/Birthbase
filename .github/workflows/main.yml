@@ -53,6 +53,17 @@ jobs:
         run: |
           npm install
 
+      - name: Get latest release draft
+        id: get_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          response=$(gh api repos/${{ github.repository }}/releases --jq '.[] | select(.draft == true) | .body' | head -n 1)
+          echo "PATCH_NOTES<<EOF" >> $GITHUB_ENV
+          echo "$response" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        shell: bash
+
       # TODO: https://tauri.app/v1/guides/building/linux#cross-compiling-tauri-applications-for-arm-based-devices
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
@@ -65,7 +76,7 @@ jobs:
           includeUpdaterJson: true
           tagName: app-v__VERSION__
           releaseName: "APP v__VERSION__"
-          releaseBody: ""
+          releaseBody: "${{ env.PATCH_NOTES }}"
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
