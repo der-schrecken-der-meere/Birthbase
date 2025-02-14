@@ -56,7 +56,7 @@
       "appimage": {
         "bundleMediaFramework": false,
         "files": {
-          "/usr/assets": "../icons/"
+          "/usr/assets": "src-tauri/icons/"
         }
       },
       "deb": {
