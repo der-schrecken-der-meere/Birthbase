@@ -10,6 +10,7 @@ interface Settings extends CoreRecord {
     remember: number;
     notification: boolean;
     relaunch: boolean;
+    auto_search: boolean,
 };
 
 const get_default_settings = (): Omit<Settings, "id"> => {
@@ -20,6 +21,7 @@ const get_default_settings = (): Omit<Settings, "id"> => {
         remember: 14,
         notification: false,
         relaunch: false,
+        auto_search: false,
     };
 };
 

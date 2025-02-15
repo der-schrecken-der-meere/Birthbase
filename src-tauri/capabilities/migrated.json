@@ -19,7 +19,6 @@
     {
       "identifier": "fs:scope-appdata-recursive",
       "allow": [{ "path": "$APPCONFIG/*" }]
-    },
-    "updater:default"
+    }
   ]
 }

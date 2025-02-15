@@ -25,7 +25,7 @@ const pre_react_init = async () => {
   set_notification_worker();
   const settings = await get_settings_model();
   if (isTauri()) {
-    await init_updater()
+    await init_updater(settings);
     await init_tauri();
   }
   setup_settings(settings);

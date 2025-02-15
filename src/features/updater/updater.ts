@@ -1,10 +1,11 @@
 import { check, DownloadEvent, Update } from "@tauri-apps/plugin-updater"
 import { relaunch } from "@tauri-apps/plugin-process"
 import { Platform } from "@tauri-apps/plugin-os";
-import { update_available, update_last_check, update_searching, use_update_store } from "@/hooks/use_update_store";
+import { update_available, update_last_check, update_searching, use_update_store, update_version } from "@/hooks/use_update_store";
 import type { VersionNumber } from "@/lib/types/number";
-import { update_version as update_app_version, update_version } from "@/hooks/use_app_store";
+import { update_version as update_app_version } from "@/hooks/use_app_store";
 import { getCurrentWindow, ProgressBarStatus } from "@tauri-apps/api/window";
+import { create_toast, ToastType } from "@/hooks/use_app_toast";
 
 /**
  * Triggers the progress event for UI related updates and
@@ -37,34 +38,43 @@ const handle_update_event = (type: DownloadEvent, download_size: number, downloa
  * 
  */
 const install_update = async (platform: Platform, restart: boolean = true) => {
-    const update = await check() as Update;
-    const window = getCurrentWindow();
+    use_update_store.getState().start_progress();
+    try {
+        const update = await check() as Update;
+        const window = getCurrentWindow();
 
-    let n_download_size = 0;
-    let n_downloaded = 0;
+        let n_download_size = 0;
+        let n_downloaded = 0;
 
-    await update.downloadAndInstall(async (event) => {
-        const { downloaded, download_size, progress } = handle_update_event(event, n_download_size, n_downloaded);
-        n_download_size = download_size;
-        n_downloaded += downloaded;
-        await window.setProgressBar({ progress: Math.floor(progress), status: ProgressBarStatus.Error });
-    })
+        await update.downloadAndInstall(async (event) => {
+            const { downloaded, download_size, progress } = handle_update_event(event, n_download_size, n_downloaded);
+            n_download_size = download_size;
+            n_downloaded += downloaded;
+            await window.setProgressBar({ progress: Math.floor(progress), status: ProgressBarStatus.Error });
+        })
 
-    const { version } = update;
-    update_app_version(version as VersionNumber);
+        const { version } = update;
+        update_app_version(version as VersionNumber);
 
-    // Clean up resource from memory
-    update.close();
+        // Clean up resource from memory
+        update.close();
 
-    // Due Windows Installer the application must be restarted or closed
-    // after the update has been downloaded
-    if (platform === "windows") {
-        restart = true;
-    }
+        // Due Windows Installer the application must be restarted or closed
+        // after the update has been downloaded
+        if (platform === "windows") {
+            restart = true;
+        }
 
-    if (restart) {
-        await relaunch();
-        return;
+        if (restart) {
+            await relaunch();
+            return;
+        }
+    } catch (e) {
+        use_update_store.getState().finish_progress();
+        create_toast({
+            title: "Fehler beim installieren des Updates",
+            description: "Die Verbindung zum Server wurde unterbrochen. Bitte überprüfen Sie ihre Netzwerkverbindung",
+        }, ToastType.ERROR);
     }
     update_last_check();
     update_available(false);
@@ -72,13 +82,23 @@ const install_update = async (platform: Platform, restart: boolean = true) => {
 
 const check_update = async () => {
     update_searching(true);
-    const update = await check();
-    if (update) {
-        const { version } = update;
-        update_version(version as VersionNumber);
-        update_available(true);
-    } else {
-        update_available(false);
+    update_available(false);
+    use_update_store.getState().set_update_notes("");
+    try {
+        const update = await check({
+            timeout: 10_000,
+        });
+        if (update) {
+            const { version, body } = update;
+            use_update_store.getState().set_update_notes(body ? body : "");
+            update_version(version as VersionNumber);
+            update_available(true);
+        }
+    } catch (e) {
+        create_toast({
+            title: "Fehler beim Suchen nach Updates",
+            description: "Die Verbindung zum Server wurde unterbrochen. Bitte überprüfen Sie ihre Netzwerkverbindung",
+        }, ToastType.ERROR);
     }
     update_searching(false);
     update_last_check();

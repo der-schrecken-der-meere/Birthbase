@@ -12,6 +12,7 @@ interface UpdateStore {
     searching: boolean,
     version: VersionNumber,
     display_version: string,
+    update_notes: string,
     start_progress: () => void,
     update_progress: (progress: number) => void,
     finish_progress: () => void,
@@ -21,17 +22,19 @@ interface UpdateStore {
     update_available: (available: boolean) => void,
     update_version: (version: VersionNumber) => void,
     update_display_version: (display_version: string) => void,
+    set_update_notes: (update_version: string) => void,
 };
 
 const use_update_store = create<UpdateStore>()((set) => ({
     searching: false,
     prompt_open: false,
-    available: true,
+    available: false,
     progress: 0,
     started: false,
     last_check: "",
     version: "0.0.0",
     display_version: "",
+    update_notes: "",
     start_progress: () => set(() => ({ progress: 0, started: true })),
     update_progress: (progress) => set(() => ({ progress })),
     finish_progress: () => set(() => ({ progress: 100, started: false, available: false })),
@@ -41,6 +44,7 @@ const use_update_store = create<UpdateStore>()((set) => ({
     update_available: (available) => set(() => ({ available })),
     update_version: (version) => set(() => ({ version })),
     update_display_version: (display_version) => set(() => ({ display_version })),
+    set_update_notes: (update_notes) => set(() => ({ update_notes }))
 }));
 
 const update_last_check = () => {

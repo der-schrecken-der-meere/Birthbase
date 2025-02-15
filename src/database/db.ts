@@ -112,6 +112,11 @@ class DexieDB extends Dexie implements Birthbase {
                 birthday.date = format_date_to_iso_midnight("de", "Europe/Berlin", new Date(birthday.date))
             });
         });
+        this.version(10).upgrade(async trans => {
+            return trans.table(TABLES.SETTINGS).toCollection().modify((settings: Settings) => {
+                settings.auto_search = true;
+            });
+        });
     }
     add<K extends keyof Birthbase, T extends getInsert<K>>(table: K, record: Omit<T, "id">): Promise<T>;
     add<K extends keyof Birthbase, T extends getInsert<K>>(table: K, record: Omit<T, "id">[]): Promise<T[]>;

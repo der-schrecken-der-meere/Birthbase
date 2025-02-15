@@ -1,7 +1,7 @@
 import { SettingsLayoutBreadcrumbs } from "@/components/layouts/SettingsLayout";
 import { NavigationEntry, SettingsFormElement, SettingsFormPageWrapper } from "../Settings";
 import { use_update_store } from "@/hooks/use_update_store";
-import { RefreshCw, RotateCcw } from "lucide-react";
+import { RefreshCw, RotateCcw, Search } from "lucide-react";
 import { CheckUpdate, DownloadUpdate, UpdaterProgress } from "@/components/updater/Updater";
 import { Separator } from "@/components/ui/separator";
 import { BarLoader } from "react-spinners";
@@ -14,13 +14,14 @@ import { create_toast, ToastType } from "@/hooks/use_app_toast";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Settings } from "@/database/tables/settings/settings";
+import { get_default_settings, Settings } from "@/database/tables/settings/settings";
 import { obj_is_empty } from "@/lib/functions/object/empty";
 import { FormField } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 
 const formSchema = z.object({
     relaunch: z.coerce.boolean(),
+    auto_search: z.coerce.boolean(),
 });
 
 type UpdateForm = z.infer<typeof formSchema>;
@@ -31,7 +32,6 @@ const Update = () => {
         pageTitle: "Update",
         breadcrumbDisplay: SettingsLayoutBreadcrumbs,
     });
-    
 
     const update_available = use_update_store((state) => state.available);
     const last_check = use_update_store((state) => state.last_check);
@@ -43,22 +43,18 @@ const Update = () => {
     const { data, isError, error, isFetching } = get_settings_query();
     const { mutate: update } = set_settings_query();
 
-    useEffect(() => {
-        if (isError) {
-            create_toast({
-                title: "Fehler beim Anzeigen der Einstellungen",
-                description: JSON.stringify(error),
-            }, ToastType.ERROR);
-        }
-    }, [isError, error]);
-
     const form = useForm<UpdateForm>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            relaunch: false,
-        },
+        defaultValues: (() => {
+            const default_settings = get_default_settings();
+            return {
+                relaunch: default_settings.relaunch,
+                auto_search: default_settings.auto_search,
+            };
+        })(),
         values: {
             relaunch: data.relaunch,
+            auto_search: data.auto_search,
         }
     });
 
@@ -67,6 +63,10 @@ const Update = () => {
 
         if (form.formState.dirtyFields.relaunch) {
             new_settings.relaunch = data.relaunch;
+        }
+
+        if (form.formState.dirtyFields.auto_search) {
+            new_settings.auto_search = data.auto_search;
         }
 
         if (!obj_is_empty(new_settings)) {
@@ -87,6 +87,15 @@ const Update = () => {
         }
 
     }, []);
+
+    useEffect(() => {
+        if (isError) {
+            create_toast({
+                title: "Fehler beim Anzeigen der Einstellungen",
+                description: JSON.stringify(error),
+            }, ToastType.ERROR);
+        }
+    }, [isError, error]);
 
     if (isFetching) {
         return (
@@ -150,7 +159,7 @@ const Update = () => {
                                 icon={<RotateCcw/>}
                                 rightElement={
                                     <Switch
-                                        aria-label="Neustart nach Update ein- oder ausschalten"
+                                        aria-label="Appneustart nach Update aktivieren oder deaktivieren"
                                         checked={value}
                                         onCheckedChange={onChange}
                                         {...props}
@@ -164,6 +173,27 @@ const Update = () => {
                     />
                 </>
             )}
+            <Separator/>
+            <FormField
+                control={form.control}
+                name="auto_search"
+                render={({ field: { onChange, value, ...props } }) => (
+                    <SettingsFormElement
+                        icon={<Search/>}
+                        rightElement={
+                            <Switch
+                                aria-label="Automatische Updatesuche beim Appstart"
+                                checked={value}
+                                onCheckedChange={onChange}
+                                {...props}
+                            />
+                        }
+                        caption="Beim Start der App automatisch nach Updates suchen"
+                    >
+                        Automatische Updatesuche
+                    </SettingsFormElement>
+                )}
+            />
         </SettingsFormPageWrapper>
     );
 }

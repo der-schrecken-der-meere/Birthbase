@@ -12,6 +12,8 @@
     "autostart:allow-enable",
     "autostart:allow-disable",
     "autostart:allow-is-enabled",
-    "core:window:allow-set-progress-bar"
+    "core:window:allow-set-progress-bar",
+    "updater:allow-check",
+    "updater:allow-download-and-install"
   ]
 }

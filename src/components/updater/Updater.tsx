@@ -15,6 +15,11 @@ import { LinuxMacUpdater } from './LinuxMacUpdater';
 import { get_settings_query } from '@/features/manage_settings/query';
 import { create_toast, ToastType } from '@/hooks/use_app_toast';
 import { check_update, install_update } from '@/features/updater/updater';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
+import Markdown from "react-markdown";
+import { cn } from '@/lib/utils';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ScrollArea } from '../ui/scroll-area';
 
 const UpdaterProgress = ({
     value,
@@ -81,10 +86,12 @@ const Updater = () => {
     const current_version = use_app_store((state) => state.version);
     const update_version = use_update_store((state) => state.version);
     const os_type = use_app_store((state) => state.os_type);
+    const update_notes = use_update_store((state) => state.update_notes);
 
     const { data: { relaunch }, isError, error, isFetching } = get_settings_query();
 
     const [restart, setRestart] = useState(relaunch);
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
         if (isError) {
@@ -124,7 +131,7 @@ const Updater = () => {
                 ? (<UpdaterProgress/>)
                 : (
                     <>
-                        {primitive_strict_or<OsType>(os_type, "linux", "windows") && (
+                        {primitive_strict_or<OsType>(os_type, "linux", "macos") && (
                             <Suspense
                                 fallback={<Skeleton className='w-full h-4' />}
                             >
@@ -137,7 +144,48 @@ const Updater = () => {
                     </>
                 )
             }
-            <div className='flex items-center'>
+            <Collapsible open={open} onOpenChange={setOpen}>
+                <div className='flex items-center shrink-0'>
+                    Update-Notizen
+                    <CollapsibleTrigger asChild>
+                        <Button
+                            className='ml-auto'
+                            variant="secondary"
+                            size="icon"
+                        >
+                            {open ? <ChevronUp className='h-4 w-4' /> : <ChevronDown className='h-4 w-4' />}
+                        </Button>
+                    </CollapsibleTrigger>
+                </div>
+                
+                
+                <CollapsibleContent>
+                    <ScrollArea className='max-h-[300px] h-[300px]'>
+                        <Markdown
+                            className="text-sm text-muted-foreground"
+                            components={{
+                                ul: ({ children, className, ...props }) => {
+                                    return (
+                                        <ul className={cn("[&_>_li]:list-disc", className)} {...props}>
+                                            {children}
+                                        </ul>
+                                    );
+                                },
+                                li: ({ children, className, ...props }) => {
+                                    return (
+                                        <li className={cn("list-outside ml-4.5", className)} {...props}>
+                                            {children}
+                                        </li>
+                                    );
+                                }
+                            }}
+                        >
+                            {update_notes}
+                        </Markdown>
+                    </ScrollArea>
+                </CollapsibleContent>
+            </Collapsible>
+            <div className='flex items-center shrink-0'>
                 <div className='flex items-center justify-between'>
                     <DownloadUpdate disabled={is_downloading} relaunch={restart}>
                         Updaten
