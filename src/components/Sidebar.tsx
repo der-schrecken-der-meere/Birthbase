@@ -97,6 +97,13 @@ const AppSidebar = () => {
                             <Search />
                         </SidebarMenuAction>
                     </SidebarMenuItem>
+                    {!isMobile && (
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild>
+                                <CustomSidebarTrigger className='justify-start'/>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    )}
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent

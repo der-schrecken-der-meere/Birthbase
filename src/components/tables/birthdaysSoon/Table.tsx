@@ -19,7 +19,7 @@ const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">> & 
 
     const groupBirhtdays = useCallback((birthdays: Row<Birthday>[]) => {
         return birthdaysToGroups(birthdays, (d) => d.original.date, "de", "Dieser Monat");
-    }, [data]);
+    }, []);
 
     const onRowClick = useCallback((data: Birthday) => {
         open_birthday_form_read(data);

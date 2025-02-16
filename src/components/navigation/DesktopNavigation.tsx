@@ -1,6 +1,5 @@
 import { CSSProperties, Fragment, useCallback } from "react";
 import { GoBackInHistory } from "../History";
-import { CustomSidebarTrigger } from "../Sidebar";
 import { Breadcrumb, BreadcrumbEllipsis, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "../ui/breadcrumb";
 import { Link, NavLink } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
@@ -66,7 +65,6 @@ const DesktopUpperNavbar = ({
 
     return (
         <>
-            <CustomSidebarTrigger className='h-7 w-7'/>
             <GoBackInHistory
                 variant="ghost"
                 size="icon"
