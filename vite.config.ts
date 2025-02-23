@@ -11,7 +11,11 @@ export default defineConfig(({ command, mode, isPreview }) => {
   return {
     publicDir: "public",
     plugins: [
-      react(),
+      react({
+        babel: {
+          // plugins: [["babel-plugin-react-compiler"]]
+        }
+      }),
       tailwindcss(),
     ],
     resolve: {

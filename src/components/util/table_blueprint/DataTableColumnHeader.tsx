@@ -1,11 +1,9 @@
 import {
-    ArrowUpAZ,
     ArrowDownZA,
     ArrowDown10,
     ArrowDownWideNarrow,
     ChevronsUpDown,
     EyeOff,
-    ArrowUp01,
     ArrowUpNarrowWide,
     ArrowDown01,
     ArrowDownAZ,
@@ -23,9 +21,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import React, { createElement } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 
-type ColumnType = "string"|"number"|"date"|"mixed";
+export type ColumnType = "string"|"number"|"date"|"mixed";
 
 interface DataTableColumnHeaderProps<TData, TValue>
     extends React.HTMLAttributes<HTMLDivElement> {
@@ -74,6 +73,8 @@ export function DataTableColumnHeader<TData, TValue>({
     const [_, setSearchParams] = useSearchParams();
     const location = useLocation();
 
+    const { t } = useTranslation("table");
+
     return (
         <div className={cn("flex items-center space-x-2", className)}>
             <DropdownMenu>
@@ -96,22 +97,22 @@ export function DataTableColumnHeader<TData, TValue>({
                 <DropdownMenuContent align="start">
                     <DropdownMenuItem onClick={() => {column.toggleSorting(false);setSearchParams({"col": column.id, "sort": "asc"});new URL(".", window.origin + location.pathname + location.search)}}>
                         <HeaderUpSymbol type={colType} className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-                        Aufsteigend
+                        {t("ascending")}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => {column.toggleSorting(true);setSearchParams({"col": column.id, "sort": "desc"});new URL(".", window.origin + location.pathname + location.search)}}>
                         <HeaderDownSymbol type={colType} className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-                        Absteigend
+                        {t("descending")}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => {column.clearSorting();setSearchParams({"col": column.id});new URL(".", window.origin + location.pathname + location.search)}}>
                         <ChevronsUpDown className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-                        Zurücksetzen
+                        {t("reset")}
                     </DropdownMenuItem>
                     {column.getCanHide() && (
                         <>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
                                 <EyeOff className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-                                Ausblenden
+                                {t("hide")}
                             </DropdownMenuItem>
                         </>
                     )}

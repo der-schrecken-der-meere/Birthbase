@@ -29,7 +29,6 @@ export default function DataTablePagination<TData>({
         />
         <CurrentPage
           className="w-[120px]"
-          str="Seite $1 von $2"
           table={table}
         />
         <Navigation

@@ -27,31 +27,29 @@ import { Form, FormControl, FormItem, FormLabel } from '@/components/ui/form';
 import { DialogTriggerProps } from '@radix-ui/react-dialog';
 import { RadioGroupProps } from '@radix-ui/react-radio-group';
 import { FieldValues, UseFormReturn } from 'react-hook-form';
-import { SettingsLayoutBreadcrumbs } from '@/components/layouts/SettingsLayout';
-import { PageLinks } from '@/globals/constants/links';
-import { settings_links } from '@/globals/constants/nav_entries';
+import { use_settings_breadcrumbs } from '@/components/layouts/SettingsLayout';
 import { update_navbar } from '@/hooks/use_app_navbar';
+import { use_nav_entries } from '@/hooks/use_nav_entries';
+import { useTranslation } from 'react-i18next';
+import { PulseLoader } from 'react-spinners';
 
 const Settings = () => {
+
+    const { breadcrumbs } = use_settings_breadcrumbs();
+    const settings_links = use_nav_entries((state) => state.settings_links);
     
     update_navbar({
-        pageTitle: "Einstellungen",
+        pageTitle: "main.settings",
         breadcrumbDisplay: () => {
-            const breads = structuredClone(SettingsLayoutBreadcrumbs);
-            breads[0].type = [
-                {
-                    display: "Startseite",
-                    href: PageLinks.HOME,
-                }
-            ];
-            breads.length = 1;
+            const breads = structuredClone(breadcrumbs);
+            breads[0].type.length = 1;
             return breads;
         }
     });
 
     return (
         <ScrollArea className='h-full'>
-            {settings_links.map((link_entry, i) => (
+            {settings_links.entries.map((link_entry, i) => (
                 <Fragment
                     key={link_entry.url}
                 >
@@ -59,7 +57,7 @@ const Settings = () => {
                     <NavigationLink
                         to={link_entry.url}
                         icon={<link_entry.icon className="w-6 h-6" />}
-                        caption={!link_entry.search ? "" : link_entry.search.join(", ")}
+                        caption={!link_entry.search ? "" : link_entry.search}
                     >
                         {link_entry.title}
                     </NavigationLink>
@@ -329,15 +327,25 @@ const SettingsFormPageWrapper = <T extends FieldValues,>({
     children: ReactNode,
     onSubmit: (data: T) => void,
 }) => {
+    const { t } = useTranslation(["generally"]);
+
     return (
         <Form {...form}>
             <form className='h-full flex flex-col' onSubmit={form.handleSubmit(onSubmit)}>
-                <ScrollArea className='h-full pr-2'>
-                    {children}
-                </ScrollArea>
-                <Button type='submit' className='self-end screen-h-lg:mb-10 mb-1 mr-1' disabled={!form.formState.isDirty}>
-                    Speichern
-                </Button>
+                <fieldset className='h-full flex flex-col' disabled={form.formState.isSubmitting}>
+                    <ScrollArea className='h-full pr-2'>
+                        {children}
+                    </ScrollArea>
+                    <Button type='submit' className='self-end screen-h-lg:mb-10 mb-1 mr-1' disabled={!form.formState.isDirty}>
+                        {form.formState.isSubmitting
+                            ? <PulseLoader
+                                color='hsl(var(--foreground))'
+                                size="0.5rem"
+                            />
+                            : t("save_btn")
+                        }
+                    </Button>
+                </fieldset>
             </form>
         </Form>
     );

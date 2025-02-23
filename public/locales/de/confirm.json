@@ -1,0 +1,8 @@
+{
+    "sure": "Sind Sie sich sicher?",
+    "cant_undone": "Diese Aktion kann nicht mehr rückgängig gemacht werden.",
+    "msgs": {
+        "delete_birthday": "Der Geburtstag wird gelöscht und danach nicht mehr angezeigt.",
+        "empty_storage": "Alle App-Einstellungen, Geburtstage und Benachrichtigungen werden gelöscht."
+    }
+}

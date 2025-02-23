@@ -1,0 +1,8 @@
+{
+    "birthday_form": {
+        "change_title": "Geburtstag ändern oder löschen",
+        "change_description": "Bearbeiten oder Löschen Sie den ausgewählten Geburtstag. Die neuen Daten werden nach dem erfolgreichen Aktualisieren oder Löschen auf der Startseite oder unter \"Meine Geburtstage\" angezeigt.",
+        "create_title": "Geburtstag erstellen",
+        "create_description": "Erstellen Sie einen neuen Geburtstag. Dieser wird nach dem erfolgreichen Erstellen auf der Startseite oder unter \"Meine Geburtstage\" angezeigt."
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "errors": {
+        "show_birthdays": "Fehler beim Anzeigen der Geburtstage",
+        "save_birthday": "Fehler beim Speichern des Geburtstages",
+        "change_birthday": "Fehler beim Ändern des Geburtstages",
+        "delete_birthday": "Fehler beim Löschen des Geburtstages",
+        "change_settings": "Fehler beim Speichern der Einstellungen",
+        "show_settings": "Fehler beim Anzeigen der Einstellungen",
+        "show_notifications": "Fehler beim Anzeigen der Benachrichtigungen",
+        "change_notifications": "Fehler beim Ändern der Benachrichtigungen",
+        "delete_notifications": "Fehler beim Löschen der Benachrichtigungen"
+    },
+    "success": {
+        "save_birthday": "Der Geburtstag wurde erfolgreich gespeichert",
+        "change_birthday": "Der Geburtstag wurde erfolgreich geändert",
+        "delete_birthday": "Der Geburtstag wurde erfolgreich gelöscht",
+        "change_settings": "Die Einstellungen wurde erfolgreich geändert"
+    }
+}

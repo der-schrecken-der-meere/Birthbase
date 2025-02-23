@@ -1,0 +1,16 @@
+{
+    "first_name_title": "First name",
+    "first_name_placeholder": "John",
+    "first_name_description": "First name of the person",
+    "first_name_required_error": "First name must be provided",
+    "first_name_type_error": "First name must be of type text",
+    "last_name_title": "Last name",
+    "last_name_placeholder": "Doe",
+    "last_name_description": "Last name of the person",
+    "last_name_required_error": "Last name must be provided",
+    "last_name_type_error": "Last name must be of type text",
+    "date_title": "Date",
+    "date_placeholder": "Select date",
+    "date_format_error": "Wrong date format",
+    "date_description": "Date of the birthday"
+}

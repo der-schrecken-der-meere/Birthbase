@@ -27,6 +27,7 @@ import React, { ReactNode, useMemo, type Dispatch, type SetStateAction } from "r
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface DataTableProps<TData, TValue> {
     className?: string;
@@ -56,7 +57,6 @@ export const DataTable = <TData, TValue>({
     footerElements,
     headerElements,
     defaultSorting,
-    noDataFoundText = "Keine Daten gefunden.",
     headerScreenReaderOnly = false,
     tbody = (rows) => (
         <TableBody>
@@ -76,6 +76,8 @@ export const DataTable = <TData, TValue>({
         
     )
 }: DataTableProps<TData, TValue>) => {
+    const { t } = useTranslation("table");
+
     let config = useMemo<TableOptions<TData>>(() => {
         let _config: TableOptions<TData> = {
             data,
@@ -113,7 +115,7 @@ export const DataTable = <TData, TValue>({
             getPaginationRowModel: getPaginationRowModel(),
         }}
         return _config;
-    }, [columns, data, filter, selection, sorting, visibility, pagination])
+    }, [columns, data, filter, selection, sorting, visibility, pagination]);
 
     const table = useReactTable(config);
 
@@ -155,7 +157,7 @@ export const DataTable = <TData, TValue>({
                         <TableBody>
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    {noDataFoundText}
+                                    {t("empty")}
                                 </TableCell>
                             </TableRow>
                         </TableBody>

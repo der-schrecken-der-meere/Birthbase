@@ -1,0 +1,16 @@
+{
+    "first_name_title": "Vorname",
+    "first_name_placeholder": "Max",
+    "first_name_description": "Der Vorname der Person",
+    "first_name_required_error": "Vorname muss angegeben sein",
+    "first_name_type_error": "Vorname muss vom Typ Text sein",
+    "last_name_title": "Nachname",
+    "last_name_placeholder": "Mustermann",
+    "last_name_description": "Der Nachname der Person",
+    "last_name_required_error": "Nachname muss angegeben sein",
+    "last_name_type_error": "Nachname muss vom Typ Text sein",
+    "date_title": "Datum",
+    "date_placeholder": "Datum auswählen",
+    "date_format_error": "Falsches Datumsformat",
+    "date_description": "Das Datum des Geburtstages"
+}

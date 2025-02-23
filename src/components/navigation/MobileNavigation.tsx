@@ -2,13 +2,13 @@ import { CSSProperties, FunctionComponent, HTMLAttributes, ReactNode, useMemo } 
 import { GoBackInHistory } from "../History";
 import { CustomSidebarTrigger } from "../Sidebar";
 import { UpperNavbarProps } from "./Navigation";
-import { LinkEntry, main_links } from "@/globals/constants/nav_entries";
 import { PageLinks } from "@/globals/constants/links";
 import { cn } from "@/lib/utils";
 import { MobileAddBirthdayButton } from "../AddBirthdayButton";
 import { LinkProps, NavLink } from "react-router-dom";
 import { buttonVariants } from "../ui/button";
 import { get_notifications_query } from "@/features/latest_notifications/query";
+import { LinkEntry, use_nav_entries } from "@/hooks/use_nav_entries";
 
 const MobileUpperNavbar = ({
     pageTitle,
@@ -27,7 +27,8 @@ const MobileUpperNavbar = ({
 };
 
 const find_link = (page_link: PageLinks) => {
-    return main_links.find((link) => link.url === page_link) as LinkEntry;
+    const main_links = use_nav_entries.getState().main_links;
+    return main_links.entries.find((link) => link.url === page_link) as LinkEntry;
 };
 
 type NotificationIconProps = {

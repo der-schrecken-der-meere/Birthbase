@@ -24,7 +24,7 @@ function Calendar({
     <DayPicker
       formatters={{
         formatMonthDropdown: (date, dateLib) => {
-          return format_number_to_month_lll((dateLib as DateLib).options.locale as any, date.getMonth());
+          return format_number_to_month_lll((dateLib as DateLib).options.locale?.code as any, date.getMonth());
         },
       }}
       showOutsideDays={showOutsideDays}

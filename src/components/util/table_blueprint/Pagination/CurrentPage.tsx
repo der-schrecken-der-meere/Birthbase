@@ -1,30 +1,25 @@
 import { Table } from "@tanstack/react-table"
 
 import { cn } from "@/lib/utils"
-import { useMemo } from "react";
-import { replace } from "@/lib/functions/string/replace";
+import { useTranslation } from "react-i18next";
 
 type CurrentPageProps<TData> = React.HTMLAttributes<HTMLDivElement> & {
     table: Table<TData>;
-    str: string
 };
 
 const CurrentPage = <TData,>({
     table,
     className,
-    str,
     ...props
 }: CurrentPageProps<TData>) => {
 
-    const text = useMemo<string>(() => {
-        const formated = replace(str, table.getState().pagination.pageIndex + 1, table.getPageCount());
-        if (!formated) throw new Error("Arguments for certain placeholders are missing");
-        return formated
-    }, [str, table.getState().pagination.pageIndex, table.getPageCount()]);
+    const { t } = useTranslation(["table"]);
+    const current = table.getState().pagination.pageIndex + 1;
+    const max = table.getPageCount();
 
     return (
         <div className={cn("flex w-[100px] items-center justify-center text-sm font-medium", className)} {...props}>
-            {text}
+            {t("current_page", { current, max: max === 0 ? max + 1 : max })}
         </div>
     )
 };

@@ -33,6 +33,7 @@ import { ConfirmDialog } from "./singletons/ConfirmDialog";
 import { BirthdayFormDialog } from "./singletons/BirthdayFormDialog";
 import { is_desktop } from "@/lib/functions/logic/desktop";
 import { SettingsEntriesSkeleton } from "./skeletons/SettingsEntriesSkeleton";
+import { useTranslation } from "react-i18next";
 
 const MyBirthdays = lazy(() => delay_promise(() => import("../pages/MyBirthdays"), 0));
 const Settings = lazy(() => delay_promise(() => import("../pages/Settings/Settings"), 0));
@@ -48,12 +49,20 @@ const Update = lazy(() => delay_promise(() => import("../pages/Settings/Update/U
 
 const App = () => {
     const is_booting = use_app_store((state) => state.is_booting);
+    const { i18n } = useTranslation();
 
     useEffect(() => {
         (async () => {
             unset_is_booting();
         })();
     }, []);
+
+    useEffect(() => {
+        if (i18n.resolvedLanguage) {
+            document.documentElement.lang = i18n.resolvedLanguage;
+            document.documentElement.dir = i18n.dir(i18n.resolvedLanguage);
+        }
+    }, [i18n, i18n.resolvedLanguage]);
 
     const _router = createBrowserRouter(
         createRoutesFromElements(

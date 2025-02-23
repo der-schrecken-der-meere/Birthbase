@@ -1,29 +1,35 @@
-import { SettingsLayoutBreadcrumbs } from "@/components/layouts/SettingsLayout";
+import { use_settings_breadcrumbs } from "@/components/layouts/SettingsLayout";
 import { isTauri } from "@tauri-apps/api/core";
 import { SettingsFormElement, SettingsFormPageWrapper } from "../Settings";
 import { FormField } from "@/components/ui/form";
 import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { enable, isEnabled, disable } from "@tauri-apps/plugin-autostart";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { primitive_strict_or } from "@/lib/functions/logic/or";
 import { OsType, type } from "@tauri-apps/plugin-os";
 import { Switch } from "@/components/ui/switch";
 import { Rocket } from "lucide-react";
 import { update_navbar } from "@/hooks/use_app_navbar";
-
-const formSchema = z.object({
-    autostart: z.coerce.boolean(),
-});
-
-type AppForm = z.infer<typeof formSchema>;
+import { useTranslation } from "react-i18next";
+import { use_settings_form } from "@/hooks/use_settings_form";
+import { Settings } from "@/database/tables/settings/settings";
+import { obj_is_empty } from "@/lib/functions/object/empty";
 
 const App = () => {
 
+    const { t } = useTranslation(["pages"]);
+    const { breadcrumbs } = use_settings_breadcrumbs();
+
+    const ts = useCallback((key: string) => {
+        return t(`settings_app.${key}`);
+    }, [t]);
+
+    const formSchema = useMemo(() => z.object({
+        autostart: z.coerce.boolean(),
+    }), []);
+
     update_navbar({
-        pageTitle: "App",
-        breadcrumbDisplay: SettingsLayoutBreadcrumbs,
+        pageTitle: "settings.app",
+        breadcrumbDisplay: breadcrumbs,
     });
 
     if (!isTauri()) {
@@ -38,42 +44,26 @@ const App = () => {
         );
     }
 
-    const [ autostart, setAutostart ] = useState(false);
-    const [ disabled, setDisabled ] = useState(true);
+    const { form, isFetching, onSubmit } = use_settings_form({
+        form_schema: formSchema,
+        on_submit: (data) => {
+            const new_settings: Partial<Settings> = {};
 
-    const form = useForm<AppForm>({
-        resolver: zodResolver(formSchema),
-        defaultValues: ({
-            autostart: false,
-        }),
-        values: {
-            autostart,
+            if (form.formState.dirtyFields.autostart) {
+                new_settings.autostart = data.autostart;
+            }
+
+            if (!obj_is_empty(new_settings)) {
+                return new_settings;
+            }
         }
-    })
+    });
 
-    useEffect(() => {
-        (async () => {
-            const autostart_enabled = await isEnabled();
-            setDisabled(false);
-            if (autostart_enabled) {
-                setAutostart(true);
-                return;
-            }
-            setAutostart(false);
-        })();
-    }, []);
-
-    const onSubmit = useCallback((data: AppForm) => {
-        (async () => {
-            if (data.autostart) {
-                await enable();
-                setAutostart(true);
-                return;
-            }
-            await disable();
-            setAutostart(false);
-        })();
-    }, []);
+    if (isFetching) {
+        return (
+            <div>Loading...</div>
+        );
+    }
 
     return (
         <SettingsFormPageWrapper
@@ -88,16 +78,15 @@ const App = () => {
                         icon={<Rocket/>}
                         rightElement={
                             <Switch
-                                aria-label="Autostart ein- oder ausschalten"
+                                aria-label={ts("autostart_aria")}
                                 checked={value}
                                 onCheckedChange={onChange}
-                                disabled={disabled}
                                 {...props}
                             />
                         }
-                        caption={"Öffnet beim Start des Betriebssystems die App"}
+                        caption={ts("autostart_description")}
                     >
-                        Autostart
+                        {ts("autostart_title")}
                     </SettingsFormElement>
                 )}
             />

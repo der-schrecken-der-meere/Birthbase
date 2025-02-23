@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 // React Router Dom
 
 // Tanstack Table
-import { ColumnFiltersState, SortingState, VisibilityState } from "@tanstack/react-table";
+import { ColumnDef, ColumnFiltersState, SortingState, VisibilityState } from "@tanstack/react-table";
 
 // Tableblueprints
 import { DataTable }        from "../../util/table_blueprint/DataTable";
@@ -15,38 +15,24 @@ import DataTableViewOptions from "../../util/table_blueprint/Filter/DataTableVie
 import MobileTableOptions   from "../../util/table_blueprint/MobileTableOptions";
 
 import columns from "./columns";
-import { get_birthdays_query } from "@/features/manage_birthdays/query";
+import { Birthday } from "@/database/tables/birthday/birthdays";
+import { useTranslation } from "react-i18next";
 
-import { useTableSortURL } from "../../../hooks/use-tableSortURL";
-import { MyBirthdaysSkeleton } from "@/components/skeletons/MyBirthdaysSkeleton";
-import { create_toast, ToastType } from "@/hooks/use_app_toast";
-
-const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">>> = ({
-    className
+const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">> & { 
+    columns: ColumnDef<Birthday>[],
+    defaultSorting: SortingState,
+    data: Birthday[]
+}> = ({
+    className,
+    defaultSorting,
+    data
 }) => {
+    const { t } = useTranslation(["pages"]);
 
-    const { defaultSorting } = useTableSortURL({ columns });
-
-    const { isLoading, isError, data, error, isFetching } = get_birthdays_query();
     const sortingState = useState<SortingState>([]);
     const columnFilter = useState<ColumnFiltersState>([]);
     const visibility = useState<VisibilityState>({})
     // const birthdays = useSelector((state: RootState) => state.data.value);
-
-    useEffect(() => {
-        if (isError) {
-            create_toast({
-                "title": "Fehler beim Laden der Geburtstage",
-                "description": JSON.stringify(error),
-            }, ToastType.ERROR);
-        }
-    }, [isError, error]);
-
-    if (isLoading || isFetching) {
-        return (
-            <MyBirthdaysSkeleton/>
-        );
-    }
 
     return (
         <DataTable
@@ -63,8 +49,8 @@ const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">>> =
                     <ValueFilter
                         table={table}
                         className="w-60 min-w-40 mr-2 text-sm"
-                        columnId="Nachname"
-                        placeholder="Nachname..."
+                        columnId="lastname"
+                        placeholder={t("my_birthdays.last_name")}
                     />
                     <DataTableViewOptions
                         className="hidden @xs:flex"
@@ -86,7 +72,6 @@ const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">>> =
                         />
                         <CurrentPage
                             className="w-[120px] hidden @xs:block"
-                            str="Seite $1 von $2"
                             table={table}
                         />
                         <Navigation

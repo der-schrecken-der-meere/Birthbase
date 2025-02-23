@@ -29,20 +29,32 @@ import Table from '@/components/tables/birthdays/Table.js';
 import { delay_promise } from '@/lib/functions/promise/delay';
 import { PageLinks } from '@/globals/constants/links';
 import { update_navbar } from '@/hooks/use_app_navbar';
+import { useTranslation } from 'react-i18next';
+import { useTableSortURL } from '@/hooks/use-tableSortURL';
+import columns from "./../components/tables/birthdays/columns";
+import { get_birthdays_query } from '@/features/manage_birthdays/query';
+import { MyBirthdaysSkeleton } from '@/components/skeletons/MyBirthdaysSkeleton';
+import { create_toast, ToastType } from '@/hooks/use_app_toast';
 
 const OtherFunctionDialog = lazy(() => delay_promise(() => import("../components/dialogs/OtherFunctions"), 0));
 
 const MyBirthdays = () => {
 
+    const { t } = useTranslation(["navigation", "toast", "generally"]);
+
+    const { defaultSorting } = useTableSortURL({ columns });
+
+    const { isLoading, isError, data, error, isFetching } = get_birthdays_query();
+
     update_navbar({
-        docTitle: "Birthbase - Meine Geburtstage",
-        pageTitle: "Meine Geburtstage",
+        docTitle: "main.my_birthdays",
+        pageTitle: "main.my_birthdays",
         breadcrumbDisplay: [
             {
                 id: "menu",
                 type: [
                     {
-                        display: "Startseite",
+                        display: t("main.home"),
                         href: PageLinks.HOME,
                     }
                 ]
@@ -50,10 +62,31 @@ const MyBirthdays = () => {
         ],
     });
 
+    useEffect(() => {
+        if (isError) {
+            console.error(error);
+            create_toast({
+                "title": t("error", { ns: "generally" }),
+                "description": t("errors.show_birthdays", { ns: "toast" }),
+            }, ToastType.ERROR);
+        }
+    }, [isError, error]);
+
+    if (isLoading || isFetching) {
+        return (
+            <MyBirthdaysSkeleton/>
+        );
+    }
+    
     return (
         <>
             {/* <OtherFunctions/> */}
-            <Table className='shrink' />
+            <Table
+                defaultSorting={defaultSorting}
+                data={data}
+                columns={columns}
+                className='shrink'
+            />
         </>
     )
 }

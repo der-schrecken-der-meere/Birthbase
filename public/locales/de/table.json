@@ -1,0 +1,22 @@
+{
+    "view": "Ansicht",
+    "show_columns": "Spalten anzeigen",
+    "current_page": "Seite {{current}} von {{max}}",
+    "to_first": "Zur ersten Seite gehen",
+    "to_previous": "Zur vorherigen Seite gehen",
+    "to_next": "Zur nächsten Seite gehen",
+    "to_last": "Zur letzten Seite gehen",
+    "rows_per_page": "Zeilen pro Seite",
+    "rows_selected_one": "{{selected}} von {{max}} Zeile ausgewählt",
+    "rows_selected_other": "{{selected}} von {{max}} Zeilen ausgewählt",
+    "empty": "Keine Daten gefunden",
+    "ascending": "Aufsteigend",
+    "descending": "Absteigend",
+    "hide": "Ausblenden",
+    "reset": "Zurücksetzten",
+    "options_title": "Tablenoptionen",
+    "options_description": "Hier können Sie die Ansicht oder Paramter der Tabelle ändern",
+    "columns": "Spalten",
+    "columns_description": "Spalten, die ausgeblendet werden können",
+    "rows_per_page_description": "Die maximale Anzahl an Zeilen pro Seite"
+}

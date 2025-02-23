@@ -5,6 +5,7 @@ import { Label } from "../ui/label";
 
 const LinuxMacUpdater = ({
     className,
+    children,
     ...props
 }: CheckboxProps) => {
     return (
@@ -13,7 +14,7 @@ const LinuxMacUpdater = ({
                 className={cn("shrink-0 mr-2 mt-0.5", className)}
                 {...props}
             />
-            Nach der Installation des Updates die App neustarten, um die neuste Änderungen nutzen zu können.
+            {children}
         </Label>
     );
 };

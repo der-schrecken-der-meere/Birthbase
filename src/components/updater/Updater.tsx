@@ -20,6 +20,7 @@ import Markdown from "react-markdown";
 import { cn } from '@/lib/utils';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
+import { useTranslation } from 'react-i18next';
 
 const UpdaterProgress = ({
     value,
@@ -88,6 +89,8 @@ const Updater = () => {
     const os_type = use_app_store((state) => state.os_type);
     const update_notes = use_update_store((state) => state.update_notes);
 
+    const { t } = useTranslation(["updater", "generally"]);
+
     const { data: { relaunch }, isError, error, isFetching } = get_settings_query();
 
     const [restart, setRestart] = useState(relaunch);
@@ -118,9 +121,9 @@ const Updater = () => {
 
     return (
         <BasicDialog
-            title={`Auf Version ${update_version} updaten`}
+            title={t("update_to", { version: update_version })}
             description={
-                <span className='mt-2 font-bold'>Aktuelle Version: {current_version}</span>
+                <span className='mt-2 font-bold'>{t("current_version", { version: current_version })}</span>
             }
             headerVisibility
             defaultOpen={is_prompt_open}
@@ -138,7 +141,9 @@ const Updater = () => {
                                 <LinuxMacUpdater
                                     onCheckedChange={on_relaunch_change}
                                     defaultChecked={relaunch}
-                                />
+                                >
+                                    {t("restart_app")}
+                                </LinuxMacUpdater>
                             </Suspense>
                         )}
                     </>
@@ -146,7 +151,7 @@ const Updater = () => {
             }
             <Collapsible open={open} onOpenChange={setOpen}>
                 <div className='flex items-center shrink-0'>
-                    Update-Notizen
+                    {t("update_notes")}
                     <CollapsibleTrigger asChild>
                         <Button
                             className='ml-auto'
@@ -188,11 +193,11 @@ const Updater = () => {
             <div className='flex items-center shrink-0'>
                 <div className='flex items-center justify-between'>
                     <DownloadUpdate disabled={is_downloading} relaunch={restart}>
-                        Updaten
+                        {t("update_btn")}
                     </DownloadUpdate>
                 </div>
                 <DialogClose asChild>
-                    <Button className='ml-auto' disabled={is_downloading} variant="secondary">Abbrechen</Button>
+                    <Button className='ml-auto' disabled={is_downloading} variant="secondary">{t("cancel", { ns: "generally" })}</Button>
                 </DialogClose>
             </div>
         </BasicDialog>

@@ -1,0 +1,7 @@
+{
+    "current_version": "Current version: {{version}}",
+    "update_to": "Update to version {{version}}",
+    "update_notes": "Update notes",
+    "restart_app": "After installing the update, restart the app to use the latest changes.",
+    "update_btn": "Update"
+}

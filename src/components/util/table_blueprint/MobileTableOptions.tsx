@@ -6,6 +6,7 @@ import { SlidersHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 import { MobileTableOptionsForm } from "@/components/forms/MobileTableOptions";
+import { useTranslation } from 'react-i18next'
 
 type MobileTableOptionsProps<TData> = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "children"> & {
     table: Table<TData>
@@ -23,6 +24,8 @@ const MobileTableOptions = <TData,>({
         setOpen(false);
     }, []);
 
+    const { t } = useTranslation("table");
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -33,12 +36,12 @@ const MobileTableOptions = <TData,>({
                     {...props}
                 >
                     <SlidersHorizontal className="h-4 w-4" />
-                    <span className="sr-only">Ansicht</span>
+                    <span className="sr-only">{t("view")}</span>
                 </Button>
             </DialogTrigger>
             <DialogContent>
-                <DialogTitle>Tabellenoptionen</DialogTitle>
-                <DialogDescription>Hier können Sie die Ansicht oder Parameter der Tabelle ändern</DialogDescription>
+                <DialogTitle>{t("options_title")}</DialogTitle>
+                <DialogDescription>{t("options_description")}</DialogDescription>
                 <MobileTableOptionsForm
                     table={table}
                     onSubmitClick={onSubmitClick}

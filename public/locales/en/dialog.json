@@ -1,0 +1,8 @@
+{
+    "birthday_form": {
+        "change_title": "Change or delete Birthday",
+        "change_description": "Edit or delete the selected birthday. The new data will be displayed on the home page or under \"My Birthdays\" after the successful update or deletion.",
+        "create_title": "Create Birthday",
+        "create_description": "Create a new Birthday. After successful creation, this will be displayed on the home page or under \"My Birthdays\"."
+    }
+}

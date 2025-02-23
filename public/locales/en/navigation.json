@@ -1,0 +1,28 @@
+{
+    "main": {
+        "title": "Main menu",
+        "home": "Home",
+        "my_birthdays": "My birthdays",
+        "settings": "Settings",
+        "notifications": "Notifications"
+    },
+    "settings": {
+        "title": "Settings",
+        "appearance": "Appearance",
+        "appearance_search": "Mode, Color",
+        "notifications": "Notifications",
+        "notifications_search": "Right, Reminder",
+        "storage": "Storage",
+        "storage_search": "Quotas, Empty storage",
+        "time": "Date and Time",
+
+        "language": "Language",
+
+        "info": "Info",
+        "info_search": "Current version",
+        "app": "App",
+        "app_search": "Autostart",
+        "update": "Update",
+        "update_search": "Search updates"
+    }
+}

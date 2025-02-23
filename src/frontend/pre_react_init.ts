@@ -2,6 +2,7 @@ import { get_settings_model } from "@/database/tables/settings/db_model";
 import type { Settings } from "@/database/tables/settings/settings";
 import { change_color } from "@/features/manage_settings/appearance/color";
 import { change_mode } from "@/features/manage_settings/appearance/mode";
+import { change_language } from "@/features/manage_settings/language/language";
 import { set_notification_worker } from "@/features/notify/notify";
 import { init_tauri } from "@/init/tauri_init";
 // import { mock_init_tauri } from "@/init/test/tauri_init";
@@ -34,6 +35,7 @@ const pre_react_init = async () => {
 const setup_settings = (settings: Omit<Settings, "id">) => {
   change_color(settings.color);
   change_mode(settings.mode);
+  change_language(settings.language);
 };
 
 export { pre_react_init, queryClient };

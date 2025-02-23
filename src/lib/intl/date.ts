@@ -8,6 +8,11 @@ const format_number_to_relative_time = (locale: string, time: number, unit: Intl
     return new Intl.RelativeTimeFormat(locale, { numeric: "always", style: "short" }).format(time, unit);
 };
 
+const format_day_month = (locale: Intl.LocalesArgument, date: Date) => {
+    const formattedDate = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "2-digit" }).format(date);
+    return formattedDate.replace(/\D+$/, '');
+};
+
 const get_local_timezone = () => {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
 };
@@ -64,6 +69,7 @@ const format_date_to_short_str = (
 export {
     format_number_to_month_lll,
     format_number_to_relative_time,
+    format_day_month,
     format_date_to_short_str,
     format_date_to_iso_midnight,
     get_local_timezone,

@@ -1,0 +1,8 @@
+{
+    "sure": "Are you sure?",
+    "cant_undone": "This action cannot be undone.",
+    "msgs": {
+        "delete_birthday": "The birthday will be deleted and will no longer be displayed afterwards.",
+        "empty_storage": "All app settings, birthdays and notifications will be deleted."
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "errors": {
+        "show_birthdays": "Error occured while trying to display birthdays",
+        "save_birthday": "Error occured while trying to save the birthday",
+        "change_birthday": "Error occured while trying to change the birthday",
+        "delete_birthday": "Error occured while trying to delete the birthday",
+        "change_settings": "Error occured while trying to update the settings",
+        "show_settings": "Error occured while trying to display the settings",
+        "show_notifications": "Error occured while trying to display the notifications",
+        "change_notifications": "Error occured while trying to change the notifications",
+        "delete_notifications": "Error occured while trying to delete the notifications"
+    },
+    "success": {
+        "save_birthday": "The birthday was saved successfully",
+        "change_birthday": "The birthday was changed successfully",
+        "delete_birthday": "The birthday was deleted successfully",
+        "change_settings": "The Settings were changed successfully"
+    }
+}

@@ -14,7 +14,8 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from "@/components/ui/tooltip"
-import { createElement, useMemo } from "react"
+import { useMemo } from "react"
+import { useTranslation } from "react-i18next"
 
 type LucideElement = React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
 
@@ -34,6 +35,8 @@ const Navigation = <TData,>({
     className,
     ...props
 }: NavigationProps<TData>) => {
+    const { t } = useTranslation(["table"]);
+
     const buttons = useMemo<NavigationButtons>(() => ([
         {
             id: "go-first",
@@ -41,21 +44,21 @@ const Navigation = <TData,>({
             chevron: ChevronsLeft,
             disabled: table.getCanPreviousPage,
             onClick: () => table.setPageIndex(0),
-            tooltip: "Zur ersten Seite navigieren",
+            tooltip: t("to_first"),
         },
         {
             id: "go-prev",
             chevron: ChevronLeft,
             disabled: table.getCanPreviousPage,
             onClick: () => table.previousPage(),
-            tooltip: "Zur vorherigen Seite navigieren",
+            tooltip: t("to_previous"),
         },
         {
             id: "go-next",
             chevron: ChevronRight,
             disabled: table.getCanNextPage,
             onClick: () => table.nextPage(),
-            tooltip: "Zur nächsten Seite navigieren",
+            tooltip: t("to_next"),
         },
         {
             id: "go-last",
@@ -63,15 +66,15 @@ const Navigation = <TData,>({
             chevron: ChevronsRight,
             disabled: table.getCanNextPage,
             onClick: () => table.setPageIndex(table.getPageCount() - 1),
-            tooltip: "Zur letzten Seite navigieren",
+            tooltip: t("to_last"),
         },
-    ]), []);
+    ]), [t]);
 
     return (
-        <div className={cn("flex items-center space-x-2", className)} {...props}>
-            {buttons.map((e) => (
-                <TooltipProvider key={e.id}>
-                    <Tooltip>
+        <div className={cn("flex items-center [&_>_button:not(:last-of-type)]:mr-2 relative", className)} {...props}>
+            <TooltipProvider>
+                {buttons.map((e) => (
+                    <Tooltip key={e.id}>
                         <TooltipTrigger asChild>
                             <Button
                                 variant="outline"
@@ -79,15 +82,15 @@ const Navigation = <TData,>({
                                 onClick={e.onClick}
                                 disabled={!e.disabled()}
                             >
-                                {createElement(e.chevron, { className: "h-4 w-4" })}
+                                <e.chevron className="h-4 w-4"/>
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>{e.tooltip}</p>
+                            <span>{e.tooltip}</span>
                         </TooltipContent>
                     </Tooltip>
-                </TooltipProvider>
-            ))}
+                ))}
+            </TooltipProvider>
         </div>
     )
 }

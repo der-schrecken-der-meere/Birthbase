@@ -1,0 +1,28 @@
+{
+    "main": {
+        "title": "Hauptmenü",
+        "home": "Startseite",
+        "my_birthdays": "Meine Geburtstage",
+        "settings": "Einstellungen",
+        "notifications": "Benachrichtigungen"
+    },
+    "settings": {
+        "title": "Einstellungen",
+        "appearance": "Darstellung",
+        "appearance_search": "Modus, Akzentfarbe",
+        "notifications": "Benachrichtigungen",
+        "notifications_search": "Berechtigung, Erinnerungen",
+        "storage": "Speicher",
+        "storage_search": "Speichernutzung, Speicher leeren",
+        "time": "Datum und Zeit",
+
+        "language": "Sprache",
+
+        
+        "info_search": "Aktuelle Version",
+
+
+
+        "update_search": "Updatesuche"
+    }
+}

@@ -1,4 +1,4 @@
-import { SettingsLayoutBreadcrumbs } from "@/components/layouts/SettingsLayout";
+import { use_settings_breadcrumbs } from "@/components/layouts/SettingsLayout";
 import { NavigationEntry, SettingsFormElement, SettingsFormPageWrapper } from "../Settings";
 import { use_update_store } from "@/hooks/use_update_store";
 import { RefreshCw, RotateCcw, Search } from "lucide-react";
@@ -8,94 +8,75 @@ import { BarLoader } from "react-spinners";
 import { update_navbar } from "@/hooks/use_app_navbar";
 import { use_app_store } from "@/hooks/use_app_store";
 import { Skeleton } from "@/components/ui/skeleton";
-import { get_settings_query, set_settings_query } from "@/features/manage_settings/query";
-import { useCallback, useEffect } from "react";
-import { create_toast, ToastType } from "@/hooks/use_app_toast";
+import { useCallback, useMemo } from "react";
 import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { get_default_settings, Settings } from "@/database/tables/settings/settings";
+import { Settings } from "@/database/tables/settings/settings";
 import { obj_is_empty } from "@/lib/functions/object/empty";
 import { FormField } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
-
-const formSchema = z.object({
-    relaunch: z.coerce.boolean(),
-    auto_search: z.coerce.boolean(),
-});
-
-type UpdateForm = z.infer<typeof formSchema>;
+import { useTranslation } from "react-i18next";
+import { use_settings_form } from "@/hooks/use_settings_form";
+import { isTauri } from "@tauri-apps/api/core";
+import { primitive_strict_or } from "@/lib/functions/logic/or";
+import { OsType } from "@tauri-apps/plugin-os";
 
 const Update = () => {
 
+    const { t, i18n } = useTranslation(["pages"]);
+    const { breadcrumbs } = use_settings_breadcrumbs();
+
+    const ts = useCallback((key: string) => {
+        return t(`settings_update.${key}`);
+    }, [t]);
+
+    const formSchema = useMemo(() => z.object({
+        relaunch: z.coerce.boolean(),
+        auto_search: z.coerce.boolean(),
+    }), [ts]);
+
+    const type = use_app_store((state) => state.os_type);
+
     update_navbar({
-        pageTitle: "Update",
-        breadcrumbDisplay: SettingsLayoutBreadcrumbs,
+        pageTitle: "settings.update",
+        breadcrumbDisplay: breadcrumbs,
     });
+
+    if (!isTauri()) {
+        return (
+            null
+        );
+    }
+
+    if (!primitive_strict_or<OsType>(type, "linux", "linux", "windows")) {
+        return (
+            null
+        );
+    }
 
     const update_available = use_update_store((state) => state.available);
     const last_check = use_update_store((state) => state.last_check);
     const is_downloading = use_update_store((state) => state.started);
     const searching = use_update_store((state) => state.searching);
-    const version = use_update_store((state) => state.display_version);
+    const version = use_update_store((state) => state.version);
     const os_type = use_app_store((state) => state.os_type);
 
-    const { data, isError, error, isFetching } = get_settings_query();
-    const { mutate: update } = set_settings_query();
+    const { form, isFetching, onSubmit, data } = use_settings_form({
+        form_schema: formSchema,
+        on_submit: (data) => {
+            const new_settings: Partial<Settings> = {};
 
-    const form = useForm<UpdateForm>({
-        resolver: zodResolver(formSchema),
-        defaultValues: (() => {
-            const default_settings = get_default_settings();
-            return {
-                relaunch: default_settings.relaunch,
-                auto_search: default_settings.auto_search,
-            };
-        })(),
-        values: {
-            relaunch: data.relaunch,
-            auto_search: data.auto_search,
+            if (form.formState.dirtyFields.auto_search) {
+                new_settings.auto_search = data.auto_search;
+            }
+            if (form.formState.dirtyFields.relaunch) {
+                new_settings.relaunch = data.relaunch;
+            }
+
+            if (!obj_is_empty(new_settings)) {
+                return new_settings;
+            }
         }
     });
-
-    const on_submit = useCallback((data: UpdateForm) => {
-        const new_settings: Partial<Settings> = {};
-
-        if (form.formState.dirtyFields.relaunch) {
-            new_settings.relaunch = data.relaunch;
-        }
-
-        if (form.formState.dirtyFields.auto_search) {
-            new_settings.auto_search = data.auto_search;
-        }
-
-        if (!obj_is_empty(new_settings)) {
-            update(new_settings, {
-                onSuccess: () => {
-                    create_toast({
-                        title: "Erfolgreich",
-                        description: "Die Einstellungen wurden aktualisiert",
-                    }, ToastType.SUCCESS);
-                },
-                onError: (error) => {
-                    create_toast({
-                        title: "Fehler beim Speichern der Einstellungen",
-                        description: JSON.stringify(error), 
-                    }, ToastType.ERROR);
-                },
-            });
-        }
-
-    }, []);
-
-    useEffect(() => {
-        if (isError) {
-            create_toast({
-                title: "Fehler beim Anzeigen der Einstellungen",
-                description: JSON.stringify(error),
-            }, ToastType.ERROR);
-        }
-    }, [isError, error]);
 
     if (isFetching) {
         return (
@@ -107,11 +88,11 @@ const Update = () => {
 
     const caption = searching
     ? <BarLoader className="!block !w-full !bg-transparent mt-3" color="hsl(var(--foreground))"/>
-    : `Letzte Überprüfung: ${last_check}`
+    : t("settings_update.last_checked", { last_check: new Date(last_check).toLocaleString(i18n.language) });
     
     return (
         <SettingsFormPageWrapper
-            onSubmit={on_submit}
+            onSubmit={onSubmit}
             form={form}
         >
             <NavigationEntry
@@ -124,7 +105,7 @@ const Update = () => {
                                 size="sm"
                                 disabled={is_downloading}
                             >
-                                <span>Update herunterladen</span>
+                                <span>{ts("download_btn")}</span>
                             </DownloadUpdate>
                         ) : (
                             <CheckUpdate
@@ -132,20 +113,20 @@ const Update = () => {
                                 size="sm"
                                 disabled={searching}
                             >
-                                <span>Nach Update suchen</span>
+                                <span>{ts("search_update")}</span>
                             </CheckUpdate>
                         )
                 }
                 icon={<RefreshCw/>}
                 caption={caption}
             >
-                {update_available ? "Update verfügbar" : "Sie haben die neuste Version"}
+                {update_available ? ts("available_title") : ts("latest_title")}
             </NavigationEntry>
             {is_downloading && (
                 <NavigationEntry
                     caption={<UpdaterProgress className="h-2 mt-2"/>}
                 >
-                    {version}
+                    {t("settings_update.version", { version: version })}
                 </NavigationEntry>
             )}
             {os_type === "linux" && (
@@ -159,15 +140,15 @@ const Update = () => {
                                 icon={<RotateCcw/>}
                                 rightElement={
                                     <Switch
-                                        aria-label="Appneustart nach Update aktivieren oder deaktivieren"
+                                        aria-label={ts("relaunch_aria")}
                                         checked={value}
                                         onCheckedChange={onChange}
                                         {...props}
                                     />
                                 }
-                                caption="Nach der Installation des Updates wird die App neugestartet"
+                                caption={ts("relaunch_description")}
                             >
-                                Neustart nach Update
+                                {ts("relaunch_title")}
                             </SettingsFormElement>
                         )}
                     />
@@ -182,20 +163,20 @@ const Update = () => {
                         icon={<Search/>}
                         rightElement={
                             <Switch
-                                aria-label="Automatische Updatesuche beim Appstart"
+                                aria-label={ts("autosearch_aria")}
                                 checked={value}
                                 onCheckedChange={onChange}
                                 {...props}
                             />
                         }
-                        caption="Beim Start der App automatisch nach Updates suchen"
+                        caption={ts("autosearch_description")}
                     >
-                        Automatische Updatesuche
+                        {ts("autosearch_title")}
                     </SettingsFormElement>
                 )}
             />
         </SettingsFormPageWrapper>
     );
-}
+};
 
 export default Update;

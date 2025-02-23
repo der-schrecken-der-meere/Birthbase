@@ -1,0 +1,92 @@
+{
+    "home": {
+        "person_full_name": "{{first_name}} {{last_name}}",
+        "turns": "turns {{new_age}} - {{date}}",
+        "empty": "You have no birthdays"
+    },
+    "my_birthdays": {
+        "last_name": "Last name...",
+        "actions": "Actions",
+        "copy_as_message": "Copy birthday as message",
+        "copy_message_zero": "{{firstname}} {{lastname}} ({{date}}) turned {{age}} today",
+        "copy_message_one": "{{firstname}} {{lastname}} ({{date}}) will be {{age}} in one day",
+        "copy_message_other": "{{firstname}} {{lastname}} ({{date}}) will be {{age}} in {{until}} days",
+        "date": "Date",
+        "lastname": "Last name",
+        "firstname": "First name",
+        "age": "Age",
+        "until": "Until",
+        "other": "Other"
+    },
+    "notifications": {
+        "all": "All",
+        "birthday_one": "Birthday",
+        "birthday_other": "Birthdays",
+        
+        "reminder_other": "Reminder",
+        "info_one": "Info",
+        "info_other": "Infos",
+        "mark_read": "Mark as read",
+        "empty": "You have no notifications"
+    },
+    "settings_appearance": {
+        "mode_title": "Mode",
+        "mode_placeholder": "Mode",
+        "mode_required_error": "Please select a mode",
+        "mode_description": "Changes the mode",
+        "color_title": "Color",
+        "color_placeholder": "Color",
+        "color_required_error": "Please select a color",
+        "color_description": "Changes the color"
+    },
+    "settings_notifications": {
+        "notification_title": "Notifications",
+        "notification_description": "Allows the app to send messages to the system",
+        "notification_hint_description": "This permission can only be changed via the browser.",
+        "notification_hint_part_1": "Press the info or settings button at the top left next to the URL and set the permissions",
+        "notification_hint_part_2": "If no button is visible, you must press the button on the right",
+        "notification_aria": "Toggle Notifications",
+        "reminder_title": "Reminder",
+        "reminder_lower_error": "It has to be at least a day",
+        "reminder_higher_error": "It cannot be higher than 365 days",
+        "reminder_description": "When to be reminded of upcoming birthdays",
+        "reminder_input_description": "Remind me day/s before birthdays"
+    },
+    "settings_storage": {
+        "storage_description": "{{usage}}/{{quotas}} used",
+        "empty_storage": "Empty storage"
+    },
+    "settings_language": {
+        "language_title": "Language",
+        "language_required_error": "Please select a language",
+        "language_description": "Display language of the app"
+    },
+    "settings_info": {
+        "app_version_title": "App version",
+        "app_version_description": "Current version",
+        "tauri_version_title": "Tauri version",
+        "tauri_version_description": "Current version"
+    },
+    "settings_app": {
+        "autostart_title": "Autostart",
+        "autostart_description": "Opens the app automaticly after the start of the system",
+        "autostart_aria": "Toggle autostart"
+    },
+    "settings_update": {
+        "available_title": "Update available",
+        "latest_title": "You have the latest version",
+        "download_btn": "Download update",
+        "search_update": "Check for updates",
+        "relaunch_title": "Relaunch after Update",
+        "relaunch_description": "After installing the update, restart the app",
+        "relaunch_aria": "Toggle app relaunch after installing update",
+        "autosearch_title": "Check for Updates automaticly",
+        "autosearch_description": "Automatically check for updates after starting the app",
+        "autosearch_aria": "Toggle checking for Updates after starting the app",
+        "last_checked": "Last check: {{last_check}}",
+        "version": "Version: {{version}}"
+    },
+    "not_found": {
+        "return": "Press <BackToHome>here</BackToHome> to return to the home page."
+    }
+}

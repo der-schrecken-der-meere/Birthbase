@@ -2,7 +2,7 @@ import { useCallback, useMemo, useRef } from 'react'
 
 // React Date
 import { format } from "date-fns";
-import { de } from "date-fns/locale";
+import { de, enGB } from "date-fns/locale";
 
 // React Forms
 import {
@@ -36,62 +36,82 @@ import { Checkbox } from '../ui/checkbox';
 import { Birthday, getDefaultBirthday } from '@/database/tables/birthday/birthdays';
 
 // Hooks
-// import { useDeleteBirthdays } from '@/components/hooks/useDeleteBirthday';
-
-// Queries
-import { add_birthday_query, upd_birthday_query } from '@/features/manage_birthdays/query';
+import { use_birthday_mutation } from '@/hooks/use_birthday_mutation';
+import { BirthdayFormMode, use_birthday_form } from '@/hooks/use_birthday_form';
 
 // Util functions
-import { useDeleteBirthdays } from '@/hooks/useDeleteBirthday';
 import { cn } from '@/lib/utils';
 import { format_date_to_iso_midnight } from '@/lib/intl/date';
-import { create_toast, ToastType } from '@/hooks/use_app_toast';
-import { BirthdayFormMode, use_birthday_form } from '@/hooks/use_birthday_form';
 import { CalendarDays } from 'lucide-react';
 import { PulseLoader } from 'react-spinners';
+import { useTranslation } from 'react-i18next';
 
 type FormMethod = "create"|"update"|"delete"|"read";
 
 const BirthdayForm = () => {
+
+    const { t, i18n } = useTranslation(["birthday_form", "generally", "toast_msg"]);
+
     const formSchema = useMemo(() => {
         return z.object({
             id: z.number(),
             firstname: z.string({
-                required_error: "Vorname muss gefüllt sein",
-                invalid_type_error: "Vorname muss ein String sein",
+                required_error: t("first_name_required_error"),
+                invalid_type_error: t("first_name_type_error"),
             })
-            .min(3, {
-                message: "Vorname muss mindestens 3 Buchstaben haben",
+            .min(1, {
+                message: t("first_name_required_error"),
             }),
             lastname: z.string({
-                required_error: "Nachname muss gefüllt sein",
-                invalid_type_error: "Nachname muss ein String sein",
+                required_error: t("last_name_required_error"),
+                invalid_type_error: t("last_name_type_error"),
             }),
             date: z.coerce.date({
-                message: "Falsches Datumsformat",
+                message: t("date_format_error"),
             }),
             marked: z.coerce.boolean(),
         });
-    }, []);
+    }, [t]);
 
     type T_Form = z.infer<typeof formSchema>
+
+    const date_picker_lang = useMemo(() => {
+        switch (i18n.language) {
+            case "de":
+                return de;
+            case "en":
+                return enGB;
+        }
+    }, [t]);
 
     const set_open = use_birthday_form((state) => state.set_open);
     const set_operation = use_birthday_form((state) => state.set_operation);
     const operation = use_birthday_form((state) => state.operation);
     const birthday = use_birthday_form((state) => state.birthday);
 
-    const { mutate: add } = add_birthday_query();
-
     const methodRef = useRef<FormMethod>("create");
 
-    const { deleteBirthday } = useDeleteBirthdays({
-        onSuccess: () => {
-            set_open(false);
+    const {
+        add_birthday,
+        update_birthday,
+        delete_birthday,
+    } = use_birthday_mutation({
+        add: {
+            onSuccess: () => {
+                set_open(false);
+            }
+        },
+        remove: {
+            onSuccess: () => {
+                set_open(false);
+            }
+        },
+        update: {
+            onSuccess: () => {
+                set_open(false);
+            }
         }
-    })
-
-    const { mutate: update } = upd_birthday_query();
+    });
 
     const form = useForm<T_Form>({
         resolver: zodResolver(formSchema),
@@ -128,7 +148,7 @@ const BirthdayForm = () => {
         if (operation === BirthdayFormMode.CREATE) {
             return (
                 <SubmitButton isSubmitting={form.formState.isSubmitting} onClick={onAddClick}>
-                    Hinzufügen
+                    {t("add_btn", { ns: "generally" })}
                 </SubmitButton>
             );
         }
@@ -137,16 +157,16 @@ const BirthdayForm = () => {
                 {operation === BirthdayFormMode.READ
                     ?
                         <SubmitButton isSubmitting={form.formState.isSubmitting} onClick={onReadClick}>
-                            Bearbeiten
+                           {t("edit_btn", { ns: "generally" })}
                         </SubmitButton>
                     :
                         <SubmitButton isSubmitting={form.formState.isSubmitting} disabled={!form.formState.isDirty} onClick={onUpdateClick}>
-                            Ändern
+                            {t("change_btn", { ns: "generally" })}
                         </SubmitButton>
                 }
                 
                 <SubmitButton isSubmitting={form.formState.isSubmitting} onClick={onDeleteClick} variant="destructive" className='ml-auto'>
-                    Löschen
+                    {t("delete_btn", { ns: "generally" })}
                 </SubmitButton>
             </>
         );
@@ -169,43 +189,13 @@ const BirthdayForm = () => {
             
             switch (methodRef.current) {
                 case "create":
-                    add(newObj, {
-                        onSuccess: () => {
-                            create_toast({
-                                title: "Erfolgreich",
-                                description: "Der Geburstag wurde gespeichert",
-                                duration: 3_000,
-                            }, ToastType.SUCCESS);
-                            set_open(false);
-                        },
-                        onError: (error) => {
-                            create_toast({
-                                title: "Fehler beim Speichern des Geburtstages",
-                                description: JSON.stringify(error),
-                                duration: 7_500,
-                            }, ToastType.ERROR);
-                        }
-                    });
+                    add_birthday(newObj);
                     break;
                 case "delete":
-                    deleteBirthday(newObj);
+                    delete_birthday(newObj);
                     break;
                 case "update":
-                    update(newObj, {
-                        onSuccess: () => {
-                            create_toast({
-                                title: "Erfolgreich",
-                                description: "Der Geburtstag wurde geändert",
-                            }, ToastType.SUCCESS);
-                            set_open(false);
-                        },
-                        onError: (error) => {
-                            create_toast({
-                                title: "Fehler beim Ändern des Geburtstages",
-                                description: JSON.stringify(error),
-                            }, ToastType.ERROR);
-                        },
-                    })
+                    update_birthday(newObj);
                 break;
                 default:
                     break;
@@ -227,12 +217,12 @@ const BirthdayForm = () => {
                         name="firstname"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>Vorname</FormLabel>
+                                <FormLabel>{t("first_name_title")}</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Max" className='text-sm' {...field}/>
+                                    <Input placeholder={t("first_name_placeholder")} className='text-sm' {...field}/>
                                 </FormControl>
                                 <FormDescription>
-                                    Der Vorname der Person
+                                    {t("first_name_description")}
                                 </FormDescription>
                                 <FormMessage/>
                             </FormItem>
@@ -243,12 +233,12 @@ const BirthdayForm = () => {
                         name="lastname"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>Nachname</FormLabel>
+                                <FormLabel>{t("last_name_title")}</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Mustermann" className='text-sm' {...field}/>
+                                    <Input placeholder={t("last_name_placeholder")} className='text-sm' {...field}/>
                                 </FormControl>
                                 <FormDescription>
-                                    Der Nachname der Person
+                                    {t("last_name_description")}
                                 </FormDescription>
                                 <FormMessage/>
                             </FormItem>
@@ -259,7 +249,7 @@ const BirthdayForm = () => {
                         name="date"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>Datum</FormLabel>
+                                <FormLabel>{t("date_title")}</FormLabel>
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         <FormControl>
@@ -271,7 +261,7 @@ const BirthdayForm = () => {
                                                 {field.value ? (
                                                     format(field.value, "dd-MM-yyyy")
                                                 ) : (
-                                                    <span>Datum auswählen</span>
+                                                    <span>{t("date_placeholder")}</span>
                                                 )}
                                                 <CalendarDays className='ml-1 h-4 w-4 opacity-50' />
                                             </Button>
@@ -279,7 +269,7 @@ const BirthdayForm = () => {
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0" align="start" >
                                         <Calendar
-                                            locale={de}
+                                            locale={date_picker_lang}
 
                                             // timeZone={timezone}
 
@@ -304,7 +294,7 @@ const BirthdayForm = () => {
                                     </PopoverContent>
                                 </Popover>
                                 <FormDescription>
-                                    Das Datum des Geburtstages
+                                    {t("date_description")}
                                 </FormDescription>
                                 <FormMessage/>
                             </FormItem>

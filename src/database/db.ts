@@ -117,6 +117,11 @@ class DexieDB extends Dexie implements Birthbase {
                 settings.auto_search = true;
             });
         });
+        this.version(11).upgrade(async trans => {
+            return trans.table(TABLES.SETTINGS).toCollection().modify((settings: Settings) => {
+                settings.language = "en";
+            });
+        });
     }
     add<K extends keyof Birthbase, T extends getInsert<K>>(table: K, record: Omit<T, "id">): Promise<T>;
     add<K extends keyof Birthbase, T extends getInsert<K>>(table: K, record: Omit<T, "id">[]): Promise<T[]>;

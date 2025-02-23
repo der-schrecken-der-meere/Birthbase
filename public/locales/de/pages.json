@@ -1,0 +1,92 @@
+{
+    "home": {
+
+        "turns": "wird {{new_age}} - {{date}}",
+        "empty": "Sie haben keine Geburtstage"
+    },
+    "my_birthdays": {
+        "last_name": "Nachname...",
+        "actions": "Aktionen",
+        "copy_as_message": "Geburtstage als Nachricht kopieren",
+        "copy_message_zero": "{{firstname}} {{lastname}} ({{data}}) ist heute {{age}} geworden",
+        "copy_message_one": "{{firstname}} {{lastname}} ({{date}}) wird in einem Tag {{age}}",
+        "copy_message_other": "{{firstname}} {{lastname}} ({{date}}) wird in {{until}} Tagen {{age}}",
+        "date": "Datum",
+        "lastname": "Nachname",
+        "firstname": "Vorname",
+        "age": "Alter",
+        "until": "Tage bis",
+        "other": "Sonstiges"
+    },
+    "notifications": {
+        "all": "Alle",
+        "birthday_one": "Geburtstag",
+        "birthday_other": "Geburtstage",
+        "reminder_one": "Erinnerung",
+        "reminder_other": "Erinnerungen",
+
+
+        "mark_read": "Als gelesen markieren",
+        "empty": "Sie haben keine Benachrichtigungen"
+    },
+    "settings_appearance": {
+        "mode_title": "Modus",
+        "mode_placeholder": "Modus",
+        "mode_required_error": "Bitte einen Modus auswählen",
+        "mode_description": "Ändert den Modus",
+        "color_title": "Farbe",
+        "color_placeholder": "Farbe",
+        "color_required_error": "Bitte eine Farbe auswählen",
+        "color_description": "Ändert die Farbe"
+    },
+    "settings_notifications": {
+        "notification_title": "Benachrichtigungen",
+        "notification_description": "Erlaubt der App Nachrichten an das System zu senden",
+        "notification_hint_description": "Diese Berechtigung kann nur über den Browser geändert werden.",
+        "notification_hint_part_1": "Drücken Sie links oben neben der URL den Info- oder Einstellungsbutton und setzen Sie die Berechtigung",
+        "notification_hint_part_2": "Ist kein Button zu sehen, müssen Sie den Button auf der rechten Seite drücken",
+        "notification_aria": "Benachrichtigungen ein- oder ausschalten",
+        "reminder_title": "Erinnerung",
+        "reminder_lower_error": "Es muss mindestens ein Tag sein",
+        "reminder_higher_error": "Es darf nicht höher als 365 Tage sein",
+        "reminder_description": "Wann Sie vor bevorstehende Geburtstagen erinnert werden",
+        "reminder_input_description": "Tag/e vor Geburtstage erinnern"
+    },
+    "settings_storage": {
+        "storage_description": "{{usage}}/{{quotas}} benutzt",
+        "empty_storage": "Speicher leeren"
+    },
+    "settings_language": {
+        "language_title": "Sprache",
+        "language_required_error": "Bitte wählen Sie eine Sprache aus",
+        "language_description": "Anzeigesprache der App"
+    },
+    "settings_info": {
+        "app_version_title": "App-Version",
+        "app_version_description": "Aktuelle Version",
+        "tauri_version_title": "Tauri-Version",
+        "tauri_version_description": "Aktuelle Version"
+    },
+    "settings_app": {
+
+        "autostart_description": "Öffnet die App automatisch nach dem Start des Systems",
+        "autostart_aria": "Autostart ein- oder ausschalten"
+    },
+    "settings_update": {
+        "available_title": "Update verfügbar",
+        "latest_title": "Sie haben die neuste Version",
+        "download_btn": "Update herunterladen",
+        "search_update": "Nach Updates suchen",
+        "relaunch_title": "Neustart nach Update",
+        "relaunch_description": "Nach der Installation des Updates die App neustarten",
+        "relaunch_aria": "Appneustart nach Update aktivieren oder deaktivieren",
+        "autosearch_title": "Automatische Updatesuche",
+        "autosearch_description": "Beim Start der App automatisch nach Updates suchen",
+        "autosearch_aria": "Automatische Updatesuche beim Appstart",
+        "last_checked": "Letzte Überprüfung: {{last_check}}"
+
+    },
+    "not_found": {
+        "return": "<BackToHome>Hier</BackToHome> drücken, um zum Hauptmenü zurück zu kehren."
+    }
+}

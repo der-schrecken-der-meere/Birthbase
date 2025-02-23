@@ -1,0 +1,29 @@
+{
+    "current_month": "Dieser Monat",
+    "current_day": "Heute",
+    "day_one": "Tag",
+    "day_other": "Tage",
+    "create_btn": "Erstellen",
+    "edit_btn": "Bearbeiten",
+    "delete_btn": "Löschen",
+    "change_btn": "Ändern",
+    "save_btn": "Speichern",
+    "add_btn": "Hinzufügen",
+    "success": "Erfolgreich",
+    "error": "Fehler",
+    "cancel": "Abbrechen",
+    "continue": "Fortfahren",
+    "colors": {
+        "purple": "Lila",
+        "blue": "Blau",
+        "green": "Grün",
+
+        "red": "Rot",
+        "gray": "Grau"
+    },
+    "modes": {
+        "dark": "Dunkel",
+        "light": "Hell"
+
+    }
+}

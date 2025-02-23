@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
+import { useTranslation } from "react-i18next"
 
 type DataTableViewOptionsProps<TData> = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "children"> & {
   table: Table<TData>
@@ -21,6 +22,8 @@ export default function DataTableViewOptions<TData>({
   className,
   ...props
 }: DataTableViewOptionsProps<TData>) {
+  const { t } = useTranslation("table");
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -31,11 +34,11 @@ export default function DataTableViewOptions<TData>({
           {...props}
         >
           <SlidersHorizontal className="mr-2 h-4 w-4" />
-          Ansicht
+          {t("view")}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[150px]">
-        <DropdownMenuLabel>Spalten anzeigen</DropdownMenuLabel>
+        <DropdownMenuLabel>{t("show_columns")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table
           .getAllColumns()
@@ -51,7 +54,8 @@ export default function DataTableViewOptions<TData>({
                 checked={column.getIsVisible()}
                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
               >
-                {column.id}
+                {/* @ts-ignore */}
+                {t(column.columnDef.meta?.key, { ns: column.columnDef.meta?.ns })}
               </DropdownMenuCheckboxItem>
             )
           })}

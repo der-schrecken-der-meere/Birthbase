@@ -14,13 +14,15 @@ import { ISOMidnightFullTZ } from '@/lib/types/date';
 import { PartyPopper } from 'lucide-react';
 import { calc_days_until_next_birthday, calcAge } from '@/lib/functions/birthdays/calculations';
 import { format_date_to_iso_midnight } from '@/lib/intl/date';
+import { useTranslation } from 'react-i18next';
+import { i18n, TFunction } from 'i18next';
 
 const Home = () => {
 
     update_navbar({
-        docTitle: "Birthbase - Startseite",
-        "pageTitle": "Startseite",
-        breadcrumbDisplay: []
+        docTitle: 'main.home',
+        pageTitle: 'main.home',
+        breadcrumbDisplay: [],
     });
 
     return (
@@ -31,19 +33,22 @@ const Home = () => {
 };
 
 const BirthdayList = () => {
+
+    const { t, i18n } = useTranslation(["pages", "generally"]);
+
     const { data, isError, error, isFetching } = get_birthdays_query();
 
     useEffect(() => {
         if (isError) {
             create_toast({
-                title: "Fehler beim Anzeigen der Geburtstage",
+                title: t("toast.errors.show_birthdays"),
                 description: JSON.stringify(error),
             }, ToastType.ERROR);
         }
     }, [isError, error]);
 
-    const groupBirthdays = useCallback((birthdays: Birthday[]) => {
-        return birthdaysToGroups(birthdays, (birthday) => birthday.date, "de", "Dieser Monat");
+    const groupBirthdays = useCallback((birthdays: Birthday[], t: TFunction<[string], undefined>, i18n: i18n) => {
+        return birthdaysToGroups(birthdays, (birthday) => birthday.date, i18n.language, t("current_month", { "ns": "generally" }));
     }, []);
 
     const onRowClick = useCallback((data: Birthday) => {
@@ -58,9 +63,18 @@ const BirthdayList = () => {
         );
     }
 
+    if (data.length === 0) {
+        return (
+            <div className='flex flex-col gap-2 items-center justify-center h-full text-center text-muted-foreground text-sm'>
+                <PartyPopper className='w-20 h-20'/>
+                <span>{t("home.empty")}</span>
+            </div>
+        );
+    }
+
     return (
         <ScrollArea className='h-full'>
-            {groupBirthdays(data).map((month, index) => (
+            {groupBirthdays(data, t, i18n).map((month, index) => (
                 <Fragment key={`${month.month}-${index}`}>
                     <MonthDivider className='bg-muted/80 text-muted-foreground text-sm my-2'>
                         {month.month}
@@ -73,7 +87,10 @@ const BirthdayList = () => {
                             date={birthday.date}
                             onClick={() => onRowClick(birthday)}
                         >
-                            {`${birthday.name.first} ${birthday.name.last}`}
+                            {t("home.person_full_name", {
+                                first_name: birthday.name.first,
+                                last_name: birthday.name.last
+                            })}
                         </BirthdayEntry>
                     ))}
                 </Fragment>
@@ -111,15 +128,15 @@ const BirthdayEntry = ({
     date: ISOMidnightFullTZ,
 }) => {
 
-    let days_badge: ReactNode = <PartyPopper/>;
+    const { t } = useTranslation(["pages", "generally"]);
 
-    const info_str = `wird ${age + 1} - ${format(new Date(date), "dd.MM")}`;
+    let days_badge: ReactNode = <PartyPopper/>;
 
     if (until !== 0) {
         days_badge = (
             <>
                 <span className='text-lg'>{until}</span>
-                <span className='text-xs'>{until === 1 ? "Tag" : "Tage"}</span>
+                <span className='text-xs'>{t("day", { count: until, ns: "generally" })}</span>
             </>
         );
     }
@@ -131,7 +148,7 @@ const BirthdayEntry = ({
                     {children}
                 </div>
                 <div className="flex flex-nowrap items-center gap-1 mt-auto text-sm text-muted-foreground">
-                    {info_str}
+                    {t("home.turns", { new_age: age + 1, date: format(new Date(date), "dd.MM") })}
                 </div>
             </div>
             <div className="flex flex-col justify-center items-center ml-auto">

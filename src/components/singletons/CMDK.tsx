@@ -25,11 +25,14 @@ import { ScrollArea } from "../ui/scroll-area";
 
 import { primitive_strict_or } from "@/lib/functions/logic/or";
 import { PageLinks } from "@/globals/constants/links";
-import { main_links, settings_links } from "@/globals/constants/nav_entries";
+import { use_nav_entries } from "@/hooks/use_nav_entries";
 
 const CMDK = () => {
 
     const [open, setOpen] = useState(false);
+
+    const main_links = use_nav_entries((state) => state.main_links);
+    const settings_links = use_nav_entries((state) => state.settings_links);
 
     const onClick = () => {
         setOpen(false);
@@ -53,8 +56,8 @@ const CMDK = () => {
             <CommandList className="overflow-hidden">
                 <ScrollArea className="h-[300px]">
                     <CommandEmpty>Keine Übereinstimmungen gefunden.</CommandEmpty>
-                    <CommandGroup heading="Links">
-                        {main_links.map((link) => (
+                    <CommandGroup heading={main_links.title}>
+                        {main_links.entries.map((link) => (
                             <SearchEntry
                                 key={link.url}
                                 to={link.url}
@@ -67,8 +70,8 @@ const CMDK = () => {
                         ))}
                     </CommandGroup>
                     <CommandSeparator />
-                    <CommandGroup heading="Einstellungen">
-                        {settings_links.map((link) => (
+                    <CommandGroup heading={settings_links.title}>
+                        {settings_links.entries.map((link) => (
                             <SearchEntry
                                 key={link.url}
                                 to={link.url}
@@ -112,7 +115,7 @@ type SearchEntryProps = {
     onClick: () => void,
     Icon: FunctionComponent<{ className: string }>,
     title: string,
-    hidden?: string[],
+    hidden?: string,
     shortcut?: string,
 };
 
@@ -133,7 +136,7 @@ const SearchEntry = ({
                 <Icon className="mr-2 h-4 w-4" />
                 <span>
                     {title}
-                    {(hidden && hidden.length > 0) && <span className="hidden">{hidden.join(", ")}</span>}
+                    {hidden && <span className="hidden">{hidden}</span>}
                 </span>
                 {shortcut && <CommandShortcut>{shortcut}</CommandShortcut>}
             </Link>

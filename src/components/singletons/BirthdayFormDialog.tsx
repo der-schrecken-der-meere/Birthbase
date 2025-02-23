@@ -4,6 +4,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import { Skeleton } from "../ui/skeleton";
 import BirthdayForm from "../forms/BirthdayForm";
 import { BirthdayFormMode, use_birthday_form } from "@/hooks/use_birthday_form";
+import { useTranslation } from "react-i18next";
 
 const BirthdayFormDialog = () => {
 
@@ -11,20 +12,18 @@ const BirthdayFormDialog = () => {
     const operation = use_birthday_form((state) => state.operation);
     const set_open = use_birthday_form((state) => state.set_open);
 
+    const { t } = useTranslation(["dialog"]);
+
     const DialogTitleString = useMemo(() => {
         return operation === BirthdayFormMode.CREATE
-            ? "Geburtstag erstellen"
-            : "Geburtstag ändern oder löschen";
+            ? t("birthday_form.create_title")
+            : t("birthday_form.change_title");
     }, [operation]);
 
     const DialogDescriptionString = useMemo(() => {
         return operation === BirthdayFormMode.CREATE
-            ? "Erstellen Sie einen neuen Geburtstag." + 
-                " Dieser wird nach dem erfolgreichen Erstellen auf der Startseite " +
-                " oder unter \"Meine Geburtstage\" angezeigt."
-            : "Bearbeiten oder Löschen Sie den ausgewählten Geburtstag." +
-                " Die neuen Daten werden nach dem erfolgreichen Aktualisieren oder Löschen auf der Startseite " +
-                " oder unter \"Meine Geburtstage\" angezeigt.";
+            ? t("birthday_form.create_description")
+            : t("birthday_form.change_description");
     }, [operation]) 
 
     return (

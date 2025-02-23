@@ -1,0 +1,29 @@
+{
+    "current_month": "This Month",
+    "current_day": "Today",
+    "day_one": "day",
+    "day_other": "days",
+    "create_btn": "Create",
+    "edit_btn": "Edit",
+    "delete_btn": "Delete",
+    "change_btn": "Change",
+    "save_btn": "Save",
+    "add_btn": "Add",
+    "success": "Success",
+    "error": "Error",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "colors": {
+        "purple": "Purple",
+        "blue": "Blue",
+        "green": "Green",
+        "orange": "Orange",
+        "red": "Red",
+        "gray": "Gray"
+    },
+    "modes": {
+        "dark": "Dark",
+        "light": "Light",
+        "system": "System"
+    }
+}

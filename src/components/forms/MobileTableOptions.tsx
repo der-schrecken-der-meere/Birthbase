@@ -10,6 +10,7 @@ import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 
 import { RowsPerPageSelect } from "../util/table_blueprint/Pagination/RowsPerPage";
+import { useTranslation } from "react-i18next";
 
 const ROWS_PER_PAGE = [5, 10, 20, 30, 40, 50];
 
@@ -17,6 +18,10 @@ const formSchema = z.object({
     columns: z.array(z.object({
         columnName: z.string(),
         visibility: z.boolean(),
+        meta: z.object({
+            ns: z.string(),
+            key: z.string(),
+        })
     })),
     rowsPerPage: z.coerce.number(),
 });
@@ -46,6 +51,7 @@ const MobileTableOptionsForm = <TData extends RowData>({
             columns: canHideColumns.map((column) => ({
                 columnName: column.id,
                 visibility: column.getIsVisible(),
+                meta: column.columnDef.meta,
             })),
         }
     });
@@ -60,6 +66,8 @@ const MobileTableOptionsForm = <TData extends RowData>({
         }
     }
 
+    const { t } = useTranslation(["table", "generally"]);
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -69,7 +77,7 @@ const MobileTableOptionsForm = <TData extends RowData>({
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>
-                                Spalten
+                                {t("columns")}
                             </FormLabel>
                             <FormControl>
                                 <div className="flex flex-col gap-2">
@@ -78,7 +86,7 @@ const MobileTableOptionsForm = <TData extends RowData>({
                                         key={column.columnName}
                                         value={column.visibility}
                                         id={column.columnName}
-                                        columnName={column.columnName}
+                                        columnName={t(column.meta.key, { ns: column.meta.ns })}
                                         onCheckedChange={(value) => {
                                             const newArray = [...field.value];
                                             newArray[index].visibility = value;
@@ -89,7 +97,7 @@ const MobileTableOptionsForm = <TData extends RowData>({
                                 </div>
                             </FormControl>
                             <FormDescription>
-                                Spalten, die verborgen werden können
+                                {t("columns_description")}
                             </FormDescription>
                         </FormItem>
                     )}
@@ -100,7 +108,7 @@ const MobileTableOptionsForm = <TData extends RowData>({
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>
-                                Zeilen pro Seite
+                                {t("rows_per_page")}
                             </FormLabel>
                             <FormControl>
                                 <RowsPerPageSelect
@@ -111,13 +119,13 @@ const MobileTableOptionsForm = <TData extends RowData>({
                                 />
                             </FormControl>
                             <FormDescription>
-                                Die maximale Anzahl an Zeilen pro Seite
+                                {t("rows_per_page_description")}
                             </FormDescription>
                         </FormItem>
                     )}
                 />
                 <Button disabled={form.formState.isSubmitting || !form.formState.isDirty} type="submit" variant="outline">
-                    Speichern
+                    {t("save_btn", { ns: "generally" })}
                 </Button>
             </form>
         </Form>

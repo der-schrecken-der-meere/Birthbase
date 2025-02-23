@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/select"
 import { RowData, Table } from "@tanstack/react-table"
 import { SelectProps } from "@radix-ui/react-select"
+import { useTranslation } from "react-i18next"
 
 type RowsPerPageProps<TData> = React.HTMLAttributes<HTMLDivElement> & {
     table: Table<TData>,
@@ -20,9 +21,11 @@ const RowsPerPage = <TData,>({
     className,
     ...props
 }: RowsPerPageProps<TData>) => {
+    const { t } = useTranslation(["table"]);
+
     return (
         <div className={cn("flex items-center space-x-2", className)} {...props}>
-            <p className="text-sm font-medium">Zeilen pro Seite</p>
+            <p className="text-sm font-medium">{t("rows_per_page")}</p>
             <Select
                 value={`${table.getState().pagination.pageSize}`}
                 onValueChange={(value) => {

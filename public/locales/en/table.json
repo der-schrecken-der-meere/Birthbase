@@ -1,0 +1,22 @@
+{
+    "view": "View",
+    "show_columns": "Show columns",
+    "current_page": "Page {{current}} of {{max}}",
+    "to_first": "Go to first page",
+    "to_previous": "Go to previous page",
+    "to_next": "Go to next page",
+    "to_last": "Go to last page",
+    "rows_per_page": "Rows per page",
+    "rows_selected_one": "{{selected}} of {{max}} line selected",
+    "rows_selected_other": "{{selected}} of {{max}} lines selected",
+    "empty": "No data found",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "hide": "Hide",
+    "reset": "Reset",
+    "options_title": "Table options",
+    "options_description": "Here you can change the view or parameters of the table",
+    "columns": "Columns",
+    "columns_description": "Columns that can be hidden",
+    "rows_per_page_description": "The maximum number of lines per page"
+}

@@ -64,15 +64,18 @@ import {
 import {
     cn
 } from '@/lib/utils';
-import { main_links, settings_links } from '@/globals/constants/nav_entries';
 import { PageLinks } from '@/globals/constants/links';
 import { ButtonProps } from 'react-day-picker';
+import { use_nav_entries } from '@/hooks/use_nav_entries';
 
 const AppSidebar = () => {
 
     const onClick = useCallback(() => {
         document.dispatchEvent(new KeyboardEvent("keydown", { key: "f", ctrlKey: true }));
     }, []);
+
+    const main_links = use_nav_entries((state) => state.main_links);
+    const settings_links = use_nav_entries((state) => state.settings_links);
 
     const { isMobile } = useSidebar();
 
@@ -110,10 +113,10 @@ const AppSidebar = () => {
                 // className='overflow-hidden'
             >
                 <SidebarGroup>
-                    <SidebarGroupLabel>Hauptmenü</SidebarGroupLabel>
+                    <SidebarGroupLabel>{main_links.title}</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {main_links.map((link) => {
+                            {main_links.entries.map((link) => {
                                 const props: SidebarEntryProps & {key: Key} = {
                                     key: link.url,
                                     url: link.url,
@@ -130,10 +133,10 @@ const AppSidebar = () => {
                     </SidebarGroupContent>
                 </SidebarGroup>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Einstellungen</SidebarGroupLabel>
+                    <SidebarGroupLabel>{settings_links.title}</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {settings_links.map((link) => (
+                            {settings_links.entries.map((link) => (
                                 <SidebarEntry
                                     key={link.url}
                                     url={link.url}

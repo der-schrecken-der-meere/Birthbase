@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import { Button, ButtonProps } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { open_birthday_form_create } from "@/hooks/use_birthday_form";
+import { useTranslation } from "react-i18next";
 
 const BasicAddBirthdayButton = ({
     children,
@@ -26,13 +27,16 @@ const BasicAddBirthdayButton = ({
 const AddBirthdayButton = ({
     ...props
 }: ButtonProps) => {
+
+    const { t } = useTranslation(["generally"]);
+
     return (
         <BasicAddBirthdayButton
             size="sm"
             variant="secondary"
             {...props}
         >
-            <span className="ml-1">Erstellen</span>
+            <span className="ml-1">{t("create_btn")}</span>
         </BasicAddBirthdayButton>
     );
 }

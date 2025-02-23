@@ -8,12 +8,13 @@ import { format_number_to_relative_time } from "@/lib/intl/date";
 import { get_relative_time_string } from "@/lib/functions/date/relative_time";
 import { cn } from "@/lib/utils";
 import { BellRing, Eye, Info, LucideProps, Mailbox, PartyPopper, Trash2 } from "lucide-react";
-import { ForwardRefExoticComponent, useCallback, useEffect, useMemo, useState, } from "react";
+import { ForwardRefExoticComponent, useCallback, useEffect, useMemo, useState } from "react";
 import { NotificationType } from "@/features/notify/notify";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PopoverTriggerProps } from "@radix-ui/react-popover";
 import { create_toast, ToastType } from "@/hooks/use_app_toast";
 import { update_navbar } from "@/hooks/use_app_navbar";
+import { useTranslation } from "react-i18next";
 
 type FilterButtonProps = {
     onClick: () => void;
@@ -45,15 +46,20 @@ const FilterButton = ({
 
 const Notifications = () => {
 
+    const { t } = useTranslation(["pages", "navigation", "toast"]);
+    const ts = useCallback((key: string) => {
+        return t(`notifications.${key}`);
+    }, [t]);
+
     update_navbar({
-        docTitle: "Birthbase - Benachrichtigungen",
-        pageTitle: "Benachrichtigungen",
+        docTitle: "main.notifications",
+        pageTitle: "main.notifications",
         breadcrumbDisplay: [
             {
                 id: "menu",
                 type: [
                     {
-                        display: "Startseite",
+                        display: t("main.home", { ns: "navigation" }),
                         href: PageLinks.HOME,
                     }
                 ]
@@ -73,9 +79,10 @@ const Notifications = () => {
             notification,
             {
                 onError: (error) => {
+                    console.error(error);
                     create_toast({
-                        title: "Fehler beim Löschen der Benachrichtigung",
-                        description: JSON.stringify(error),
+                        title: t("error", { ns: "generally" }),
+                        description: t("errors.delete_notifications", { ns: "toast" }),
                     }, ToastType.ERROR);
                 },
             }
@@ -88,9 +95,10 @@ const Notifications = () => {
             new_notification,
             {
                 onError: (error) => {
+                    console.error(error);
                     create_toast({
-                        title: "Fehler beim Löschen der Benachrichtigung",
-                        description: JSON.stringify(error),
+                        title: t("error", { ns: "generally" }),
+                        description: t("errors.change_notifications", { ns: "toast" }),
                     }, ToastType.ERROR);
                 },
             }
@@ -100,7 +108,7 @@ const Notifications = () => {
     const filter_buttons = useMemo<FilterButtonProps[]>(() => [
         {
             active: true,
-            text: "Alle",
+            text: t("notifications.all"),
             onClick: () => {
                 setFilter(null);
                 setActive(0);
@@ -108,7 +116,7 @@ const Notifications = () => {
         },
         {
             active: false,
-            text: "Geburtstage",
+            text: t("notifications.birthday", { count: 2 }),
             onClick: () => {
                 setFilter(NotificationType.BIRTHDAY);
                 setActive(1);
@@ -116,7 +124,7 @@ const Notifications = () => {
         },
         {
             active: false,
-            text: "Erinnerungen",
+            text: t("notifications.reminder", { count: 2 }),
             onClick: () => {
                 setFilter(NotificationType.BIRTHDAY_REMINDER);
                 setActive(2);
@@ -124,19 +132,20 @@ const Notifications = () => {
         },
         {
             active: false,
-            text: "Infos",
+            text: t("notifications.info", { count: 2 }),
             onClick: () => {
                 setFilter(NotificationType.INFO);
                 setActive(3);
             },
         }
-    ], []);
+    ], [ts]);
 
     useEffect(() => {
         if (isError) {
+            console.error(error);
             create_toast({
-                title: "Fehler beim Anzeigen der Benachrichtigungen",
-                description: JSON.stringify(error),
+                title: t("error", { ns: "generally" }),
+                description:t("errors.show_notifications", { ns: "toast" }),
             }, ToastType.ERROR);
         }
     }, [isError, error]);
@@ -175,7 +184,7 @@ const Notifications = () => {
                     ? (
                         <div className="h-full flex flex-col justify-center items-center text-center margin-auto rounded-md text-muted-foreground text-sm">
                             <Mailbox className="w-20 h-20"/>
-                            Sie haben keine ungelesenen Benachrichtigungen
+                            {ts("empty")}
                         </div>
                     ) : (
                         <div className="space-y-4 w-full table table-fixed mr-2">
@@ -193,7 +202,6 @@ const Notifications = () => {
                         </div>
                     )
                 }
-                {/* <div className="h-[10000px]"></div> */}
             </ScrollArea>
         </>
     );
@@ -213,17 +221,17 @@ const get_notification_parts = (
         case NotificationType.BIRTHDAY:
             return {
                 Icon: PartyPopper,
-                title: "Geburtstag",
+                title: "birthday",
             };
         case NotificationType.BIRTHDAY_REMINDER:
             return {
                 Icon: BellRing,
-                title: "Erinngerung",
+                title: "reminder",
             };
         case NotificationType.INFO:
             return {
                 Icon: Info,
-                title: "Info",
+                title: "info",
             };
     }
 };
@@ -237,8 +245,10 @@ const NotificationMessage = ({
     notification,
     ...props
 }: NotificationMessageProps) => {
+    const { t, i18n } = useTranslation(["pages", "generally"]);
+
     const obj_time = get_relative_time_string(notification.timestamp, Date.now());
-    const str_time_pasted = format_number_to_relative_time("de", -obj_time.time, obj_time.unit);
+    const str_time_pasted = format_number_to_relative_time(i18n.language, -obj_time.time, obj_time.unit);
 
     const { Icon, title } = get_notification_parts(notification.type);
 
@@ -248,34 +258,15 @@ const NotificationMessage = ({
                 className={cn("w-full flex rounded-lg border-[1px] p-3 gap-4 bg-secondary items-stretch", notification.read && "text-muted-foreground bg-transparent", className)}
                 {...props}
             >
-                {/* Text */}
                 <Icon className="h-8 w-8 self-center shrink-0" />
                 <div className="w-full">
                     <div className="float-right w-40 h-5 text-right text-muted-foreground text-sm mr-2">{str_time_pasted}</div>
                     <div className="text-left text-current/80">
-                        <div className="font-bold">{title}</div>
+                        <div className="font-bold">{t(`notifications.${title}`, { count: 1 })}</div>
                         {children}
                     </div>
                     
                 </div>
-                {/* <ScrollArea className="w-full">
-                    
-                    <ScrollBar orientation="horizontal" />
-                </ScrollArea>
-                <div className="flex flex-col ml-auto gap-1 shrink-0"> */}
-                    
-                    {/* <div className="flex justify-end mt-auto">
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            className="text-destructive"
-                            onClick={() => onDelete(notification)}
-                        >
-                            <Trash2 className="w-4 h-4"/>
-                        </Button>
-                    </div> */}
-                    {/* <div className="text-right text-muted-foreground text-sm mr-2">29d</div> */}
-                {/* </div> */}
             </PopoverTrigger>
             <PopoverContent className="p-1 flex flex-col gap-1">
                 {!notification.read && (
@@ -285,7 +276,7 @@ const NotificationMessage = ({
                         variant="outline"
                     >
                         <Eye className="w-4 h-4 mr-2"/>
-                        Als gelesen markieren
+                        {t("notifications.mark_read")}
                     </Button>
                 )}
                 <Button
@@ -294,7 +285,7 @@ const NotificationMessage = ({
                     variant="outline"
                 >
                     <Trash2 className="w-4 h-4 mr-2"/>
-                    Löschen
+                    {t("delete_btn", { ns: "generally" })}
                 </Button>
             </PopoverContent>
         </Popover>
