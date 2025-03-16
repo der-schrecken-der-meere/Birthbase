@@ -1,20 +1,25 @@
-import { use_app_toast } from "@/hooks/use_app_toast";
-import { useToast } from "../ui/use-toast";
-import { Toaster } from "../ui/toaster";
 import { useEffect } from "react";
 
+import { Toaster } from "../ui/toaster";
+
+import { useToastStore } from "@/stores/use_toast_store";
+
+import { useToast } from "../ui/use-toast";
+
 const Toast = () => {
-    const toast_config = use_app_toast((state) => state.toast_config);
-    const toast_create = use_app_toast((state) => state.toast_create);
-    const unset_toast = use_app_toast((state) => state.unset_toast_create);
+
     const { toast } = useToast();
 
+    const toastConfig = useToastStore((state) => state.toastConfig);
+    const isCreated = useToastStore((state) => state.isCreated);
+    const setNotCreated = useToastStore((state) => state.setNotCreated);
+
     useEffect(() => {
-        if (toast_create) {
-            toast(toast_config);
-            unset_toast();
+        if (isCreated) {
+            setNotCreated();
+            toast(toastConfig);
         }
-    }, [toast_config]);
+    }, [toastConfig]);
 
     return (
         <Toaster/>

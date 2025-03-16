@@ -24,7 +24,7 @@ const calc_days_until_next_birthday = (birth_date: ISODateFullTZ, compare_date: 
  * @param birth_date - The birthdate
  * @param compare_date - The date to compare with
  */
-const calcAge = (birth_date: ISODateFullTZ, compare_date: ISODateFullTZ) => {
+const calcAge = (birth_date: number, compare_date: number) => {
     const obj_birth_date = new Date(birth_date);
     const obj_compare_date = new Date(compare_date);
     let age = obj_compare_date.getFullYear() - obj_birth_date.getFullYear();

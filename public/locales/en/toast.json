@@ -1,19 +1,56 @@
 {
     "errors": {
-        "show_birthdays": "Error occured while trying to display birthdays",
-        "save_birthday": "Error occured while trying to save the birthday",
-        "change_birthday": "Error occured while trying to change the birthday",
-        "delete_birthday": "Error occured while trying to delete the birthday",
-        "change_settings": "Error occured while trying to update the settings",
-        "show_settings": "Error occured while trying to display the settings",
-        "show_notifications": "Error occured while trying to display the notifications",
-        "change_notifications": "Error occured while trying to change the notifications",
-        "delete_notifications": "Error occured while trying to delete the notifications"
+        "show": {
+            "birthdays": "Error occured while trying to display birthdays",
+            "notifications": "Error occured while trying to display notifications",
+            "settings": "Error occured while trying to display settings"
+        },
+        "delete": {
+            "birthday": "Error occured while trying to delete the birthday",
+            "notification": "Error occured while trying to delete the notification",
+            "settings": "Error occured while trying to delete settings"
+        },
+        "update": {
+            "birthday": "Error occured while trying to update the birthday",
+            "notification": "Error occured while trying to update the notification",
+            "settings": "Error occured while trying to update settings"
+        },
+        "add": {
+            "birthday": "Error occured while trying to save the birthday",
+            "notification": "Error occured while trying to save the notification",
+            "settings": "Error occured while trying to save settings"
+        },
+        "install_update": {
+            "title": "Error occured while trying to install the update",
+            "description": "Possible reasons: no internet connection, server not reachable or an error occured while downloading the update"
+        },
+        "search_update": {
+            "title": "Error occured while trying to search for updates",
+            "description": "Possible reasons: no internet connection, server not reachable or an error occured while searching for updates"
+        },
+        "notify": {
+            "title": "Error occured while trying to send notifications",
+            "descriptions": {
+                "run": "The program encountered an unknown error",
+                "no_right": "The operating system refuses to send notifications"
+            }
+        }
     },
     "success": {
-        "save_birthday": "The birthday was saved successfully",
-        "change_birthday": "The birthday was changed successfully",
-        "delete_birthday": "The birthday was deleted successfully",
-        "change_settings": "The Settings were changed successfully"
+        "add": {
+            "birthday": "The birthday was saved successfully",
+            "notification": "The notification was saved successfully",
+            "settings": "Settings were saved successfully"
+        },
+        "update": {
+            "birthday": "The birthday was changed successfully",
+            "notification": "The notification was changed successfully",
+            "settings": "Settings were changed successfully"
+        },
+        "delete": {
+            "birthday": "The birthday was deleted successfully",
+            "notification": "The notification was deleted successfully",
+            "settings": "Settings were deleted successfully"
+        }
     }
 }

@@ -25,5 +25,7 @@
         "dark": "Dunkel",
         "light": "Hell"
 
-    }
+    },
+    "misc": "Sonstiges",
+    "close_app": "App schließen"
 }

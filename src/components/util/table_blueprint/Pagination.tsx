@@ -11,11 +11,11 @@ type DataTablePaginationProps<TData> = React.HTMLAttributes<HTMLDivElement> & {
   className?: string,
 }
 
-export default function DataTablePagination<TData>({
+const DataTablePagination = <TData,>({
   table,
   className,
   ...props
-}: DataTablePaginationProps<TData>) {
+}: DataTablePaginationProps<TData>) => {
   return (
     <div className={cn("flex items-center justify-between px-2", className)} {...props}>
       <SelectedRows
@@ -36,5 +36,7 @@ export default function DataTablePagination<TData>({
         />
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default DataTablePagination;

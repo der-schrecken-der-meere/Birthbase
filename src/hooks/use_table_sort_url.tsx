@@ -39,7 +39,7 @@ const useTableSortURL = <TData extends RowData>(
     return {
         columns: props.columns,
         defaultSorting
-    }
+    };
 };
 
 export { useTableSortURL };

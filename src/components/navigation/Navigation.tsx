@@ -1,10 +1,14 @@
-import { HTMLAttributes } from 'react';
-import { cn } from '@/lib/utils';
-import { get_notifications_query } from '@/features/latest_notifications/query';
-import { useSidebar } from '../ui/sidebar';
-import { MobileUpperNavbar } from './MobileNavigation';
+import { type HTMLAttributes } from 'react';
+
 import { DesktopUpperNavbar } from './DesktopNavigation';
-import { use_app_navbar } from '@/hooks/use_app_navbar';
+import { MobileUpperNavbar } from './MobileNavigation';
+
+import { useNavbarStore } from '@/stores/use_navbar_store';
+
+import { useGetNotificationsQuery } from '@/features/latest_notifications/query';
+import { useSidebar } from '../ui/sidebar';
+
+import { cn } from '@/lib/utils';
 
 type UpperNavbarProps = {
     pageTitle: string,
@@ -15,13 +19,12 @@ const UpperNavbar = ({
     className,
     ...props
 } : HTMLAttributes<HTMLDivElement>) => {
-
-    const page_title = use_app_navbar((state) => state.page_title);
-    const bread_crumbs = use_app_navbar((state) => state.bread_crumbs);
+    
+    const pageTitle = useNavbarStore((state) => state.pageTitle);
+    const breadCrumbs = useNavbarStore((state) => state.breadCrumbs);
 
     const { isMobile } = useSidebar();
-
-    const { data: notification_data } = get_notifications_query();
+    const { data: { not_read } } = useGetNotificationsQuery();
 
     return (
         <div
@@ -31,20 +34,20 @@ const UpperNavbar = ({
             {isMobile
                 ? (
                     <MobileUpperNavbar
-                        pageTitle={page_title}
-                        notifications={notification_data.not_read}
+                        pageTitle={pageTitle}
+                        notifications={not_read}
                     />
                 )
                 : (
                     <DesktopUpperNavbar
-                        pageTitle={page_title}
-                        notifications={notification_data.not_read}
-                        breadcrumbs={bread_crumbs}
+                        pageTitle={pageTitle}
+                        notifications={not_read}
+                        breadcrumbs={breadCrumbs}
                     />
                 )
             }
         </div>
-    )
+    );
 };
 
 export type { UpperNavbarProps };

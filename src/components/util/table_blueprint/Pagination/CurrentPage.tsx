@@ -21,7 +21,7 @@ const CurrentPage = <TData,>({
         <div className={cn("flex w-[100px] items-center justify-center text-sm font-medium", className)} {...props}>
             {t("current_page", { current, max: max === 0 ? max + 1 : max })}
         </div>
-    )
+    );
 };
 
 export default CurrentPage;

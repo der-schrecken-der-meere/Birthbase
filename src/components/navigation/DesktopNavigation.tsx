@@ -1,4 +1,8 @@
-import { CSSProperties, Fragment, useCallback } from "react";
+import type { BreadcrumbDisplayProps, BreadcrumbProps } from "@/stores/use_navbar_store";
+import type { UpperNavbarProps } from "./Navigation";
+
+import { type CSSProperties, Fragment } from "react";
+
 import { GoBackInHistory } from "../History";
 import { Breadcrumb, BreadcrumbEllipsis, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "../ui/breadcrumb";
 import { Link, NavLink } from "react-router-dom";
@@ -6,10 +10,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { AddBirthdayButton } from "../AddBirthdayButton";
 import { Button } from "../ui/button";
-import { PageLinks } from "@/globals/constants/links";
 import { Bell } from "lucide-react";
-import { UpperNavbarProps } from "./Navigation";
-import { BreadcrumbDisplayProps, BreadcrumbProps } from "@/hooks/use_app_navbar";
+
+import { PageLinks } from "@/globals/constants/links";
 
 const BreadcrumbListItem = ({
     type,
@@ -26,7 +29,6 @@ const BreadcrumbListItem = ({
             :   <DropdownMenu>
                     <DropdownMenuTrigger className='flex items-center gap-1'>
                         <BreadcrumbEllipsis className='h-4 w-4' />
-                        <span className='sr-only'>Menü auf- und zuklappen</span>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='start'>
                         {type.map((breadcrumb) => (
@@ -51,7 +53,7 @@ const DesktopUpperNavbar = ({
     notifications,
 }: UpperMobileNavbarProps) => {
 
-    const renderBreadcrumbs = useCallback((breadcrumbs?: BreadcrumbDisplayProps[]) => {
+    const renderBreadcrumbs = (breadcrumbs?: BreadcrumbDisplayProps[]) => {
         if (!breadcrumbs) return null;
         return breadcrumbs.map((breadcrumb) => (
             <Fragment key={breadcrumb.id}>
@@ -61,7 +63,7 @@ const DesktopUpperNavbar = ({
                 <BreadcrumbSeparator />
             </Fragment>
         ))
-    }, []);
+    };
 
     return (
         <>

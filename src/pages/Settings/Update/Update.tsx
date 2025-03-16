@@ -1,83 +1,76 @@
-import { use_settings_breadcrumbs } from "@/components/layouts/SettingsLayout";
-import { NavigationEntry, SettingsFormElement, SettingsFormPageWrapper } from "../Settings";
-import { use_update_store } from "@/hooks/use_update_store";
-import { RefreshCw, RotateCcw, Search } from "lucide-react";
+import { type Settings } from "@/database/tables/settings/settings";
+
 import { CheckUpdate, DownloadUpdate, UpdaterProgress } from "@/components/updater/Updater";
-import { Separator } from "@/components/ui/separator";
-import { BarLoader } from "react-spinners";
-import { update_navbar } from "@/hooks/use_app_navbar";
-import { use_app_store } from "@/hooks/use_app_store";
+import { NavigationEntry, SettingsFormElement, SettingsFormPageWrapper } from "../Settings";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCallback, useMemo } from "react";
-import { z } from "zod";
-import { Settings } from "@/database/tables/settings/settings";
-import { obj_is_empty } from "@/lib/functions/object/empty";
+import { Separator } from "@/components/ui/separator";
 import { FormField } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
+import { BarLoader } from "react-spinners";
+import { RefreshCw, RotateCcw, Search } from "lucide-react";
+
+import { useUpdateStore } from "@/stores/use_update_store";
+
+import { useSettingsBreadcrumbs } from "@/components/layouts/SettingsLayout";
+import { useNavbar } from "@/hooks/core/use_navbar";
+import { useSettingsForm } from "@/hooks/use_settings_form";
 import { useTranslation } from "react-i18next";
-import { use_settings_form } from "@/hooks/use_settings_form";
-import { isTauri } from "@tauri-apps/api/core";
-import { primitive_strict_or } from "@/lib/functions/logic/or";
-import { OsType } from "@tauri-apps/plugin-os";
+
+import { z } from "zod";
+import { obj_is_empty } from "@/lib/functions/object/empty";
+import { OnlyTauri } from "@/components/OnlyTauri";
 
 const Update = () => {
+    const { breadcrumbs } = useSettingsBreadcrumbs();
 
-    const { t, i18n } = useTranslation(["pages"]);
-    const { breadcrumbs } = use_settings_breadcrumbs();
-
-    const ts = useCallback((key: string) => {
-        return t(`settings_update.${key}`);
-    }, [t]);
-
-    const formSchema = useMemo(() => z.object({
-        relaunch: z.coerce.boolean(),
-        auto_search: z.coerce.boolean(),
-    }), [ts]);
-
-    const type = use_app_store((state) => state.os_type);
-
-    update_navbar({
+    useNavbar({
         pageTitle: "settings.update",
         breadcrumbDisplay: breadcrumbs,
     });
 
-    if (!isTauri()) {
-        return (
-            null
-        );
-    }
+    return (
+        <OnlyTauri osTypes={["linux", "windows", "macos"]}>
+            <UpdateForm/>
+        </OnlyTauri>
+    );
+};
 
-    if (!primitive_strict_or<OsType>(type, "linux", "linux", "windows")) {
-        return (
-            null
-        );
-    }
+const UpdateForm = () => {
 
-    const update_available = use_update_store((state) => state.available);
-    const last_check = use_update_store((state) => state.last_check);
-    const is_downloading = use_update_store((state) => state.started);
-    const searching = use_update_store((state) => state.searching);
-    const version = use_update_store((state) => state.version);
-    const os_type = use_app_store((state) => state.os_type);
+    const isAvailable = useUpdateStore((state) => state.isAvailable);
+    const lastCheck = useUpdateStore((state) => state.lastCheck);
+    const isDownloading = useUpdateStore((state) => state.isDownloading);
+    const isSearching = useUpdateStore((state) => state.isSearching);
+    const version = useUpdateStore((state) => state.version);
 
-    const { form, isFetching, onSubmit, data } = use_settings_form({
+    const { t, i18n } = useTranslation(["pages"]);
+    const ts = (key: string) => {
+        return t(`settings_update.${key}`);
+    };
+
+    const formSchema = z.object({
+        relaunch: z.coerce.boolean(),
+        auto_search: z.coerce.boolean(),
+    });
+    
+    const { form, isFetching, onSubmit, data } = useSettingsForm({
         form_schema: formSchema,
         on_submit: (data) => {
             const new_settings: Partial<Settings> = {};
-
+            
             if (form.formState.dirtyFields.auto_search) {
                 new_settings.auto_search = data.auto_search;
             }
             if (form.formState.dirtyFields.relaunch) {
                 new_settings.relaunch = data.relaunch;
             }
-
+            
             if (!obj_is_empty(new_settings)) {
                 return new_settings;
             }
         }
     });
-
+    
     if (isFetching) {
         return (
             <>
@@ -86,10 +79,10 @@ const Update = () => {
         );
     }
 
-    const caption = searching
-    ? <BarLoader className="!block !w-full !bg-transparent mt-3" color="hsl(var(--foreground))"/>
-    : t("settings_update.last_checked", { last_check: new Date(last_check).toLocaleString(i18n.language) });
-    
+    const caption = isSearching
+    ? <BarLoader className="!block !w-full !bg-transparent my-2 h-5" color="hsl(var(--foreground))"/>
+    : t("settings_update.last_checked", { last_check: new Date(lastCheck).toLocaleString(i18n.language) });
+
     return (
         <SettingsFormPageWrapper
             onSubmit={onSubmit}
@@ -97,13 +90,13 @@ const Update = () => {
         >
             <NavigationEntry
                 rightElement={
-                    update_available
+                    isAvailable
                         ? (
                             <DownloadUpdate
                                 relaunch={data.relaunch}
                                 variant="secondary"
                                 size="sm"
-                                disabled={is_downloading}
+                                disabled={isDownloading}
                             >
                                 <span>{ts("download_btn")}</span>
                             </DownloadUpdate>
@@ -111,7 +104,7 @@ const Update = () => {
                             <CheckUpdate
                                 variant="secondary"
                                 size="sm"
-                                disabled={searching}
+                                disabled={isSearching}
                             >
                                 <span>{ts("search_update")}</span>
                             </CheckUpdate>
@@ -120,40 +113,38 @@ const Update = () => {
                 icon={<RefreshCw/>}
                 caption={caption}
             >
-                {update_available ? ts("available_title") : ts("latest_title")}
+                {isAvailable ? ts("available_title") : ts("latest_title")}
             </NavigationEntry>
-            {is_downloading && (
+            {isDownloading && (
                 <NavigationEntry
                     caption={<UpdaterProgress className="h-2 mt-2"/>}
                 >
                     {t("settings_update.version", { version: version })}
                 </NavigationEntry>
             )}
-            {os_type === "linux" && (
-                <>
-                    <Separator/>
-                    <FormField
-                        control={form.control}
-                        name="relaunch"
-                        render={({ field: { onChange, value, ...props } }) => (
-                            <SettingsFormElement
-                                icon={<RotateCcw/>}
-                                rightElement={
-                                    <Switch
-                                        aria-label={ts("relaunch_aria")}
-                                        checked={value}
-                                        onCheckedChange={onChange}
-                                        {...props}
-                                    />
-                                }
-                                caption={ts("relaunch_description")}
-                            >
-                                {ts("relaunch_title")}
-                            </SettingsFormElement>
-                        )}
-                    />
-                </>
-            )}
+            <OnlyTauri osTypes={["linux"]} >
+                <Separator/>
+                <FormField
+                    control={form.control}
+                    name="relaunch"
+                    render={({ field: { onChange, value, ...props } }) => (
+                        <SettingsFormElement
+                            icon={<RotateCcw/>}
+                            rightElement={
+                                <Switch
+                                    aria-label={ts("relaunch_aria")}
+                                    checked={value}
+                                    onCheckedChange={onChange}
+                                    {...props}
+                                />
+                            }
+                            caption={ts("relaunch_description")}
+                        >
+                            {ts("relaunch_title")}
+                        </SettingsFormElement>
+                    )}
+                />
+            </OnlyTauri>
             <Separator/>
             <FormField
                 control={form.control}

@@ -1,19 +1,56 @@
 {
     "errors": {
-        "show_birthdays": "Fehler beim Anzeigen der Geburtstage",
-        "save_birthday": "Fehler beim Speichern des Geburtstages",
-        "change_birthday": "Fehler beim Ändern des Geburtstages",
-        "delete_birthday": "Fehler beim Löschen des Geburtstages",
-        "change_settings": "Fehler beim Speichern der Einstellungen",
-        "show_settings": "Fehler beim Anzeigen der Einstellungen",
-        "show_notifications": "Fehler beim Anzeigen der Benachrichtigungen",
-        "change_notifications": "Fehler beim Ändern der Benachrichtigungen",
-        "delete_notifications": "Fehler beim Löschen der Benachrichtigungen"
+        "show": {
+            "birthdays": "Fehler beim Anzeigen der Geburtstage",
+            "notifications": "Fehler beim Anzeigen der Benachrichtigungen",
+            "settings": "Fehler beim Anzeigen der Einstellungen"
+        },
+        "delete": {
+            "birthday": "Fehler beim Löschen des Geburtstages",
+            "notification": "Fehler beim Löschen der Benachrichtigung",
+            "settings": "Fehler beim Löschen der Einstellungen"
+        },
+        "update": {
+            "birthday": "Fehler beim Ändern des Geburtstages",
+            "notification": "Fehler beim Ändern der Benachrichtigungen",
+            "settings": "Fehler beim Ändern der Einstellungen"
+        },
+        "add": {
+            "birthday": "Fehler beim Speichern des Geburtstages",
+            "notification": "Fehler beim Speichern der Benachrichtigung",
+            "settings": "Fehler beim Speichern der Einstellungen"
+        },
+        "install_update": {
+            "title": "Fehler beim installieren des Updates",
+            "description": "Mögliche Ursachen: keine Internetverbindung, Server nicht erreichbar oder ein Fehler beim Herunterladen des Updates"
+        },
+        "search_update": {
+            "title": "Fehler beim Suchen nach Updates",
+            "description": "Mögliche Ursachen: keine Internetverbindung, Server nicht erreichbar oder ein Fehler beim Suchen nach Updates"
+        },
+        "notify": {
+            "title": "Fehler beim Benachrichtigen",
+            "descriptions": {
+                "run": "Das Programm ist auf einen unbekannten Fehler gestoßen",
+                "no_right": "Das Betriebssystem verweigert das Senden von Benachrichtigungen"
+            }
+        }
     },
     "success": {
-        "save_birthday": "Der Geburtstag wurde erfolgreich gespeichert",
-        "change_birthday": "Der Geburtstag wurde erfolgreich geändert",
-        "delete_birthday": "Der Geburtstag wurde erfolgreich gelöscht",
-        "change_settings": "Die Einstellungen wurde erfolgreich geändert"
+        "add": {
+            "birthday": "Der Geburtstag wurde erfolgreich gespeichert",
+            "notification": "Die Benachrichtigung wurde erfolgreich gespeichert",
+            "settings": "Die Einstellungen wurden erfolgreich gespeichert"
+        },
+        "update": {
+            "birthday": "Der Geburtstag wurde erfolgreich geändert",
+            "notification": "Die Benachrichtigung wurde erfolgreich geändert",
+            "settings": "Die Einstellungen wurden erfolgreich geändert"
+        },
+        "delete": {
+            "birthday": "Der Geburtstag wurde erfolgreich gelöscht",
+            "notification": "Die Benachrichtigung wurdee erfolgreich gelöscht",
+            "settings": "Die Einstellungen wurden erfolgreich gelöscht"
+        }
     }
 }

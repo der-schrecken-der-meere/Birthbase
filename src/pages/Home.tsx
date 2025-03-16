@@ -1,25 +1,30 @@
-import { Fragment, HTMLAttributes, ReactNode, useCallback, useEffect } from 'react';
-import { Birthday } from '@/database/tables/birthday/birthdays';
-// import Table from '../components/tables/birthdaysSoon/Table';
-import { get_birthdays_query } from '@/features/manage_birthdays/query';
+import type { HTMLAttributes, ReactNode } from 'react';
+import type { Birthday } from '@/database/tables/birthday/birthdays';
+import type { MidnightTimestamp } from '@/lib/types/date';
+import type { TFunction } from 'i18next';
+
+import { Fragment } from 'react';
+
 import { Skeleton } from '../components/ui/skeleton';
-import { create_toast, ToastType } from '@/hooks/use_app_toast';
-import { update_navbar } from '@/hooks/use_app_navbar';
-import { birthdaysToGroups } from '@/lib/functions/birthdays/sorting';
-import { open_birthday_form_read } from '@/hooks/use_birthday_form';
-import { cn } from '@/lib/utils';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { format } from 'date-fns';
-import { ISOMidnightFullTZ } from '@/lib/types/date';
 import { PartyPopper } from 'lucide-react';
-import { calc_days_until_next_birthday, calcAge } from '@/lib/functions/birthdays/calculations';
-import { format_date_to_iso_midnight } from '@/lib/intl/date';
+import { ScrollArea } from '@/components/ui/scroll-area';
+
+import { useBirthdayFormStore } from '@/stores/use_birthday_form_store';
+
+import { useGetBirthdaysQuery } from '@/features/manage_birthdays/query';
 import { useTranslation } from 'react-i18next';
-import { i18n, TFunction } from 'i18next';
+import { useNavbar } from '@/hooks/core/use_navbar';
+import { useQuery } from '@/hooks/core/use_query';
+
+import { birthdaysToGroups } from '@/lib/functions/birthdays/sorting';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import { i18n } from 'i18next';
+import { calculate_age, calculate_days_until_next_birthday } from '@/lib/functions/birthday';
 
 const Home = () => {
 
-    update_navbar({
+    useNavbar({
         docTitle: 'main.home',
         pageTitle: 'main.home',
         breadcrumbDisplay: [],
@@ -34,26 +39,22 @@ const Home = () => {
 
 const BirthdayList = () => {
 
+    const setReadMode = useBirthdayFormStore((state) => state.setReadMode);
+
     const { t, i18n } = useTranslation(["pages", "generally"]);
 
-    const { data, isError, error, isFetching } = get_birthdays_query();
+    const { data, isFetching } = useQuery({
+        tKey: "birthdays",
+        useQueryFn: useGetBirthdaysQuery,
+    });
 
-    useEffect(() => {
-        if (isError) {
-            create_toast({
-                title: t("toast.errors.show_birthdays"),
-                description: JSON.stringify(error),
-            }, ToastType.ERROR);
-        }
-    }, [isError, error]);
+    const groupBirthdays = (birthdays: Birthday[], t: TFunction<[string], undefined>, i18n: i18n) => {
+        return birthdaysToGroups(birthdays, (birthday) => birthday.timestamp, i18n.language, t("current_month", { "ns": "generally" }));
+    };
 
-    const groupBirthdays = useCallback((birthdays: Birthday[], t: TFunction<[string], undefined>, i18n: i18n) => {
-        return birthdaysToGroups(birthdays, (birthday) => birthday.date, i18n.language, t("current_month", { "ns": "generally" }));
-    }, []);
-
-    const onRowClick = useCallback((data: Birthday) => {
-        open_birthday_form_read(data);
-    }, []);
+    const onRowClick = (data: Birthday) => {
+        setReadMode(data);
+    };
 
     if (isFetching) {
         return (
@@ -82,9 +83,9 @@ const BirthdayList = () => {
                     {month.birthdays.map((birthday) => (
                         <BirthdayEntry
                             key={birthday.id}
-                            age={calcAge(birthday.date, format_date_to_iso_midnight("de", "Europe/Berlin", new Date()))}
-                            until={calc_days_until_next_birthday(birthday.date, format_date_to_iso_midnight("de", "Europe/Berlin", new Date()))}
-                            date={birthday.date}
+                            age={calculate_age(birthday.timestamp)}
+                            until={calculate_days_until_next_birthday(birthday.timestamp)}
+                            date={birthday.timestamp}
                             onClick={() => onRowClick(birthday)}
                         >
                             {t("home.person_full_name", {
@@ -96,10 +97,6 @@ const BirthdayList = () => {
                 </Fragment>
             ))}
         </ScrollArea>
-        // <Table
-        //     data={data as Birthday[]}
-        //     className="flex-1"
-        // />
     );
 };
 
@@ -125,7 +122,7 @@ const BirthdayEntry = ({
 }: HTMLAttributes<HTMLDivElement> & {
     age: number,
     until: number,
-    date: ISOMidnightFullTZ,
+    date: MidnightTimestamp,
 }) => {
 
     const { t } = useTranslation(["pages", "generally"]);

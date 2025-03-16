@@ -1,14 +1,18 @@
-import { CSSProperties, FunctionComponent, HTMLAttributes, ReactNode, useMemo } from "react";
+import type { CSSProperties, FunctionComponent, HTMLAttributes, ReactNode } from "react";
+import type { UpperNavbarProps } from "./Navigation";
+
 import { GoBackInHistory } from "../History";
 import { CustomSidebarTrigger } from "../Sidebar";
-import { UpperNavbarProps } from "./Navigation";
+import { LinkProps, NavLink } from "react-router-dom";
+import { MobileAddBirthdayButton } from "../AddBirthdayButton";
+
+import { type LinkEntry, useNavEntriesStore } from "@/stores/use_nav_entries_store";
+
+import { useGetNotificationsQuery } from "@/features/latest_notifications/query";
+
 import { PageLinks } from "@/globals/constants/links";
 import { cn } from "@/lib/utils";
-import { MobileAddBirthdayButton } from "../AddBirthdayButton";
-import { LinkProps, NavLink } from "react-router-dom";
 import { buttonVariants } from "../ui/button";
-import { get_notifications_query } from "@/features/latest_notifications/query";
-import { LinkEntry, use_nav_entries } from "@/hooks/use_nav_entries";
 
 const MobileUpperNavbar = ({
     pageTitle,
@@ -27,7 +31,7 @@ const MobileUpperNavbar = ({
 };
 
 const find_link = (page_link: PageLinks) => {
-    const main_links = use_nav_entries.getState().main_links;
+    const main_links = useNavEntriesStore.getState().mainLinks;
     return main_links.entries.find((link) => link.url === page_link) as LinkEntry;
 };
 
@@ -39,7 +43,7 @@ const NotificationIcon = ({
     Icon
 }: NotificationIconProps) => {
 
-    const { data: notification_data } = get_notifications_query();
+    const { data: notification_data } = useGetNotificationsQuery();
 
     return (
         <div className="relative">
@@ -57,30 +61,27 @@ const MobileLowerNavbar = ({
     className,
     ...props
 }: HTMLAttributes<HTMLDivElement>) => {
-    const arr_nav_entries = useMemo(() => {
-        const entries: ((Omit<LinkEntry, "icon"> & { invisible?: boolean, icon: ReactNode })|null)[] = Array.from(
-            { length: 5 },
-            (_, i) => {
-                switch (i) {
-                    case 0:
-                        const home = find_link(PageLinks.HOME);
-                        return { ...home, ...{icon: <home.icon/>} }
-                    case 1:
-                        const birthdays = find_link(PageLinks.MY_BIRTHDAYS_PARAMS);
-                        return { ...birthdays, ...{icon: <birthdays.icon/>} }
-                    case 3:
-                        const notifications = find_link(PageLinks.NOTIFICATIONS);
-                        return { ...notifications, ...{icon: <NotificationIcon Icon={notifications.icon}/>} }
-                    case 4:
-                        const settings = find_link(PageLinks.SETTINGS);
-                        return { ...settings, ...{icon: <settings.icon/>} };
-                    default:
-                        return null;
-                }
+    const arr_nav_entries: ((Omit<LinkEntry, "icon"> & { invisible?: boolean, icon: ReactNode })|null)[] = Array.from(
+        { length: 5 },
+        (_, i) => {
+            switch (i) {
+                case 0:
+                    const home = find_link(PageLinks.HOME);
+                    return { ...home, ...{icon: <home.icon/>} }
+                case 1:
+                    const birthdays = find_link(PageLinks.MY_BIRTHDAYS_PARAMS);
+                    return { ...birthdays, ...{icon: <birthdays.icon/>} }
+                case 3:
+                    const notifications = find_link(PageLinks.NOTIFICATIONS);
+                    return { ...notifications, ...{icon: <NotificationIcon Icon={notifications.icon}/>} }
+                case 4:
+                    const settings = find_link(PageLinks.SETTINGS);
+                    return { ...settings, ...{icon: <settings.icon/>} };
+                default:
+                    return null;
             }
-        );
-        return entries;
-    }, []);
+        }
+    );
 
     return (
         <div className={cn("flex items-center justify-between", className)} {...props}>
@@ -99,7 +100,7 @@ const MobileLowerNavbar = ({
                 return <MobileAddBirthdayButton key={"addBirthday"} className="h-10"/>;
             })}
         </div>
-    )
+    );
 };
 
 const MobileNavbarLink = ({
@@ -118,7 +119,7 @@ const MobileNavbarLink = ({
         >
             {children}
         </NavLink>
-    )
+    );
 };
 
 export {

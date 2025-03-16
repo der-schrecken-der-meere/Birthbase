@@ -1,62 +1,29 @@
-import { calc_days_until_next_birthday, calcAge } from "@/lib/functions/birthdays/calculations";
-import { replace } from "@/lib/functions/string/replace";
-import { format_date_to_iso_midnight, format_date_to_short_str } from "@/lib/intl/date";
-import { ISOMidnightFullTZ } from "@/lib/types/date";
+import { NotificationGroupType } from "@/database/tables/notifications/notifications";
+import { add_worker_notifications, AddSignature, del_worker_notifications, DelSignature, upd_worker_notifications, UpdSignature } from "../communication/sender";
 
-type BirthdayItem = {
-    until: number,
-    age: number,
-    firstname: string,
-    lastname: string,
-    date: string, 
-};
-
-const create_birthday_item = (
-    locale: Intl.LocalesArgument,
-    timeZone: string,
-    firstname: string,
-    lastname: string,
-    date: ISOMidnightFullTZ,
-): BirthdayItem => {
-    const str_current_date = format_date_to_iso_midnight(locale, timeZone);
-    const age = calcAge(date, str_current_date);
-    const until = calc_days_until_next_birthday(date, str_current_date);
-
-    return {
-        age,
-        until,
-        firstname,
-        lastname,
-        date: format_date_to_short_str(locale, timeZone, new Date(date)),
-    };
-};
-
-const create_birthday_text = (
-    birthdayItem: BirthdayItem,
-    template_past: string,
-    template_present: string,
-    template_future: string,
+const add_worker_birthday_notifications: AddSignature<NotificationGroupType.BIRTHDAY> = (
+    key,
+    timestamp,
+    data,
 ) => {
-    let template = template_present;
-    if (birthdayItem.until > 0) {
-        template = template_future;
-        birthdayItem.age += 1;
-    } else if (birthdayItem.until < 0) {
-        template = template_past;
-    }
-    return replace(template,
-        birthdayItem.firstname,
-        birthdayItem.lastname,
-        birthdayItem.until,
-        birthdayItem.date,
-        birthdayItem.age,
-    );
+    add_worker_notifications(key, timestamp, NotificationGroupType.BIRTHDAY, data);
+};
+const del_worker_birthday_notifications: DelSignature = (
+    key,
+    timestamp,
+) => {
+    del_worker_notifications(key, timestamp, NotificationGroupType.BIRTHDAY);
+};
+const upd_worker_birthday_notifications: UpdSignature = (
+    key,
+    old_timestamp,
+    new_timestamp,
+) => {
+    upd_worker_notifications(key, old_timestamp, new_timestamp, NotificationGroupType.BIRTHDAY);
 };
 
-export type {
-    BirthdayItem,
-};
 export {
-    create_birthday_item,
-    create_birthday_text,
+    add_worker_birthday_notifications,
+    del_worker_birthday_notifications,
+    upd_worker_birthday_notifications,
 };

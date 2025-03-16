@@ -1,4 +1,13 @@
 {
+    "search": {
+        "no_results": "Keine Ergebnisse gefunden",
+        "placeholder": "Suche",
+        "title": "Suche"
+    },
+    "sidebar": {
+        "title": "Die Hauptnavigation",
+        "description": "Hier werden Navigationselemente gruppiert angezeigt"
+    },
     "main": {
         "title": "Hauptmenü",
         "home": "Startseite",

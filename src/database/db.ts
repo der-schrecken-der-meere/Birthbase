@@ -5,19 +5,17 @@ import type { Birthday } from "./tables/birthday/birthdays.ts";
 import type { Settings } from "./tables/settings/settings.ts";
 
 // import calcDaysUntilNextBirthday from "../lib/functions/birthdays/calcDaysUntilNextBirthday.ts";
-import { has_property } from "../lib/functions/object/hasProperty.ts";
-import { date_to_iso_with_tz } from "../lib/functions/date/timezone.ts";
-import { calc_days_until_next_birthday } from "@/lib/functions/birthdays/calculations.ts";
-import { ISODateFullTZ } from "@/lib/types/date.ts";
-import { Notification } from "./tables/notifications/notifications.ts";
-import { format_date_to_iso_midnight } from "@/lib/intl/date.ts";
+import { MidnightTimestamp } from "@/lib/types/date.ts";
+import { AppNotification } from "./tables/notifications/notifications.ts";
+import { calculate_days_until_next_birthday, unify_birthday } from "@/lib/functions/birthday.ts";
+import { midnight_utc } from "@/lib/functions/date.ts";
 
 type DexieTable<T extends {id: number}> = Dexie.Table<T, number>;
 
 interface Birthbase {
     birthdays: DexieTable<Birthday>;
     settings: DexieTable<Settings>;
-    notifications: DexieTable<Notification>;
+    notifications: DexieTable<AppNotification>;
 }
 
 type insertType<T> = T extends DexieTable<infer A> ? A : never;
@@ -40,7 +38,7 @@ type getSortedBirthdaysOptions = {
     /**
      * The date or ISOString which is used for comparison. Default value is the current date
      */
-    comparingDate?: Date|ISODateFullTZ,
+    comparingDate?: Date|MidnightTimestamp,
 }
 
 // Contants
@@ -63,65 +61,27 @@ const c_db_name = "BirthdayDB";
 class DexieDB extends Dexie implements Birthbase {
     birthdays!: Dexie.Table<Birthday, number>;
     settings!: Dexie.Table<Settings, number>;
-    notifications!: Dexie.Table<Notification, number>;
+    notifications!: Dexie.Table<AppNotification, number>;
 
     constructor() {
         super(c_db_name);
-        this.version(1).stores({
-            birthdays: "++id, name, date, marked",
-            settings: "id, mode, color, permission.notification, remember",
-        })
-        this.version(2).stores({
-            settings: null,
-        })
-        this.version(3).stores({
-            settings: "++id, mode, color, permission.notification, remember",
-        })
-        this.version(4).stores({
-            settings: "++id, mode, color, remember",
-        })
-        this.version(5).stores({
-            birthdays: "++id,name,date,marked,remember",
-        })
-        .upgrade(async trans => {
-            return trans.table(TABLES.BIRTHDAYS).toCollection().modify((birthday: Birthday) => {
-                birthday.remember = [];
-            });
-        })
-        this.version(6).stores({
-            birthdays: "++id,name,date,marked,remember",
-        })
-        .upgrade(async trans => {
-            return trans.table(TABLES.BIRTHDAYS).toCollection().modify((birthday: Birthday) => {
-                birthday.date = format_date_to_iso_midnight("de", "Europe/Berlin", new Date(birthday.date));
-            });
-        });
         this.version(7).stores({
-            settings: "++id,name,date,marked,remember,notification",
+            settings: "++id",
         })
-        .upgrade(async trans => {
-            return trans.table(TABLES.SETTINGS).toCollection().modify((settings: Settings) => {
-                settings.notification = false;
-            });
-        });
         this.version(8).stores({
             notifications: "++id,timestamp",
         });
-        this.version(9).upgrade(async trans => {
+        this.version(12).stores({
+            birthdays: "++id,timestamp",
+        }).upgrade(async trans => {
             return trans.table(TABLES.BIRTHDAYS).toCollection().modify((birthday: Birthday) => {
-                birthday.date = format_date_to_iso_midnight("de", "Europe/Berlin", new Date(birthday.date))
+                /** @ts-ignore */
+                const timestamp = midnight_utc(+new Date(birthday.date));
+                const { id, name: { first, last } } = birthday;
+                const new_birthday = { id, name: { first, last }, timestamp };
+                birthday = unify_birthday(new_birthday);
             });
-        });
-        this.version(10).upgrade(async trans => {
-            return trans.table(TABLES.SETTINGS).toCollection().modify((settings: Settings) => {
-                settings.auto_search = true;
-            });
-        });
-        this.version(11).upgrade(async trans => {
-            return trans.table(TABLES.SETTINGS).toCollection().modify((settings: Settings) => {
-                settings.language = "en";
-            });
-        });
+        })
     }
     add<K extends keyof Birthbase, T extends getInsert<K>>(table: K, record: Omit<T, "id">): Promise<T>;
     add<K extends keyof Birthbase, T extends getInsert<K>>(table: K, record: Omit<T, "id">[]): Promise<T[]>;
@@ -242,26 +202,12 @@ class DexieDB extends Dexie implements Birthbase {
         // days: number, maxBirthdays: number = 10
     ): Promise<Birthday[]> {
         return new Promise((resolve, reject) => {
-            const today = (() => {
-                if (options) {
-                    if (options.comparingDate) {
-                        if (typeof options.comparingDate === "string") return options.comparingDate;
-                        return date_to_iso_with_tz(options.comparingDate);
-                    } else {
-                        return date_to_iso_with_tz(new Date());
-                    }
-                }
-                return date_to_iso_with_tz(new Date());
-            })();
             this.transaction("r", this.birthdays, async () => {
                 let collection = this.birthdays.toCollection();
                 if (options) {
-                    if (has_property(options, "all")) {
-                        if (!options.all) collection = collection.filter((birthday) => !birthday.marked);
-                    }
                     if (options.maxDayDifference) {
                         collection = collection.filter((birthday) => {
-                            const difference = (calc_days_until_next_birthday(birthday.date, today));
+                            const difference = (calculate_days_until_next_birthday(birthday.timestamp));
                             return difference <= (options.maxDayDifference as number);
                         })
                     }
@@ -271,8 +217,8 @@ class DexieDB extends Dexie implements Birthbase {
                 }
                 const res = await collection.toArray();
                 return res.sort((a, b) => {
-                    const _a = calc_days_until_next_birthday(a.date, today);
-                    const _b = calc_days_until_next_birthday(b.date, today);
+                    const _a = calculate_days_until_next_birthday(a.timestamp);
+                    const _b = calculate_days_until_next_birthday(b.timestamp);
                     if (_a > _b) return 1;
                     if (_a < _b) return -1;
                     return 0;

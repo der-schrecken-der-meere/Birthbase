@@ -1,8 +1,9 @@
-import { createElement, FunctionComponent, Key, ReactNode, useCallback } from 'react';
-import { NavLink } from 'react-router-dom';
-import { get_notifications_query } from '@/features/latest_notifications/query';
+import { type ButtonProps } from 'react-day-picker';
 
-// Icons
+import { createElement, type FunctionComponent, type Key, type ReactNode } from 'react';
+
+import { NavLink } from 'react-router-dom';
+import { Logo } from './icons/Logo';
 import {
     ChevronUp,
     Ellipsis,
@@ -10,11 +11,6 @@ import {
     Power,
     Search,
 } from 'lucide-react';
-import {
-    Logo
-} from './icons/Logo';
-
-// Components
 import {
     Sidebar,
     SidebarContent,
@@ -45,48 +41,38 @@ import {
     DropdownMenuTrigger
 } from './ui/dropdown-menu';
 
-// Tauri
-import {
-    isTauri
-} from '@tauri-apps/api/core';
-import {
-    OsType,
-    type
-} from '@tauri-apps/plugin-os';
-import {
-    exit
-} from '@tauri-apps/plugin-process';
+import { useGetNotificationsQuery } from '@/features/latest_notifications/query';
+import { useNavEntriesStore } from '@/stores/use_nav_entries_store';
 
-// Lib
-import {
-    primitive_strict_or
-} from '@/lib/functions/logic/or';
-import {
-    cn
-} from '@/lib/utils';
+import { exit } from '@tauri-apps/plugin-process';
+import { cn } from '@/lib/utils';
 import { PageLinks } from '@/globals/constants/links';
-import { ButtonProps } from 'react-day-picker';
-import { use_nav_entries } from '@/hooks/use_nav_entries';
+import { useTranslation } from 'react-i18next';
+import { OnlyTauri } from './OnlyTauri';
 
 const AppSidebar = () => {
-
-    const onClick = useCallback(() => {
-        document.dispatchEvent(new KeyboardEvent("keydown", { key: "f", ctrlKey: true }));
-    }, []);
-
-    const main_links = use_nav_entries((state) => state.main_links);
-    const settings_links = use_nav_entries((state) => state.settings_links);
+    
+    const settingsLinks = useNavEntriesStore((state) => state.settingsLinks);
+    const mainLinks = useNavEntriesStore((state) => state.mainLinks);
 
     const { isMobile } = useSidebar();
+    const { data: notification_data } = useGetNotificationsQuery();
+    const { t } = useTranslation(["navigation", "generally"]);
 
-    const { data: notification_data } = get_notifications_query();
+    const onClick = () => {
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "f", ctrlKey: true }));
+    };
 
     return (
         <Sidebar collapsible="icon">
             {isMobile && (
                 <SheetHeader className='sr-only'>
-                    <SheetTitle>Die Hauptnavigation</SheetTitle>
-                    <SheetDescription>Hier werden Navigationselemente gruppiert angezeigt</SheetDescription>
+                    <SheetTitle>
+                        {t("sidebar.title")}
+                    </SheetTitle>
+                    <SheetDescription>
+                        {t("sidebar.description")}
+                    </SheetDescription>
                 </SheetHeader>
             )}
             <SidebarHeader>
@@ -109,14 +95,12 @@ const AppSidebar = () => {
                     )}
                 </SidebarMenu>
             </SidebarHeader>
-            <SidebarContent
-                // className='overflow-hidden'
-            >
+            <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>{main_links.title}</SidebarGroupLabel>
+                    <SidebarGroupLabel>{mainLinks.title}</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {main_links.entries.map((link) => {
+                            {mainLinks.entries.map((link) => {
                                 const props: SidebarEntryProps & {key: Key} = {
                                     key: link.url,
                                     url: link.url,
@@ -133,10 +117,10 @@ const AppSidebar = () => {
                     </SidebarGroupContent>
                 </SidebarGroup>
                 <SidebarGroup>
-                    <SidebarGroupLabel>{settings_links.title}</SidebarGroupLabel>
+                    <SidebarGroupLabel>{settingsLinks.title}</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {settings_links.entries.map((link) => (
+                            {settingsLinks.entries.map((link) => (
                                 <SidebarEntry
                                     key={link.url}
                                     url={link.url}
@@ -149,42 +133,39 @@ const AppSidebar = () => {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                {!isTauri()
-                    ? null
-                    : (
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <SidebarMenuButton>
-                                            <Ellipsis/> Sonstiges
-                                            <ChevronUp className='ml-auto' />
-                                        </SidebarMenuButton>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent
-                                        side="top"
-                                        className='w-(--radix-popper-anchor-width)'
-                                    >
-                                        {!primitive_strict_or<OsType>(type(), "linux", "linux", "windows")
-                                            ? null
-                                            : (
-                                                <DropdownMenuItem className='gap-2' onClick={() => (async () => {await exit(0)})()}>
-                                                    <Power className='h-4 w-4'/>
-                                                    <span>App schließen</span>
-                                                </DropdownMenuItem>
-                                            )
-                                        }
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                    )
-                }
+                <OnlyTauri osTypes={["linux", "windows", "android", "ios", "macos"]}>
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <SidebarMenuButton>
+                                        <Ellipsis/>
+                                        {t("misc", { ns: "generally" })}
+                                        <ChevronUp className='ml-auto' />
+                                    </SidebarMenuButton>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                    side="top"
+                                    className='w-(--radix-popper-anchor-width)'
+                                >
+                                    <OnlyTauri osTypes={["linux", "windows", "macos"]}>
+                                        <DropdownMenuItem className='gap-2' onClick={() => (async () => {await exit(0)})()}>
+                                            <Power className='h-4 w-4'/>
+                                            <span>
+                                                {t("close_app", { ns: "generally" })}
+                                            </span>
+                                        </DropdownMenuItem>
+                                    </OnlyTauri>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </OnlyTauri>
             </SidebarFooter>
             <SidebarRail/>
         </Sidebar>
-    )
-}
+    );
+};
 
 type SidebarEntryProps = {
     url: string,
@@ -218,29 +199,10 @@ const SidebarEntry = ({
             {/* </SidebarMenuButton> */}
         </SidebarMenuItem>
     );
-}
+};
 
 const CustomSidebarTrigger = (props: ButtonProps) => {
-    // const { toggleSidebar, open, isMobile } = useSidebar();
-
-    // if (!isMobile)
-    //     return (
-    //         <Button
-    //             variant="outline"
-    //             size="icon"
-    //             onClick={toggleSidebar}
-    //             // className={cn("absolute top-2/4 -translate-y-2/4 z-50 left-0")}
-    //             {...props}
-    //         >
-    //             {open
-    //                 ? <ChevronsLeft/>
-    //                 : <ChevronsRight/>
-    //             }
-    //         </Button>
-    //     );
-
-    // return (<SidebarTrigger className='absolute right-0 top-0 z-50'/>)
     return <SidebarTrigger {...props} Icon={Menu}/>
-}
+};
 
 export { AppSidebar, CustomSidebarTrigger };

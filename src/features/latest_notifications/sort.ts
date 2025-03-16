@@ -1,10 +1,10 @@
-import { Notification } from "@/database/tables/notifications/notifications";
+import { AppNotification } from "@/database/tables/notifications/notifications";
 import { add_sorted_array, del_sorted_array, upd_sorted_array } from "@/lib/functions/array/sort";
 
 /**
  * Sorts a array of notifications by timestamp
  */
-const get_sorted_notifications = (array: Notification[]) => {
+const get_sorted_notifications = (array: AppNotification[]) => {
     return array.sort((a, b) => {
         return b.timestamp - a.timestamp;
     });
@@ -13,7 +13,7 @@ const get_sorted_notifications = (array: Notification[]) => {
 /**
  * Adds a new notification to a sorted array
  */
-const add_sorted_notifications = (sortedArray: Notification[], notification: Notification) => {
+const add_sorted_notifications = (sortedArray: AppNotification[], notification: AppNotification) => {
     return add_sorted_array(sortedArray, notification, (v) => notification.timestamp >= v.timestamp);
 };
 
@@ -22,7 +22,7 @@ const add_sorted_notifications = (sortedArray: Notification[], notification: Not
  * 
  * Perhaps change the position of the updated notification in the sorted array
  */
-const upd_sorted_notifications = (sortedArray: Notification[], newNotification: Notification) => {
+const upd_sorted_notifications = (sortedArray: AppNotification[], newNotification: AppNotification) => {
     const oldNotificationIndex = sortedArray.findIndex((oldNotification) => oldNotification.id === newNotification.id);
     if (oldNotificationIndex === -1) {
         return add_sorted_notifications(sortedArray, newNotification);
@@ -38,7 +38,7 @@ const upd_sorted_notifications = (sortedArray: Notification[], newNotification: 
 /**
  * Deletes a notification in a sorted array
  */
-const del_sorted_notifications = (sortedArray: Notification[], notificationID: number) => {
+const del_sorted_notifications = (sortedArray: AppNotification[], notificationID: number) => {
     return del_sorted_array(sortedArray, (v) => v.id === notificationID);
 };
 

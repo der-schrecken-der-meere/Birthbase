@@ -1,26 +1,68 @@
-import { CoreRecord } from "@/database/db_types";
-import { NotificationType } from "@/features/notify/notify";
+import type { VersionNumber } from "@/lib/types/number";
+import type { CoreRecord } from "@/database/db_types";
 
-type NoIDNotification = {
-    text: string,
-    read: boolean,
-    timestamp: number,
-    type: NotificationType,
+enum NotificationGroupType {
+    BIRTHDAY,
+    BIRTHDAY_REMINDER,
+    INFO,
+};
+enum NotificationType {
+    BIRTHDAY,
+    BIRTHDAY_REMINDER,
+    UPDATE_AVAILABLE,
+    UPDATE_INSTALLED,
 };
 
-type PartialIDNotification = NoIDNotification & Partial<CoreRecord>;
 
-type Notification = CoreRecord & NoIDNotification;
 
-const get_default_notification = (): Notification => {
+type AppNotificationProps = {
+    group_type: NotificationGroupType.BIRTHDAY,
+    data: {
+        id: number
+    },
+} | {
+    group_type: NotificationGroupType.BIRTHDAY_REMINDER,
+    data: {
+        id: number
+    },
+} | {
+    group_type: NotificationGroupType.INFO,
+    data: {
+        type: NotificationType.UPDATE_AVAILABLE,
+        version: VersionNumber,
+    } | {
+        type: NotificationType.UPDATE_INSTALLED,
+        version: VersionNumber,
+    },
+};
+type AppNotification = AppNotificationProps & CoreRecord & {
+    /** Whether the notification is read */
+    read: boolean,
+    /** Whenn the notification will be triggered */
+    timestamp: number,
+};
+
+
+
+/**
+ * Creates a default app notification with default values
+ * @returns A new app notification
+ */
+const create_default_notification = (): AppNotification => {
     return {
         id: -1,
+        group_type: NotificationGroupType.BIRTHDAY,
         read: false,
-        text: "",
         timestamp: Date.now(),
-        type: NotificationType.BIRTHDAY,
-    };
+    } as AppNotification;
 };
 
-export type { Notification, PartialIDNotification, NoIDNotification };
-export { get_default_notification };
+export type {
+    AppNotification,
+    AppNotificationProps,
+};
+export {
+    NotificationType,
+    NotificationGroupType,
+    create_default_notification,
+};

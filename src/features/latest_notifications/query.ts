@@ -1,16 +1,15 @@
 import { get_notification_model, get_notifications_model } from "@/database/tables/notifications/db_model";
 import { add_sorted_notifications, del_sorted_notifications, get_sorted_notifications, upd_sorted_notifications } from "./sort";
 import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Notification } from "@/database/tables/notifications/notifications";
+import { AppNotification, AppNotificationProps, NotificationGroupType } from "@/database/tables/notifications/notifications";
 import { add_notification_middleware, clear_notification_middleware, del_notification_middleware, upd_notification_middleware } from "@/middleware/notification";
-import { NotificationType } from "../notify/notify";
 
 type NotificationFilter = {
     [k: number]: number[],
 };
 
 type NotificationFilterChache = {
-    data: Notification[],
+    data: AppNotification[],
     filters: NotificationFilter,
     not_read: number,
 };
@@ -23,7 +22,7 @@ const c_query_key = "notifications";
 // Functions
 const initialize_filters = (): NotificationFilter => {
     const obj_filters: {[k: number]: number[]} = {};
-    for (const filter in NotificationType) {
+    for (const filter in NotificationGroupType) {
         if (isNaN(+filter)) {
             continue;
         }
@@ -33,7 +32,7 @@ const initialize_filters = (): NotificationFilter => {
 };
 
 const initialize_structure = (
-    data: Notification[] = [],
+    data: AppNotification[] = [],
     filters: NotificationFilter = initialize_filters(),
     not_read: number = 0,
 ): NotificationFilterChache => {
@@ -55,7 +54,7 @@ const split_filter_array = (
     return [first_section, second_section];
 };
 
-const get_notifications_query = () => {
+const useGetNotificationsQuery = () => {
     return useQuery({
         queryKey: [c_query_key],
         queryFn: async () => {
@@ -71,7 +70,7 @@ const get_notifications_query = () => {
 
             // Fill filters
             arr_sorted.forEach((notification, index) => {
-                obj_filters[notification.type].push(index);
+                obj_filters[notification.group_type].push(index);
                 if (!notification.read) not_read += 1;
             });
 
@@ -81,7 +80,7 @@ const get_notifications_query = () => {
     });
 };
 
-const get_notification_query = (id: number) => {
+const useGetNotificationQuery = (id: number) => {
     const queryClient = useQueryClient();
     return useQuery({
         queryKey: [c_query_key, id],
@@ -94,7 +93,7 @@ const get_notification_query = (id: number) => {
     });
 };
 
-const add_notification_query_client = (notification: Notification, queryClient: QueryClient) => {
+const addNotificationQueryClient = (notification: AppNotification, queryClient: QueryClient) => {
     queryClient.setQueryData<NotificationFilterChache>([c_query_key], (old_data) => {
         if (!old_data) return initialize_structure([notification]);
         const { data, filters, not_read } = old_data;
@@ -107,14 +106,14 @@ const add_notification_query_client = (notification: Notification, queryClient: 
         // Get the part of the array before the inserted notification
         // and reverse it to find the first (closest) type sibbling
         const reversed_array = arr_sorted.slice(0, notification_index).reverse();
-        const nearst_notification_index = reversed_array.findIndex(n => n.type === notification.type);
+        const nearst_notification_index = reversed_array.findIndex(n => n.group_type === notification.group_type);
 
 
-        let filter_type = filters[notification.type];
+        let filter_type = filters[notification.group_type];
         if (nearst_notification_index === -1) {
 
             // No type sibbling was found, so just push into the array
-            filters[notification.type] = [notification_index, ...filter_type.map(index => index + 1)];
+            filters[notification.group_type] = [notification_index, ...filter_type.map(index => index + 1)];
         } else {
             // Index of the sorted array
             const sibbling_index = reversed_array.length - 1 - nearst_notification_index;
@@ -125,29 +124,66 @@ const add_notification_query_client = (notification: Notification, queryClient: 
             // Devide the array at the found position and
             // put the index of the new notification in between
             const [first_section, second_section] = split_filter_array(filter_type, filter_index, 1);
-            filters[notification.type] = [...first_section, notification_index, ...second_section];
+            filters[notification.group_type] = [...first_section, notification_index, ...second_section];
         }
 
         return initialize_structure(arr_sorted, filters, not_read + 1);
     });
 };
 
-const add_notification_query = () => {
+const del_query_client_notification = <T extends NotificationGroupType>(
+    group_type: T,
+    accessor: (
+        item: Omit<AppNotification, "group_type"|"data"> & Extract<AppNotificationProps, { group_type: T }>
+    ) => boolean,
+    queryClient:  QueryClient
+) => {
+    let app_id: AppNotification|null = null;
+    const _ = queryClient.setQueryData<NotificationFilterChache>([c_query_key], (old_data) => {
+        if (!old_data) return initialize_structure([]);
+        const { data, filters, not_read } = old_data;
+
+        const found = filters[group_type].find((value) => accessor(data[value] as any));
+        let sorted_arr: AppNotification[] = data;
+
+        let factor = 0;
+        if (found != null) {
+            app_id = data[found];
+
+            if (!data[found].read) {
+                factor = -1;
+            }
+
+            sorted_arr = del_sorted_notifications(data, data[found].id);
+
+            const [first_section, second_section] = split_filter_array(filters[group_type], found - 1, -1);
+            // Delete the first element (Index of the deleted notification)
+            second_section.shift();
+
+            filters[group_type] = [...first_section, ...second_section];
+        }
+
+        return initialize_structure(sorted_arr, filters, not_read + factor);
+    });
+    return app_id;
+};
+
+const useAddNotificationQuery = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (notification: Notification) => {
+        mutationFn: (notification: AppNotification) => {
             return add_notification_middleware(notification);
         },
         onSuccess: (notification) => {
-            return add_notification_query_client(notification, queryClient);
+            return addNotificationQueryClient(notification, queryClient);
         },
     });
 };
 
-const upd_notification_query = () => {
+const useUpdNotificationQuery = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (notification: Notification)=> {
+        mutationFn: (notification: AppNotification)=> {
             return upd_notification_middleware(notification);
         },
         onSuccess: (new_birthday) => {
@@ -162,10 +198,10 @@ const upd_notification_query = () => {
     });
 };
 
-const del_notification_query = () => {
+const useDelNotificationQuery = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (notification: Notification) => {
+        mutationFn: async (notification: AppNotification) => {
             return del_notification_middleware(notification);
         },
         onSuccess: (notification_id) => {
@@ -180,7 +216,7 @@ const del_notification_query = () => {
 
                 if (notification_index !== -1) {
 
-                    const notification_type = data[notification_index].type;
+                    const notification_type = data[notification_index].group_type;
                     let arr_filter_indices = filters[notification_type];
                     const filter_index = arr_filter_indices.findIndex(index => index === notification_index);
 
@@ -201,7 +237,7 @@ const del_notification_query = () => {
     });
 };
 
-const clear_notification_query = () => {
+const useClearNotificationQuery = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async () => {
@@ -213,12 +249,16 @@ const clear_notification_query = () => {
     })
 };
 
+export type {
+    NotificationFilterChache
+};
 export {
-    get_notification_query,
-    get_notifications_query,
-    add_notification_query,
-    add_notification_query_client,
-    upd_notification_query,
-    del_notification_query,
-    clear_notification_query,
+    useAddNotificationQuery,
+    useClearNotificationQuery,
+    useDelNotificationQuery,
+    useGetNotificationQuery,
+    useGetNotificationsQuery,
+    useUpdNotificationQuery,
+    addNotificationQueryClient,
+    del_query_client_notification,
 };

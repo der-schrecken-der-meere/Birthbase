@@ -1,7 +1,6 @@
-// Date FNS
-import { setYear } from 'date-fns';
+import { type Column, type ColumnDef } from '@tanstack/react-table';
+import { type Birthday } from '@/database/tables/birthday/birthdays';
 
-// Shadcn UI
 import { Button } from "../../ui/button";
 import {
     DropdownMenu,
@@ -11,32 +10,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "../../ui/dropdown-menu"
+import { Trash2, Ellipsis, Pencil } from "lucide-react"
+import { type ColumnType, DataTableColumnHeader } from '../../util/table_blueprint/DataTableColumnHeader';
 
-// React Icons
-import {
-    Trash2,
-    Ellipsis,
-    Pencil,
-} from "lucide-react"
+import { useBirthdayFormStore } from '@/stores/use_birthday_form_store';
 
-// Store Slices
-
-// Tanstack table
-import { Column, ColumnDef } from '@tanstack/react-table';
-
-// Tableblueprints
-import { ColumnType, DataTableColumnHeader } from '../../util/table_blueprint/DataTableColumnHeader';
-
-// Database
-import { Birthday } from '@/database/tables/birthday/birthdays';
-
-// Lib
-import { calcAge, calc_days_until_next_birthday } from '@/lib/functions/birthdays/calculations';
-import { current_date_to_iso } from '@/lib/functions/date/timezone';
-import { open_birthday_form_update } from '@/hooks/use_birthday_form';
-import { use_birthday_mutation } from '@/hooks/use_birthday_mutation';
+import { useBirthdayMutation } from '@/hooks/use_birthday_mutation';
 import { useTranslation } from 'react-i18next';
+
+import { setYear } from 'date-fns';
 import { format_day_month } from '@/lib/intl/date';
+import { calculate_age, calculate_days_until_next_birthday } from '@/lib/functions/birthday';
 
 const ColumnHeader = <T,>({
     t_key,
@@ -66,7 +50,7 @@ export const columns: ColumnDef<Birthday>[] = [
         id: "date",
         size: 9.375,
         accessorFn: (data) => {
-            return setYear(new Date(data.date), new Date().getFullYear());
+            return setYear(new Date(data.timestamp), new Date().getFullYear());
         },
         sortingFn: "datetime",
         header: ({ column }) => <ColumnHeader colType="date" column={column} t_key="date" />,
@@ -104,7 +88,7 @@ export const columns: ColumnDef<Birthday>[] = [
         id: "age",
         size: 9.375,
         accessorFn: (data) => {
-            return calcAge(data.date, current_date_to_iso());
+            return calculate_age(data.timestamp);
         },
         sortingFn: "alphanumeric",
         meta: getMeta("age"),
@@ -118,7 +102,7 @@ export const columns: ColumnDef<Birthday>[] = [
         size: 9.375,
         meta: getMeta("until"),
         accessorFn: (data) => {
-            return calc_days_until_next_birthday(data.date, current_date_to_iso());
+            return calculate_days_until_next_birthday(data.timestamp);
         },
         sortingFn: "alphanumeric",
         header: ({ column }) => <ColumnHeader colType="number" column={column} t_key="until" />,
@@ -146,7 +130,7 @@ export const columns: ColumnDef<Birthday>[] = [
                 count: row.getValue("until"),
                 firstname: obj.name.first,
                 lastname: obj.name.last,
-                date: new Date(obj.date).toLocaleDateString(i18n.language),
+                date: new Date(obj.timestamp).toLocaleDateString(i18n.language),
                 until: row.getValue("until"),
                 age
             });
@@ -171,7 +155,9 @@ const AktionDropdown = ({
     clipboardText,
     cell,
 }: I_ActionDropdown) => {
-    const { delete_birthday } = use_birthday_mutation({});
+    const setUpdateMode = useBirthdayFormStore((state) => state.setUpdateMode);
+
+    const { del } = useBirthdayMutation({});
     const { t } = useTranslation(["pages", "generally"]);
 
     return (
@@ -192,14 +178,14 @@ const AktionDropdown = ({
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="flex gap-2" onClick={() => {
-                    open_birthday_form_update(cell);
+                    setUpdateMode(cell);
                     // dispatch(openUpdate(obj));
                 }}>
                     {t("change_btn", { ns: "generally" })}
                     <Pencil className='h-4 w-4'/>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="flex gap-2 text-destructive" onClick={() => {
-                    delete_birthday(cell);
+                    del(cell);
                 }}>
                     {t("delete_btn", { ns: "generally" })}
                     <Trash2 className='h-4 w-4'/>
@@ -207,6 +193,6 @@ const AktionDropdown = ({
             </DropdownMenuContent>
         </DropdownMenu>
     );
-}
+};
 
-export default columns
+export default columns;

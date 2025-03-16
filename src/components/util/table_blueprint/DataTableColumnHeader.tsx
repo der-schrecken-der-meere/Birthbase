@@ -31,12 +31,12 @@ interface DataTableColumnHeaderProps<TData, TValue>
     column: Column<TData, TValue>
     title: string
     colType: ColumnType
-}
+};
 
 interface HeaderSymbol {
     type?: ColumnType
     className?: string
-} 
+};
 
 const HeaderDownSymbol = ({
     type,
@@ -47,7 +47,7 @@ const HeaderDownSymbol = ({
     else if (type === "string")     el = ArrowDownZA;
     else if (type === "date")       el = ArrowDown10;
     return createElement(el, { className: className });
-}
+};
 
 const HeaderUpSymbol = ({
     type,
@@ -60,12 +60,12 @@ const HeaderUpSymbol = ({
     return createElement(el, { className: className });
 }
 
-export function DataTableColumnHeader<TData, TValue>({
+const DataTableColumnHeader = <TData, TValue>({
     column,
     title,
     className,
     colType = "mixed",
-}: DataTableColumnHeaderProps<TData, TValue>) {
+}: DataTableColumnHeaderProps<TData, TValue>) => {
     if (!column.getCanSort()) {
         return <div className={cn(className)}>{title}</div>
     }
@@ -119,5 +119,9 @@ export function DataTableColumnHeader<TData, TValue>({
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
-    )
-}
+    );
+};
+
+export {
+    DataTableColumnHeader
+};

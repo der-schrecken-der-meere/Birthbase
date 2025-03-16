@@ -4,7 +4,7 @@ const change_notification = async (notification_permission: boolean) => {
     const str_permission = await get_notification_permission();
     if (notification_permission) {
         if (str_permission === "default") {
-            const req = await request_notification_permission();
+            await request_notification_permission();
         }
     }
 };

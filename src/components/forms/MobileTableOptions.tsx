@@ -8,25 +8,12 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } fr
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-
 import { RowsPerPageSelect } from "../util/table_blueprint/Pagination/RowsPerPage";
+
 import { useTranslation } from "react-i18next";
 
 const ROWS_PER_PAGE = [5, 10, 20, 30, 40, 50];
 
-const formSchema = z.object({
-    columns: z.array(z.object({
-        columnName: z.string(),
-        visibility: z.boolean(),
-        meta: z.object({
-            ns: z.string(),
-            key: z.string(),
-        })
-    })),
-    rowsPerPage: z.coerce.number(),
-});
-
-type FormSchema = z.infer<typeof formSchema>
 type MobileTableOptionsProps<TData extends RowData> = {
     table: Table<TData>
     onSubmitClick?: () => void
@@ -36,6 +23,18 @@ const MobileTableOptionsForm = <TData extends RowData>({
     table,
     onSubmitClick,
 }: MobileTableOptionsProps<TData>) => {
+    
+    const formSchema = z.object({
+        columns: z.array(z.object({
+            columnName: z.string(),
+            visibility: z.boolean(),
+            meta: z.object({
+                ns: z.string(),
+                key: z.string(),
+            })
+        })),
+        rowsPerPage: z.coerce.number(),
+    });
 
     const canHideColumns = table
         .getAllColumns()
@@ -44,7 +43,7 @@ const MobileTableOptionsForm = <TData extends RowData>({
             typeof column.accessorFn !== "undefined" && column.getCanHide()
         );
 
-    const form = useForm<FormSchema>({
+    const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             rowsPerPage: table.getState().pagination.pageSize,
@@ -56,7 +55,7 @@ const MobileTableOptionsForm = <TData extends RowData>({
         }
     });
 
-    const onSubmit: SubmitHandler<FormSchema> = (data) => {
+    const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = (data) => {
         table.setPageSize(data.rowsPerPage);
         data.columns.forEach((column, index) => {
             canHideColumns[index].toggleVisibility(!!column.visibility);

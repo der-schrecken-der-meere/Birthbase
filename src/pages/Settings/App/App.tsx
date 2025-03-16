@@ -1,50 +1,48 @@
-import { use_settings_breadcrumbs } from "@/components/layouts/SettingsLayout";
-import { isTauri } from "@tauri-apps/api/core";
+import type { Settings } from "@/database/tables/settings/settings";
+
 import { SettingsFormElement, SettingsFormPageWrapper } from "../Settings";
 import { FormField } from "@/components/ui/form";
-import { z } from "zod";
-import { useCallback, useMemo } from "react";
-import { primitive_strict_or } from "@/lib/functions/logic/or";
-import { OsType, type } from "@tauri-apps/plugin-os";
 import { Switch } from "@/components/ui/switch";
 import { Rocket } from "lucide-react";
-import { update_navbar } from "@/hooks/use_app_navbar";
+
+import { useSettingsForm } from "@/hooks/use_settings_form";
+import { useNavbar } from "@/hooks/core/use_navbar";
 import { useTranslation } from "react-i18next";
-import { use_settings_form } from "@/hooks/use_settings_form";
-import { Settings } from "@/database/tables/settings/settings";
+import { useSettingsBreadcrumbs } from "@/components/layouts/SettingsLayout";
+import { OnlyTauri } from "@/components/OnlyTauri";
+
+import { z } from "zod";
 import { obj_is_empty } from "@/lib/functions/object/empty";
 
 const App = () => {
+    const { breadcrumbs } = useSettingsBreadcrumbs();
 
-    const { t } = useTranslation(["pages"]);
-    const { breadcrumbs } = use_settings_breadcrumbs();
-
-    const ts = useCallback((key: string) => {
-        return t(`settings_app.${key}`);
-    }, [t]);
-
-    const formSchema = useMemo(() => z.object({
-        autostart: z.coerce.boolean(),
-    }), []);
-
-    update_navbar({
+    useNavbar({
         pageTitle: "settings.app",
         breadcrumbDisplay: breadcrumbs,
     });
 
-    if (!isTauri()) {
-        return (
-            null
-        );
-    }
+    return (
+        <OnlyTauri
+            osTypes={["windows", "linux", "macos"]}
+        >
+            <AppForm/>
+        </OnlyTauri>
+    );
+};
 
-    if (!primitive_strict_or<OsType>(type(), "linux", "linux", "windows")) {
-        return (
-            null
-        );
-    }
+const AppForm = () => {
+    const { t } = useTranslation(["pages"]);
 
-    const { form, isFetching, onSubmit } = use_settings_form({
+    const ts = (key: string) => {
+        return t(`settings_app.${key}`);
+    };
+
+    const formSchema = z.object({
+        autostart: z.coerce.boolean(),
+    });
+
+    const { form, isFetching, onSubmit } = useSettingsForm({
         form_schema: formSchema,
         on_submit: (data) => {
             const new_settings: Partial<Settings> = {};

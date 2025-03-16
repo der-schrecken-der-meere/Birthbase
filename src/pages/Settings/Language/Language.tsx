@@ -1,44 +1,44 @@
-import { use_settings_breadcrumbs } from '@/components/layouts/SettingsLayout';
-import { update_navbar } from '@/hooks/use_app_navbar';
+import { type Settings } from '@/database/tables/settings/settings';
+
 import { ListItem, SettingsFormElement, SettingsFormPageWrapper } from '../Settings';
-import { z } from 'zod';
-import { useCallback, useMemo } from 'react';
-import { obj_is_empty } from '@/lib/functions/object/empty';
-import { Settings } from '@/database/tables/settings/settings';
-import { FormField } from '@/components/ui/form';
 import { Languages } from 'lucide-react';
+import { FormField } from '@/components/ui/form';
 import { UniSelect } from '@/components/Select';
-import { use_settings_form } from '@/hooks/use_settings_form';
+
+import { useSettingsBreadcrumbs } from '@/components/layouts/SettingsLayout';
+import { useNavbar } from '@/hooks/core/use_navbar';
+import { useSettingsForm } from '@/hooks/use_settings_form';
 import { useTranslation } from 'react-i18next';
+
+import { z } from 'zod';
+import { obj_is_empty } from '@/lib/functions/object/empty';
 
 const Language = () => {
 
     const { t } = useTranslation(["pages"]);
-    const { breadcrumbs } = use_settings_breadcrumbs();
+    const { breadcrumbs } = useSettingsBreadcrumbs();
 
-    const ts = useCallback((key: string) => {
+    const ts = (key: string) => {
         return t(`settings_language.${key}`);
-    }, [t]);
+    };
 
-    const formSchema = useMemo(() => z.object({
+    const formSchema = z.object({
         language: z.enum(["de", "en"], {
             required_error: ts("language_required"),
         }),
-    }), [ts]);
+    });
 
-    update_navbar({
+    useNavbar({
         pageTitle: "settings.language",
         breadcrumbDisplay: breadcrumbs,
     });
 
-    const languages = useMemo(() => {
-        return {
-            en: "English",
-            de: "Deutsch"
-        };
-    }, []);
+    const languages = {
+        en: "English",
+        de: "Deutsch",
+    };
 
-    const list_items = useMemo<ListItem[]>(() => {
+    const list_items = (() => {
         const list: ListItem[] = [];
         Object.entries(languages).forEach(([key, title]) => {
             list.push({
@@ -48,9 +48,9 @@ const Language = () => {
             })
         });
         return list;
-    }, []);
+    })();
 
-    const { form, isFetching, onSubmit } = use_settings_form({
+    const { form, isFetching, onSubmit } = useSettingsForm({
         form_schema: formSchema,
         on_submit: (data) => {
             const new_settings: Partial<Settings> = {};

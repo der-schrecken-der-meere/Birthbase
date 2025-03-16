@@ -1,25 +1,25 @@
 import { add_notifications_model, clear_notifications_model, del_notifications_model, upd_notifications_model } from "@/database/tables/notifications/db_model";
-import { Notification } from "@/database/tables/notifications/notifications";
+import { AppNotification } from "@/database/tables/notifications/notifications";
 
-const add_notification_middleware = async (notification: Notification): Promise<Notification> => {
+const add_notification_middleware = async (notification: AppNotification): Promise<AppNotification> => {
     try {
-        const obj_notification = await add_notifications_model([notification]) as Notification;
+        const obj_notification = await add_notifications_model([notification]) as AppNotification;
         return obj_notification;
     } catch (e) {
         return Promise.reject(e);
     }
 };
 
-const upd_notification_middleware = async (notification: Notification): Promise<Notification> => {
+const upd_notification_middleware = async (notification: AppNotification): Promise<AppNotification> => {
     try {
-        const obj_notification = await upd_notifications_model([notification]) as Notification;
+        const obj_notification = await upd_notifications_model([notification]) as AppNotification;
         return Promise.resolve(obj_notification);
     } catch (e) {
         return Promise.reject(e);
     }
 };
 
-const del_notification_middleware = async (notification: Notification): Promise<number> => {
+const del_notification_middleware = async (notification: AppNotification): Promise<number> => {
     try {
         await del_notifications_model([notification.id]);
         return notification.id;

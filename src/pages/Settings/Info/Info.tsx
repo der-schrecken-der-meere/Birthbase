@@ -1,40 +1,38 @@
 import { NavigationEntry } from '../Settings';
 import { Separator } from '@/components/ui/separator';
-import { use_settings_breadcrumbs } from '@/components/layouts/SettingsLayout';
-import { isTauri } from '@tauri-apps/api/core';
-import { use_app_store } from '@/hooks/use_app_store';
-import { update_navbar } from '@/hooks/use_app_navbar';
+import { OnlyTauri } from '@/components/OnlyTauri';
+
+import { useAppStore } from '@/stores/use_app_store';
+
+import { useSettingsBreadcrumbs } from '@/components/layouts/SettingsLayout';
+import { useNavbar } from '@/hooks/core/use_navbar';
 import { useTranslation } from 'react-i18next';
 
 const Info = () => {
-    const { breadcrumbs } = use_settings_breadcrumbs();
+    const { breadcrumbs } = useSettingsBreadcrumbs();
 
-    update_navbar({
+    useNavbar({
         pageTitle: "settings.info",
         breadcrumbDisplay: breadcrumbs,
     });
 
     return (
-        isTauri()
-            ?
-                <>
-                    <Version/>
-                    <TauriVersion/>
-                </>
-            :
-                null
+        <OnlyTauri osTypes={['windows', 'linux', 'macos', 'ios', 'android']}>
+            <Version/>
+            <TauriVersion/>
+        </OnlyTauri>
     );
 };
 
 const Version = () => {
-    const version = use_app_store((state) => state.version);
+    const appVersion = useAppStore((state) => state.appVersion);
     const { t } = useTranslation(["pages"]);
 
     return (
         <>
             <NavigationEntry
                 caption={t("settings_info.app_version_description")}
-                rightElement={`v${version}`}
+                rightElement={`v${appVersion}`}
             >
                 {t("settings_info.app_version_title")}
             </NavigationEntry>
@@ -44,14 +42,14 @@ const Version = () => {
 };
 
 const TauriVersion = () => {
-    const tauri_version = use_app_store((state) => state.tauri_version);
+    const tauriVersion = useAppStore((state) => state.tauriVersion);
     const { t } = useTranslation(["pages"]);
 
     return (
         <>
             <NavigationEntry
                 caption={t("settings_info.tauri_version_description")}
-                rightElement={`v${tauri_version}`}
+                rightElement={`v${tauriVersion}`}
             >
                 {t("settings_info.tauri_version_title")}
             </NavigationEntry>

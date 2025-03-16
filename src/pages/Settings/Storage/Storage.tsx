@@ -1,35 +1,38 @@
-import { useCallback, useEffect, useState } from 'react'
-import { NavigationEntry } from '../Settings'
-import { Progress } from "@/components/ui/progress"
-import { Separator } from '@/components/ui/separator'
-import { byte_format } from '@/lib/intl/storage'
-// import Table from "@/components/tables/storagesize/Table"
-import { use_settings_breadcrumbs } from '@/components/layouts/SettingsLayout'
-import { to_smallest_byte_type } from '@/lib/functions/storage/unit'
-import { calc_app_storage_size } from '@/lib/functions/storage/calculations'
-import { Button } from '@/components/ui/button'
-import { Trash2 } from 'lucide-react'
-import { clear_app_storage } from '@/lib/functions/storage/clear'
-import { clear_notification_query } from '@/features/latest_notifications/query'
-import { clear_birthday_query } from '@/features/manage_birthdays/query'
-import { clear_settings_query } from '@/features/manage_settings/query'
-import { update_navbar } from '@/hooks/use_app_navbar'
-import { open_confirm } from '@/hooks/use_app_confirm'
-import { useTranslation } from 'react-i18next'
-// import { toSmallestByteType } from '@/lib/functions/storage/unit'
+import { useEffect, useState } from 'react';
+
+import { Progress } from "@/components/ui/progress";
+import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { NavigationEntry } from '../Settings';
+import { Trash2 } from 'lucide-react';
+
+import { useConfirmStore } from '@/stores/use_confirm_store';
+
+import { useTranslation } from 'react-i18next';
+import { useSettingsBreadcrumbs } from '@/components/layouts/SettingsLayout';
+import { useClearNotificationQuery } from '@/features/latest_notifications/query';
+import { useClearBirthdayQuery } from '@/features/manage_birthdays/query';
+import { useClearSettingsQuery } from '@/features/manage_settings/query';
+import { useNavbar } from '@/hooks/core/use_navbar';
+import { clear_app_storage } from '@/lib/functions/storage/clear';
+
+import { byte_format } from '@/lib/intl/storage';
+import { to_smallest_byte_type } from '@/lib/functions/storage/unit';
+import { calc_app_storage_size } from '@/lib/functions/storage/calculations';
 
 const Storage = () => {
     const [value, setValue] = useState<StorageEstimate>({usage: 0, quota: 0});
 
-    const { mutate: clear_notifications } = clear_notification_query();
-    const { mutate: clear_birthdays } = clear_birthday_query();
-    const { mutate: clear_settings } = clear_settings_query();
+    const { mutate: clear_notifications } = useClearNotificationQuery();
+    const { mutate: clear_birthdays } = useClearBirthdayQuery();
+    const { mutate: clear_settings } = useClearSettingsQuery();
 
     const { t, i18n } = useTranslation(["pages", "confirm"]);
 
-    const { breadcrumbs } = use_settings_breadcrumbs();
+    const { breadcrumbs } = useSettingsBreadcrumbs();
+    const setConfirm = useConfirmStore((state) => state.setConfirm);
 
-    update_navbar({
+    useNavbar({
         pageTitle: "settings.storage",
         breadcrumbDisplay: breadcrumbs,
     });
@@ -38,11 +41,11 @@ const Storage = () => {
         (async () => {
             const obj_size = await calc_app_storage_size();
             setValue(obj_size);
-        })()
+        })();
     }, []);
 
-    const onDeleteClick = useCallback(() => {
-        open_confirm({
+    const onDeleteClick = () => {
+        setConfirm({
             title: t("sure", { ns: "confirm" }),
             description: t("msgs.empty_storage", { ns: "confirm" }),
             on_confirm: () => {
@@ -52,16 +55,16 @@ const Storage = () => {
                 clear_settings();
             },
         });
-    }, []);
+    };
 
-    const storage_size_to_string = useCallback((value: number) => {
+    const storage_size_to_string = (value: number) => {
         const obj_size = to_smallest_byte_type(value);
         return byte_format(i18n.language, obj_size.u, obj_size.v);
-    }, [i18n]);
+    };
 
-    const calc_usage_quota_ratio = useCallback((usage: number, quota: number) => {
+    const calc_usage_quota_ratio = (usage: number, quota: number) => {
         return usage / quota * 100;
-    }, []);
+    };
 
     return (
         <>
@@ -86,6 +89,7 @@ const Storage = () => {
                 }
             />
         </>
-    )
-}
-export default Storage
+    );
+};
+
+export default Storage;

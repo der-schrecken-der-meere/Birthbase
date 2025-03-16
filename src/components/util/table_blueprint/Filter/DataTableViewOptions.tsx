@@ -15,13 +15,13 @@ import { useTranslation } from "react-i18next"
 
 type DataTableViewOptionsProps<TData> = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "children"> & {
   table: Table<TData>
-}
+};
 
-export default function DataTableViewOptions<TData>({
+const DataTableViewOptions = <TData,>({
   table,
   className,
   ...props
-}: DataTableViewOptionsProps<TData>) {
+}: DataTableViewOptionsProps<TData>) => {
   const { t } = useTranslation("table");
 
   return (
@@ -61,5 +61,7 @@ export default function DataTableViewOptions<TData>({
           })}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
-}
+  );
+};
+
+export default DataTableViewOptions;

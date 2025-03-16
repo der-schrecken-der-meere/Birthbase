@@ -1,32 +1,35 @@
-import BasicDialog from '../dialogs/BasicDialog';
+import { type ProgressProps } from '@radix-ui/react-progress';
 
-import { Progress } from '../ui/progress';
-import { Button, ButtonProps } from '../ui/button';
-import { DialogClose } from '../ui/dialog';
-import { Suspense, useCallback, useEffect, useState } from 'react';
-// import { mock_check_update, mock_update } from '@/features/updater/test/update';
-import { use_update_store } from '@/hooks/use_update_store';
-import { ProgressProps } from '@radix-ui/react-progress';
-import { use_app_store } from '@/hooks/use_app_store';
-import { primitive_strict_or } from '@/lib/functions/logic/or';
-import { OsType } from '@tauri-apps/plugin-os';
-import { Skeleton } from '../ui/skeleton';
-import { LinuxMacUpdater } from './LinuxMacUpdater';
-import { get_settings_query } from '@/features/manage_settings/query';
-import { create_toast, ToastType } from '@/hooks/use_app_toast';
-import { check_update, install_update } from '@/features/updater/updater';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
+import { Suspense, useEffect, useState } from 'react';
+
 import Markdown from "react-markdown";
-import { cn } from '@/lib/utils';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import BasicDialog from '../dialogs/BasicDialog';
+import { LinuxMacUpdater } from './LinuxMacUpdater';
+import { Progress } from '../ui/progress';
+import { Button, type ButtonProps } from '../ui/button';
+import { DialogClose } from '../ui/dialog';
+import { Skeleton } from '../ui/skeleton';
 import { ScrollArea } from '../ui/scroll-area';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
+import { OnlyTauri } from '../OnlyTauri';
+
+import { useUpdateStore } from '@/stores/use_update_store';
+import { useAppStore } from '@/stores/use_app_store';
+
 import { useTranslation } from 'react-i18next';
+import { useGetSettingsQuery } from '@/features/manage_settings/query';
+import { useQuery } from '@/hooks/core/use_query';
+
+import { cn } from '@/lib/utils';
+import { check_update, install_update } from '@/features/updater/updater';
+import { mock_check_update, mock_update } from '@/features/updater/test/update';
 
 const UpdaterProgress = ({
     value,
     ...props
 }: ProgressProps) => {
-    const progress = use_update_store((state) => state.progress);
+    const progress = useUpdateStore((state) => state.progress);
 
     return (
         <Progress value={progress} {...props}/>
@@ -38,11 +41,11 @@ const CheckUpdate = ({
     children,
     ...props
 }: ButtonProps) => {
-    const onCheckClick = useCallback(() => {
+    const onCheckClick = () => {
         (async () => {
-            await check_update();
+            await mock_check_update();
         })();
-    }, []);
+    };
 
     return (
         <Button
@@ -62,13 +65,13 @@ const DownloadUpdate = ({
 }: ButtonProps & {
     relaunch: boolean,
 }) => {
-    const os_type = use_app_store((state) => state.os_type);
+    const osType = useAppStore((state) => state.osType);
 
-    const onDownloadClick = useCallback(() => {
+    const onDownloadClick = () => {
         (async () => {
-            await install_update(os_type, relaunch);
+            await mock_update(osType, relaunch);
         })();
-    }, [relaunch]);
+    };
 
     return (
         <Button
@@ -81,36 +84,30 @@ const DownloadUpdate = ({
 };
 
 const Updater = () => {
-    const is_downloading = use_update_store((state) => state.started);
-    const is_prompt_open = use_update_store((state) => state.prompt_open);
-    const set_prompt = use_update_store((state) => state.set_prompt);
-    const current_version = use_app_store((state) => state.version);
-    const update_version = use_update_store((state) => state.version);
-    const os_type = use_app_store((state) => state.os_type);
-    const update_notes = use_update_store((state) => state.update_notes);
+    const notes = useUpdateStore((state) => state.notes);
+    const isDownloading = useUpdateStore((state) => state.isDownloading);
+    const isPrompting = useUpdateStore((state) => state.isPrompting); 
+    const update_version = useUpdateStore((state) => state.version);
+    const setPrompting = useUpdateStore((state) => state.setPrompting);
+
+    const appVersion = useAppStore((state) => state.appVersion);
 
     const { t } = useTranslation(["updater", "generally"]);
 
-    const { data: { relaunch }, isError, error, isFetching } = get_settings_query();
+    const { data: { relaunch }, isFetching } = useQuery({
+        useQueryFn: useGetSettingsQuery,
+        tKey: "settings",
+    });
 
-    const [restart, setRestart] = useState(relaunch);
-    const [open, setOpen] = useState(false);
+    const [restart, set_restart] = useState(relaunch);
+    const [open, set_open] = useState(false);
 
-    useEffect(() => {
-        if (isError) {
-            create_toast({
-                title: "Fehler beim Anzeigen der Neustartfunktion",
-                description: JSON.stringify(error),
-            }, ToastType.ERROR);
-        }
-    }, [isError, error]);
+    const on_relaunch_change = (relaunch: boolean) => {
+        set_restart(relaunch);
+    };
 
     useEffect(() => {
-        setRestart(relaunch);
-    }, [relaunch]);
-
-    const on_relaunch_change = useCallback((relaunch: boolean) => {
-        setRestart(relaunch);
+        set_restart(relaunch);
     }, []);
 
     if (isFetching) {
@@ -123,33 +120,34 @@ const Updater = () => {
         <BasicDialog
             title={t("update_to", { version: update_version })}
             description={
-                <span className='mt-2 font-bold'>{t("current_version", { version: current_version })}</span>
+                <span className='mt-2 font-bold'>{t("current_version", { version: appVersion })}</span>
             }
             headerVisibility
-            defaultOpen={is_prompt_open}
+            defaultOpen={isPrompting}
             trigger={null}
-            onOpenChange={set_prompt}
+            onOpenChange={setPrompting}
         >
-            {is_downloading
+            {isDownloading
                 ? (<UpdaterProgress/>)
                 : (
-                    <>
-                        {primitive_strict_or<OsType>(os_type, "linux", "macos") && (
-                            <Suspense
-                                fallback={<Skeleton className='w-full h-4' />}
+                    <OnlyTauri osTypes={["linux", "macos"]}>
+                        <Suspense
+                            fallback={<Skeleton className='w-full h-4' />}
+                        >
+                            <LinuxMacUpdater
+                                onCheckedChange={on_relaunch_change}
+                                defaultChecked={relaunch}
                             >
-                                <LinuxMacUpdater
-                                    onCheckedChange={on_relaunch_change}
-                                    defaultChecked={relaunch}
-                                >
-                                    {t("restart_app")}
-                                </LinuxMacUpdater>
-                            </Suspense>
-                        )}
-                    </>
+                                {t("restart_app")}
+                            </LinuxMacUpdater>
+                        </Suspense>
+                    </OnlyTauri>
                 )
             }
-            <Collapsible open={open} onOpenChange={setOpen}>
+            <Collapsible
+                open={open}
+                onOpenChange={set_open}
+            >
                 <div className='flex items-center shrink-0'>
                     {t("update_notes")}
                     <CollapsibleTrigger asChild>
@@ -162,8 +160,6 @@ const Updater = () => {
                         </Button>
                     </CollapsibleTrigger>
                 </div>
-                
-                
                 <CollapsibleContent>
                     <ScrollArea className='max-h-[300px] h-[300px]'>
                         <Markdown
@@ -185,24 +181,37 @@ const Updater = () => {
                                 }
                             }}
                         >
-                            {update_notes}
+                            {notes}
                         </Markdown>
                     </ScrollArea>
                 </CollapsibleContent>
             </Collapsible>
             <div className='flex items-center shrink-0'>
                 <div className='flex items-center justify-between'>
-                    <DownloadUpdate disabled={is_downloading} relaunch={restart}>
+                    <DownloadUpdate
+                        disabled={isDownloading}
+                        relaunch={restart}
+                    >
                         {t("update_btn")}
                     </DownloadUpdate>
                 </div>
                 <DialogClose asChild>
-                    <Button className='ml-auto' disabled={is_downloading} variant="secondary">{t("cancel", { ns: "generally" })}</Button>
+                    <Button
+                        className='ml-auto'
+                        disabled={isDownloading}
+                        variant="secondary"
+                    >
+                        {t("cancel", { ns: "generally" })}
+                    </Button>
                 </DialogClose>
             </div>
         </BasicDialog>
     );
-}
+};
 
-export { UpdaterProgress, CheckUpdate, DownloadUpdate };
+export {
+    UpdaterProgress,
+    CheckUpdate,
+    DownloadUpdate
+};
 export default Updater;

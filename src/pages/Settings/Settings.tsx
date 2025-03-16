@@ -1,8 +1,10 @@
-import React, { Fragment, ReactNode, useState } from 'react';
+import type { SelectProps, SelectTriggerProps } from '@radix-ui/react-select';
+import type { DialogTriggerProps } from '@radix-ui/react-dialog';
+import type { RadioGroupProps } from '@radix-ui/react-radio-group';
+import type { FieldValues, UseFormReturn } from 'react-hook-form';
 
-// Custom Components
+import { type ReactElement, type ReactNode, Fragment, useState } from 'react';
 
-// Shadcn UI
 import {
     Select,
     SelectContent,
@@ -13,32 +15,29 @@ import {
 } from '@/components/ui/select';
 import { Label } from "@/components/ui/label"
 import { Separator } from '@/components/ui/separator';
-
-import { NavLink } from 'react-router-dom';
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import { RadioGroupItem, RadioGroup } from '@/components/ui/radio-group';
-import { SelectProps, SelectTriggerProps } from '@radix-ui/react-select';
-import { cn } from '@/lib/utils';
+import { Form, FormControl, FormItem, FormLabel } from '@/components/ui/form';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
+import { NavLink } from 'react-router-dom';
 import { ChevronDown, ChevronRight, ChevronUp } from 'lucide-react';
-import { Form, FormControl, FormItem, FormLabel } from '@/components/ui/form';
-import { DialogTriggerProps } from '@radix-ui/react-dialog';
-import { RadioGroupProps } from '@radix-ui/react-radio-group';
-import { FieldValues, UseFormReturn } from 'react-hook-form';
-import { use_settings_breadcrumbs } from '@/components/layouts/SettingsLayout';
-import { update_navbar } from '@/hooks/use_app_navbar';
-import { use_nav_entries } from '@/hooks/use_nav_entries';
-import { useTranslation } from 'react-i18next';
 import { PulseLoader } from 'react-spinners';
+
+import { useNavEntriesStore } from '@/stores/use_nav_entries_store';
+import { useSettingsBreadcrumbs } from '@/components/layouts/SettingsLayout';
+import { useNavbar } from '@/hooks/core/use_navbar';
+import { useTranslation } from 'react-i18next';
+
+import { cn } from '@/lib/utils';
 
 const Settings = () => {
 
-    const { breadcrumbs } = use_settings_breadcrumbs();
-    const settings_links = use_nav_entries((state) => state.settings_links);
+    const { breadcrumbs } = useSettingsBreadcrumbs();
+    const settingsLinks = useNavEntriesStore((state) => state.settingsLinks);
     
-    update_navbar({
+    useNavbar({
         pageTitle: "main.settings",
         breadcrumbDisplay: () => {
             const breads = structuredClone(breadcrumbs);
@@ -49,7 +48,7 @@ const Settings = () => {
 
     return (
         <ScrollArea className='h-full'>
-            {settings_links.entries.map((link_entry, i) => (
+            {settingsLinks.entries.map((link_entry, i) => (
                 <Fragment
                     key={link_entry.url}
                 >
@@ -68,11 +67,11 @@ const Settings = () => {
 }
 
 interface I_NavigationLinkCore {
-    icon?: React.ReactNode;
+    icon?: ReactNode;
     className?: string;
-    rightElement?: React.ReactNode;
-    children?: React.ReactNode;
-    caption?: React.ReactNode;
+    rightElement?: ReactNode;
+    children?: ReactNode;
+    caption?: ReactNode;
 }
 
 const NavigationLinkCore = ({
@@ -104,8 +103,8 @@ const NavigationLinkCore = ({
 
 interface I_NavigationLink {
     caption?: string;
-    children?: React.ReactElement<any>[] | string;
-    icon: React.ReactElement<any>;
+    children?: ReactElement<any>[] | string;
+    icon: ReactElement<any>;
     to: string;
 }
 
@@ -135,13 +134,13 @@ const NavigationLink = ({
 interface I_NavigationEntry {
     className?: string;
     /** Short description of Context */
-    caption?: React.ReactNode;
+    caption?: ReactNode;
     /** The title of Context */
-    children?: React.ReactNode;
+    children?: ReactNode;
     /** Element (mostly interactive) on the far right side of Context */
-    rightElement?: React.ReactNode;
+    rightElement?: ReactNode;
     /** Descriptive Icon of Context */
-    icon?: React.ReactNode;
+    icon?: ReactNode;
 }
 
 const NavigationEntry = ({
@@ -193,7 +192,7 @@ interface I_CollapsibleNavEntry extends Omit<I_NavigationEntry, "rightElement"|"
     /** The Title of Context */
     title?: string,
     /** Collapsible Content */
-    children?: React.ReactNode,
+    children?: ReactNode,
 }
 
 const CollapsibleNavEntry = ({
@@ -300,7 +299,7 @@ const SelectAsRadio = ({
                         {radioItems.map((v, i) => {
                             const id = `${title}-${v.value}`;
                             return (
-                                <React.Fragment key={id}>
+                                <Fragment key={id}>
                                     <NavigationEntry
                                         className='min-h-0'
                                         rightElement={<RadioGroupItem value={v.value} id={id} className='mr-2'/>}
@@ -308,7 +307,7 @@ const SelectAsRadio = ({
                                         <Label className='flex items-center' htmlFor={id}>{v.item}</Label>
                                     </NavigationEntry>
                                     {i !== radioItems.length - 1 && <Separator/>}
-                                </React.Fragment>
+                                </Fragment>
                             )
                         })}
                     </RadioGroup>
@@ -351,5 +350,5 @@ const SettingsFormPageWrapper = <T extends FieldValues,>({
     );
 }
 
-export default Settings;
 export { NavigationEntry, NavigationLink, SelectAsRadio, SelectShortend, CollapsibleNavEntry, SettingsFormElement, SettingsFormPageWrapper };
+export default Settings;

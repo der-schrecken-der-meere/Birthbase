@@ -43,7 +43,7 @@ const unset_settings_model = async () => {
     try {
         // Get all available configs
         const settingsArray = await db.get(TABLES.SETTINGS);
-        const defaultSettings = await get_default_settings();
+        const defaultSettings = get_default_settings();
         // If no configs exist
         if (settingsArray.length === 0) {
             // Create new default config

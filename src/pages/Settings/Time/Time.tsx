@@ -1,11 +1,11 @@
-import { use_settings_breadcrumbs } from '@/components/layouts/SettingsLayout';
-import { update_navbar } from '@/hooks/use_app_navbar';
+import { useSettingsBreadcrumbs } from '@/components/layouts/SettingsLayout';
+import { useNavbar } from '@/hooks/core/use_navbar';
 
 const Time = () => {
 
-    const { breadcrumbs } = use_settings_breadcrumbs();
+    const { breadcrumbs } = useSettingsBreadcrumbs();
 
-    update_navbar({
+    useNavbar({
         pageTitle: "settings.time",
         breadcrumbDisplay: breadcrumbs,
     });

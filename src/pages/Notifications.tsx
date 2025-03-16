@@ -1,26 +1,35 @@
-import { Button, ButtonProps } from "@/components/ui/button";
+import { type ButtonProps } from "@/components/ui/button";
+import { type Birthday } from "@/database/tables/birthday/birthdays";
+import { type AppNotification, type AppNotificationProps, NotificationGroupType } from "@/database/tables/notifications/notifications";
+import { type PopoverTriggerProps } from "@radix-ui/react-popover";
+
+import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Notification } from "@/database/tables/notifications/notifications";
-import { del_notification_query, get_notifications_query, upd_notification_query } from "@/features/latest_notifications/query";
+import { Eye, Mailbox, Trash2 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
+import { useGetNotificationsQuery } from "@/features/latest_notifications/query";
+import { useNavbar } from "@/hooks/core/use_navbar";
+import { useTranslation } from "react-i18next";
+import { useNotificationMutation } from "@/hooks/use_notification_mutation";
+import { useQuery } from "@/hooks/core/use_query";
+import { type UseNotificationMsgProps, useNotificationMsgTranslation } from "@/hooks/use_notification_msg";
+import { useGetBirthdayQuery } from "@/features/manage_birthdays/query";
+
 import { PageLinks } from "@/globals/constants/links";
 import { format_number_to_relative_time } from "@/lib/intl/date";
 import { get_relative_time_string } from "@/lib/functions/date/relative_time";
 import { cn } from "@/lib/utils";
-import { BellRing, Eye, Info, LucideProps, Mailbox, PartyPopper, Trash2 } from "lucide-react";
-import { ForwardRefExoticComponent, useCallback, useEffect, useMemo, useState } from "react";
-import { NotificationType } from "@/features/notify/notify";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { PopoverTriggerProps } from "@radix-ui/react-popover";
-import { create_toast, ToastType } from "@/hooks/use_app_toast";
-import { update_navbar } from "@/hooks/use_app_navbar";
-import { useTranslation } from "react-i18next";
+import { calculate_days_until_next_birthday } from "@/lib/functions/birthday";
 
 type FilterButtonProps = {
     onClick: () => void;
     text: string;
     active: boolean;
-    filter?: NotificationType;
+    filter?: NotificationGroupType;
 };
 
 const FilterButton = ({
@@ -46,12 +55,12 @@ const FilterButton = ({
 
 const Notifications = () => {
 
-    const { t } = useTranslation(["pages", "navigation", "toast"]);
-    const ts = useCallback((key: string) => {
+    const { t } = useTranslation(["pages", "navigation"]);
+    const ts = (key: string) => {
         return t(`notifications.${key}`);
-    }, [t]);
+    };
 
-    update_navbar({
+    useNavbar({
         docTitle: "main.notifications",
         pageTitle: "main.notifications",
         breadcrumbDisplay: [
@@ -67,45 +76,28 @@ const Notifications = () => {
         ],
     });
 
-    const { data, isFetching, error, isError } = get_notifications_query();
-    const { mutate: delete_notification } = del_notification_query();
-    const { mutate: update_notification } = upd_notification_query();
+    const { data, isFetching } = useQuery({
+        useQueryFn: useGetNotificationsQuery,
+        tKey: "notifications",
+    });
 
-    const [ filter, setFilter ] = useState<NotificationType | null>(null);
+    const {
+        del,
+        upd,
+    } = useNotificationMutation({});
+
+    const [ filter, setFilter ] = useState<NotificationGroupType | null>(null);
     const [ active, setActive ] = useState(0);
 
-    const onDelete = useCallback((notification: Notification) => {
-        delete_notification(
-            notification,
-            {
-                onError: (error) => {
-                    console.error(error);
-                    create_toast({
-                        title: t("error", { ns: "generally" }),
-                        description: t("errors.delete_notifications", { ns: "toast" }),
-                    }, ToastType.ERROR);
-                },
-            }
-        );
-    }, []);
+    const onDelete = (notification: AppNotification) => {
+        del(notification);
+    };
 
-    const onRead = useCallback((notification: Notification) => {
-        const new_notification: Notification = { ...notification, ...{ read: true } };
-        update_notification(
-            new_notification,
-            {
-                onError: (error) => {
-                    console.error(error);
-                    create_toast({
-                        title: t("error", { ns: "generally" }),
-                        description: t("errors.change_notifications", { ns: "toast" }),
-                    }, ToastType.ERROR);
-                },
-            }
-        );
-    }, []);
+    const onRead = (notification: AppNotification) => {
+        upd({ ...notification, ...{ read: true } });
+    };
 
-    const filter_buttons = useMemo<FilterButtonProps[]>(() => [
+    const filter_buttons: FilterButtonProps[] = [
         {
             active: true,
             text: t("notifications.all"),
@@ -118,7 +110,7 @@ const Notifications = () => {
             active: false,
             text: t("notifications.birthday", { count: 2 }),
             onClick: () => {
-                setFilter(NotificationType.BIRTHDAY);
+                setFilter(NotificationGroupType.BIRTHDAY);
                 setActive(1);
             },
         },
@@ -126,7 +118,7 @@ const Notifications = () => {
             active: false,
             text: t("notifications.reminder", { count: 2 }),
             onClick: () => {
-                setFilter(NotificationType.BIRTHDAY_REMINDER);
+                setFilter(NotificationGroupType.BIRTHDAY_REMINDER);
                 setActive(2);
             },
         },
@@ -134,21 +126,11 @@ const Notifications = () => {
             active: false,
             text: t("notifications.info", { count: 2 }),
             onClick: () => {
-                setFilter(NotificationType.INFO);
+                setFilter(NotificationGroupType.INFO);
                 setActive(3);
             },
         }
-    ], [ts]);
-
-    useEffect(() => {
-        if (isError) {
-            console.error(error);
-            create_toast({
-                title: t("error", { ns: "generally" }),
-                description:t("errors.show_notifications", { ns: "toast" }),
-            }, ToastType.ERROR);
-        }
-    }, [isError, error]);
+    ];
 
     if (isFetching) {
         return (
@@ -175,7 +157,7 @@ const Notifications = () => {
                                 text={filter_button.text}
                             />
                         );
-}                   )}
+                    })}
                 </div>
                 <ScrollBar orientation="horizontal" />
             </ScrollArea>
@@ -188,17 +170,34 @@ const Notifications = () => {
                         </div>
                     ) : (
                         <div className="space-y-4 w-full table table-fixed mr-2">
-                            {filtered_data.map((notification) => (
-                                <NotificationMessage
-                                    key={notification.id}
-                                    muted={notification.read}
-                                    notification={notification}
-                                    onDelete={onDelete}
-                                    onRead={onRead}
-                                >
-                                    {notification.text}
-                                </NotificationMessage>
-                            ))}
+                            {filtered_data.map((notification) => {
+                                switch (notification.group_type) {
+                                    case NotificationGroupType.BIRTHDAY:
+                                        return <BirthdayWrapper
+                                            key={notification.id}
+                                            notification={notification}
+                                            muted={notification.read}
+                                            onDelete={onDelete}
+                                            onRead={onRead}
+                                        />
+                                    case NotificationGroupType.BIRTHDAY_REMINDER:
+                                        return <BirthdayRemindeWrapper
+                                            key={notification.id}
+                                            notification={notification}
+                                            muted={notification.read}
+                                            onDelete={onDelete}
+                                            onRead={onRead}
+                                        />
+                                    case NotificationGroupType.INFO:
+                                        return <UpdateWrapper
+                                            key={notification.id}
+                                            notification={notification}
+                                            muted={notification.read}
+                                            onDelete={onDelete}
+                                            onRead={onRead}
+                                        />
+                                }
+                            })}
                         </div>
                     )
                 }
@@ -207,80 +206,170 @@ const Notifications = () => {
     );
 };
 
-type NotificationMessageProps = PopoverTriggerProps & {
-    muted: boolean,
-    onDelete: (notification: Notification) => void,
-    onRead: (notififcation: Notification) => void,
-    notification: Notification,
+type WrapperNotification<T extends NotificationGroupType> = Omit<NotificationMessageProps, "notification" | "notificationData"> & {
+    notification: Omit<AppNotification, "group_type" | "data"> & Extract<AppNotificationProps, { group_type: T }>,
 };
 
-const get_notification_parts = (
-    type: NotificationType,
-): { Icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>, title: string } => {
-    switch (type) {
-        case NotificationType.BIRTHDAY:
-            return {
-                Icon: PartyPopper,
-                title: "birthday",
-            };
-        case NotificationType.BIRTHDAY_REMINDER:
-            return {
-                Icon: BellRing,
-                title: "reminder",
-            };
-        case NotificationType.INFO:
-            return {
-                Icon: Info,
-                title: "info",
-            };
+const BirthdayWrapper = ({
+    notification,
+    ...props
+}: WrapperNotification<NotificationGroupType.BIRTHDAY>) => {
+
+    const { data: { id } } = notification;
+
+    console.log("id", id);
+
+    const { data, isFetching, isLoading, isError } = useGetBirthdayQuery(id);
+
+    if (isError) {
+        return null;
     }
+
+    if (isLoading || isFetching) {
+        return (
+            <Skeleton
+                className="w-full h-16"
+            />
+        )
+    }
+
+    console.log("data", data);
+
+    return (
+        <NotificationMessage
+            notification={notification}
+            notificationData={{ firstname: (data as Birthday).name.first, lastname: (data as Birthday).name.last } as any}
+            {...props}
+        />
+    );
+};
+
+const BirthdayRemindeWrapper = ({
+    notification,
+    ...props
+}: WrapperNotification<NotificationGroupType.BIRTHDAY_REMINDER>) => {
+
+    const { data: { id } } = notification;
+
+    const { data, isFetching, isLoading, isError } = useGetBirthdayQuery(id);
+
+    if (isError) {
+        return null;
+    }
+
+    if (isLoading || isFetching) {
+        return (
+            <Skeleton
+                className="w-full h-16"
+            />
+        )
+    }
+
+    return (
+        <NotificationMessage
+            notificationData={{
+                firstname: (data as Birthday).name.first,
+                lastname: (data as Birthday).name.last,
+                until: calculate_days_until_next_birthday((data as Birthday).timestamp),
+            } as any}
+            notification={notification}
+            {...props}
+        />
+    );
+};
+
+const UpdateWrapper = ({
+    notification,
+    ...props
+}: WrapperNotification<NotificationGroupType.INFO>) => {
+    return (
+        <NotificationMessage
+            notificationData={{
+                type: notification.data.type,
+                version: notification.data.version
+            } as any}
+            notification={notification}
+            {...props}
+        />
+    );
+};
+
+type NotificationMessageProps = PopoverTriggerProps & {
+    muted: boolean,
+    onDelete: (notification: AppNotification) => void,
+    onRead: (notififcation: AppNotification) => void,
+    notificationData: UseNotificationMsgProps,
+    notification: AppNotification,
 };
 
 const NotificationMessage = ({
     className,
-    children,
     muted,
     onDelete,
     onRead,
     notification,
+    notificationData,
     ...props
-}: NotificationMessageProps) => {
-    const { t, i18n } = useTranslation(["pages", "generally"]);
+}: Omit<NotificationMessageProps, "children">) => {
+    const { group_type, read, timestamp } = notification;
 
-    const obj_time = get_relative_time_string(notification.timestamp, Date.now());
+    console.log(notificationData);
+
+    const { t_data: { title, description }, Icon } = useNotificationMsgTranslation({
+        group_type,
+        /** @ts-ignore */
+        data: notificationData,
+    });
+
+    const { t, i18n } = useTranslation(["generally", "pages"]);
+
+    const obj_time = get_relative_time_string(timestamp, Date.now());
     const str_time_pasted = format_number_to_relative_time(i18n.language, -obj_time.time, obj_time.unit);
 
-    const { Icon, title } = get_notification_parts(notification.type);
+    const on_delete = () => {
+        onDelete(notification as AppNotification);
+    };
+
+    const on_read = () => {
+        onRead(notification as AppNotification);
+    };
 
     return (
         <Popover>
             <PopoverTrigger
-                className={cn("w-full flex rounded-lg border-[1px] p-3 gap-4 bg-secondary items-stretch", notification.read && "text-muted-foreground bg-transparent", className)}
+                className={cn(
+                    "w-full flex rounded-lg border-[1px] p-3 gap-4 bg-secondary items-stretch",
+                    read && "text-muted-foreground bg-transparent",
+                    className
+                )}
                 {...props}
             >
                 <Icon className="h-8 w-8 self-center shrink-0" />
                 <div className="w-full">
-                    <div className="float-right w-40 h-5 text-right text-muted-foreground text-sm mr-2">{str_time_pasted}</div>
-                    <div className="text-left text-current/80">
-                        <div className="font-bold">{t(`notifications.${title}`, { count: 1 })}</div>
-                        {children}
+                    <div className="float-right w-40 h-5 text-right text-muted-foreground text-sm mr-2">
+                        {str_time_pasted}
                     </div>
-                    
+                    <div className="text-left text-current/80">
+                        <div className="font-bold">
+                            {title}
+                        </div>
+                        {description}
+                    </div>
                 </div>
             </PopoverTrigger>
             <PopoverContent className="p-1 flex flex-col gap-1">
-                {!notification.read && (
+                {!read && (
                     <Button
-                        onClick={() => onRead(notification)}
+                        onClick={on_read}
                         size="sm"
                         variant="outline"
                     >
                         <Eye className="w-4 h-4 mr-2"/>
-                        {t("notifications.mark_read")}
+                        {t("notifications.mark_read", { ns: "pages" })}
                     </Button>
                 )}
                 <Button
-                    onClick={() => onDelete(notification)}
+                    onClick={on_delete}
                     size="sm"
                     variant="outline"
                 >
@@ -289,7 +378,6 @@ const NotificationMessage = ({
                 </Button>
             </PopoverContent>
         </Popover>
-        
     );
 };
 

@@ -1,6 +1,6 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense } from 'react'
 
-// Shadcn Components
+import Table from '@/components/tables/birthdays/Table';
 import { Button } from '@/components/ui/button'
 import { 
     Dialog,
@@ -10,43 +10,32 @@ import {
     DialogTitle,
     DialogTrigger
 } from '@/components/ui/dialog';
-
-// Luicide
+import { MyBirthdaysSkeleton } from '@/components/skeletons/MyBirthdaysSkeleton';
 import { Ellipsis } from 'lucide-react';
 
-// Custom Components
-
-// React Icons
-
-// React Router
+import { useNavbar } from '@/hooks/core/use_navbar';
+import { useGetBirthdaysQuery } from '@/features/manage_birthdays/query';
+import { useQuery } from '@/hooks/core/use_query';
+import { useTableSortURL } from '@/hooks/use_table_sort_url';
+import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router-dom';
 
-// React Redux
-
-// Store Slices
-
-import Table from '@/components/tables/birthdays/Table.js';
 import { delay_promise } from '@/lib/functions/promise/delay';
 import { PageLinks } from '@/globals/constants/links';
-import { update_navbar } from '@/hooks/use_app_navbar';
-import { useTranslation } from 'react-i18next';
-import { useTableSortURL } from '@/hooks/use-tableSortURL';
 import columns from "./../components/tables/birthdays/columns";
-import { get_birthdays_query } from '@/features/manage_birthdays/query';
-import { MyBirthdaysSkeleton } from '@/components/skeletons/MyBirthdaysSkeleton';
-import { create_toast, ToastType } from '@/hooks/use_app_toast';
 
 const OtherFunctionDialog = lazy(() => delay_promise(() => import("../components/dialogs/OtherFunctions"), 0));
 
 const MyBirthdays = () => {
-
+    
     const { t } = useTranslation(["navigation", "toast", "generally"]);
-
     const { defaultSorting } = useTableSortURL({ columns });
-
-    const { isLoading, isError, data, error, isFetching } = get_birthdays_query();
-
-    update_navbar({
+    const { data, isFetching } = useQuery({
+        tKey: "birthdays",
+        useQueryFn: useGetBirthdaysQuery,
+    });
+    
+    useNavbar({
         docTitle: "main.my_birthdays",
         pageTitle: "main.my_birthdays",
         breadcrumbDisplay: [
@@ -62,17 +51,8 @@ const MyBirthdays = () => {
         ],
     });
 
-    useEffect(() => {
-        if (isError) {
-            console.error(error);
-            create_toast({
-                "title": t("error", { ns: "generally" }),
-                "description": t("errors.show_birthdays", { ns: "toast" }),
-            }, ToastType.ERROR);
-        }
-    }, [isError, error]);
 
-    if (isLoading || isFetching) {
+    if (isFetching) {
         return (
             <MyBirthdaysSkeleton/>
         );

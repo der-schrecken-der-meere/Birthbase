@@ -21,12 +21,10 @@ import MainLayout from './layouts/MainLayout';
 // import BirthdayFormProvider from "./contexts/birthdayFormContext";
 import { SettingsLayout } from "./layouts/SettingsLayout";
 import { delay_promise } from "@/lib/functions/promise/delay";
-import { isTauri } from "@tauri-apps/api/core";
 import { MyBirthdaysSkeleton } from "./skeletons/MyBirthdaysSkeleton";
 import { PageLinks } from "@/globals/constants/links";
-import { init_tauri } from "@/init/tauri_init";
 
-import { unset_is_booting, use_app_store } from "@/hooks/use_app_store";
+import { useAppStore } from "@/stores/use_app_store";
 
 import { Toast } from "./singletons/Toast";
 import { ConfirmDialog } from "./singletons/ConfirmDialog";
@@ -36,25 +34,27 @@ import { SettingsEntriesSkeleton } from "./skeletons/SettingsEntriesSkeleton";
 import { useTranslation } from "react-i18next";
 
 const MyBirthdays = lazy(() => delay_promise(() => import("../pages/MyBirthdays"), 0));
+const Notifications = lazy(() => delay_promise(() => import("../pages/Notifications"), 0));
 const Settings = lazy(() => delay_promise(() => import("../pages/Settings/Settings"), 0));
+
 const Appearance = lazy(() => delay_promise(() => import("../pages/Settings/Appearance/Appearance"), 0));
 const NotificationsSettings = lazy(() => delay_promise(() => import("../pages/Settings/Notifications/Notifications"), 0));
-const Notifications = lazy(() => delay_promise(() => import("../pages/Notifications"), 0));
-const Info = lazy(() => delay_promise(() => import("../pages/Settings/Info/Info"), 0));
 const Storage = lazy(() => delay_promise(() => import("../pages/Settings/Storage/Storage"), 0));
 const Time = lazy(() => delay_promise(() => import("../pages/Settings/Time/Time"), 0));
 const Language = lazy(() => delay_promise(() => import("../pages/Settings/Language/Language"), 0));
+const Info = lazy(() => delay_promise(() => import("../pages/Settings/Info/Info"), 0));
 const SettingsApp = lazy(() => delay_promise(() => import("../pages/Settings/App/App"), 0));
 const Update = lazy(() => delay_promise(() => import("../pages/Settings/Update/Update"), 0));
 
 const App = () => {
-    const is_booting = use_app_store((state) => state.is_booting);
+    const isBooting = useAppStore((state) => state.isBooting);
+    const osType = useAppStore((state) => state.osType);
+    const setFinishedBooting = useAppStore((state) => state.setFinishedBooting);
+
     const { i18n } = useTranslation();
 
     useEffect(() => {
-        (async () => {
-            unset_is_booting();
-        })();
+        setFinishedBooting();
     }, []);
 
     useEffect(() => {
@@ -62,7 +62,7 @@ const App = () => {
             document.documentElement.lang = i18n.resolvedLanguage;
             document.documentElement.dir = i18n.dir(i18n.resolvedLanguage);
         }
-    }, [i18n, i18n.resolvedLanguage]);
+    }, [i18n.resolvedLanguage]);
 
     const _router = createBrowserRouter(
         createRoutesFromElements(
@@ -154,7 +154,7 @@ const App = () => {
                                 </Suspense>
                             }
                         />
-                        {is_desktop(use_app_store.getState().os_type) && (
+                        {is_desktop(osType) && (
                             <Route
                                 path={PageLinks.SETTINGS_UPDATE}
                                 element={
@@ -191,7 +191,7 @@ const App = () => {
         )
     );
 
-    if (is_booting) return null;
+    if (isBooting) return <></>;
 
     return (
         <>
@@ -200,7 +200,7 @@ const App = () => {
             <RouterProvider router={_router}/>
             <Toast/>
         </>
-    )
-}
+    );
+};
 
 export default App;

@@ -3,18 +3,18 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 const useShortcuts = () => {
     const navigate = useNavigate();
-    const location = useLocation();
+    const { pathname } = useLocation();
 
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
             if (e.key === "e" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault();
-                if (location.pathname !== "/settings") navigate("/settings");
+                if (pathname !== "/settings") navigate("/settings");
                 return;
             }
             if (e.key === "p" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault();
-                if (location.pathname !== "/notifications") navigate("/notifications");
+                if (pathname !== "/notifications") navigate("/notifications");
                 return;
             }
         };
@@ -22,7 +22,9 @@ const useShortcuts = () => {
         return () => {
             document.removeEventListener("keydown", down);
         }
-    }, [location.pathname]);
-}
+    }, [pathname]);
+};
 
-export default useShortcuts
+export {
+    useShortcuts,
+};

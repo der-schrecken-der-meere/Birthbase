@@ -25,7 +25,7 @@ const SelectedRows = <TData,>({
         >
             {t("rows_selected", { max, selected, count: max })}
         </div>
-    )
-}
+    );
+};
 
 export default SelectedRows;

@@ -45,7 +45,7 @@ interface DataTableProps<TData, TValue> {
     headerScreenReaderOnly?: boolean;
     tbody?: (rows: Row<TData>[]) => ReactNode;
 }
-export const DataTable = <TData, TValue>({
+const DataTable = <TData, TValue>({
     className,
     columns,
     data,
@@ -168,5 +168,9 @@ export const DataTable = <TData, TValue>({
             </ScrollArea>
             {return_footerElements()}
         </>
-    )
-}
+    );
+};
+
+export {
+    DataTable
+};

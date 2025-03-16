@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { Button, ButtonProps } from "./ui/button";
 import { cn } from "@/lib/utils";
-import { open_birthday_form_create } from "@/hooks/use_birthday_form";
+import { useBirthdayFormStore } from "@/stores/use_birthday_form_store";
 import { useTranslation } from "react-i18next";
 
 const BasicAddBirthdayButton = ({
@@ -11,11 +11,13 @@ const BasicAddBirthdayButton = ({
     ...props
 }: ButtonProps) => {
 
+    const setCreateMode = useBirthdayFormStore((state) => state.setCreateMode);
+
     return (
         <Button
             className={cn("h-7", className)}
             aria-label="Geburtstag erstellen"
-            onClick={open_birthday_form_create}
+            onClick={setCreateMode}
             {...props}
         >
             <Plus className="h-4 w-4"/>
@@ -39,7 +41,7 @@ const AddBirthdayButton = ({
             <span className="ml-1">{t("create_btn")}</span>
         </BasicAddBirthdayButton>
     );
-}
+};
 
 const MobileAddBirthdayButton = ({
     ...props

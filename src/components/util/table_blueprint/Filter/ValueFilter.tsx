@@ -8,7 +8,7 @@ type ValueFilterProps<TData, TValue> = Omit<React.InputHTMLAttributes<HTMLInputE
     columnId: ExtractPropertyOfArray<ColumnDef<TData, TValue>[], "id">
 }
 
-export const ValueFilter = <TData, TValue>({
+const ValueFilter = <TData, TValue>({
     className,
     table,
     columnId,

@@ -1,31 +1,36 @@
-import { type ListItem, SettingsFormElement, SettingsFormPageWrapper } from '../Settings';
-
-import { Separator } from '@/components/ui/separator'
+import type { Settings } from '@/database/tables/settings/settings';
 
 import { PaintbrushVertical, Palette } from 'lucide-react';
-import { z } from 'zod';
-import { colors } from '@/globals/constants/colors';
-import { useCallback, useMemo } from 'react';
+import { Separator } from '@/components/ui/separator'
+import { type ListItem, SettingsFormElement, SettingsFormPageWrapper } from '../Settings';
 import { FormField } from '@/components/ui/form';
-import { cn } from '@/lib/utils';
-import { Settings } from '@/database/tables/settings/settings';
-import { use_settings_breadcrumbs } from '@/components/layouts/SettingsLayout';
-
-import { obj_is_empty } from '@/lib/functions/object/empty';
-import { update_navbar } from '@/hooks/use_app_navbar';
-import { useTranslation } from 'react-i18next';
-import { use_settings_form } from '@/hooks/use_settings_form';
 import { UniSelect } from '@/components/Select';
 
+import { useSettingsBreadcrumbs } from '@/components/layouts/SettingsLayout';
+import { useNavbar } from '@/hooks/core/use_navbar';
+import { useTranslation } from 'react-i18next';
+import { useSettingsForm } from '@/hooks/use_settings_form';
+
+import { z } from 'zod';
+import { colors } from '@/globals/constants/colors';
+import { cn } from '@/lib/utils';
+import { obj_is_empty } from '@/lib/functions/object/empty';
+
 const Appearance = () => {
-
+    
     const { t } = useTranslation(["pages", "generally"]);
+    const { breadcrumbs } = useSettingsBreadcrumbs();
 
-    const ts = useCallback((key: string) => {
+    useNavbar({
+        pageTitle: "settings.appearance",
+        breadcrumbDisplay: breadcrumbs,
+    });
+
+    const ts = (key: string) => {
         return t(`settings_appearance.${key}`);
-    }, [t]);
+    };
 
-    const mode_items: ListItem[] = useMemo(() => {
+    const mode_items: ListItem[] = (() => {
         const t_modes = (key: string) => t(`modes.${key}`, { ns: "generally" });
         const list_item = (key: string) => ({
             item: t_modes(key),
@@ -38,9 +43,9 @@ const Appearance = () => {
             list_item("light"),
             list_item("system"),
         ]
-    }, [t]);
+    })();
 
-    const color_items: ListItem[] = useMemo(() => {
+    const color_items: ListItem[] = (() => {
         const t_colors = (key: string) => t(`colors.${key}`, { ns: "generally" });
         const list_item = (key: string) => ({
             item: <ColorSelectEntry text={t_colors(key)} className={key} />,
@@ -56,25 +61,18 @@ const Appearance = () => {
             list_item("red"),
             list_item("gray"),
         ];
-    }, [t]);
+    })();
 
-    const formSchema = useMemo(() => z.object({
+    const formSchema = z.object({
         mode: z.enum(["dark", "light", "system"], {
             required_error: ts("mode_required_error"),
         }),
         color: z.enum(colors, {
             required_error: ts("color_required_error"),
         }),
-    }), [t]);
-
-    const { breadcrumbs } = use_settings_breadcrumbs();
-
-    update_navbar({
-        pageTitle: "settings.appearance",
-        breadcrumbDisplay: breadcrumbs,
     });
 
-    const { form, isFetching, onSubmit } = use_settings_form({
+    const { form, isFetching, onSubmit } = useSettingsForm({
         form_schema: formSchema,
         on_submit: (data) => {
             const new_settings: Partial<Settings> = {};

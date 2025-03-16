@@ -1,56 +1,46 @@
+import { type Settings } from '@/database/tables/settings/settings';
+
 import { CollapsibleNavEntry, SettingsFormElement, SettingsFormPageWrapper } from '../Settings'
 import { Switch } from '@/components/ui/switch';
-import {
-    Bell,
-    Info,
-    AlarmClock,
-} from 'lucide-react';
-import { 
-    Popover,
-    PopoverContent,
-    PopoverTrigger
-} from "@/components/ui/popover";
+import { Bell, Info, AlarmClock } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { FormField } from '@/components/ui/form';
-import { z } from 'zod';
-import { useCallback, useMemo } from 'react';
-import { Settings } from '@/database/tables/settings/settings';
-import { use_settings_breadcrumbs } from '@/components/layouts/SettingsLayout';
+
+import { useNavbar } from '@/hooks/core/use_navbar';
+import { useSettingsForm } from '@/hooks/use_settings_form';
+import { useTranslation } from 'react-i18next';
+import { useSettingsBreadcrumbs } from '@/components/layouts/SettingsLayout';
+
 import { obj_is_empty } from '@/lib/functions/object/empty';
 import { isTauri } from '@tauri-apps/api/core';
-import { update_navbar } from '@/hooks/use_app_navbar';
-import { use_settings_form } from '@/hooks/use_settings_form';
-import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
 const Notifications = () => {
 
     const { t } = useTranslation(["pages"])
-
-    const ts = useCallback((key: string) => {
-        return t(`settings_notifications.${key}`);
-    }, [t]);
-
-    const { breadcrumbs } = use_settings_breadcrumbs()
-
-    update_navbar({
+    const { breadcrumbs } = useSettingsBreadcrumbs()
+    useNavbar({
         pageTitle: "settings.notifications",
         breadcrumbDisplay: breadcrumbs,
     });
 
-    const formSchema = useMemo(() => {
-        return z.object({
-            remember: z.coerce.number().gte(1, {
-                message: ts("reminder_lower_error"),
-            })
-            .lte(365, {
-                message: ts("reminder_higher_error"),
-            }),
-            notification: z.coerce.boolean(),
-        });
-    }, [t]);
+    const ts = (key: string) => {
+        return t(`settings_notifications.${key}`);
+    };
 
-    const { form, isFetching, onSubmit } = use_settings_form({
+    const formSchema = z.object({
+        remember: z.coerce.number().gte(1, {
+            message: ts("reminder_lower_error"),
+        })
+        .lte(365, {
+            message: ts("reminder_higher_error"),
+        }),
+        notification: z.coerce.boolean(),
+    });
+
+    const { form, isFetching, onSubmit } = useSettingsForm({
         form_schema: formSchema,
         on_submit: (data) => {
             const new_settings: Partial<Settings> = {};

@@ -1,7 +1,8 @@
 import { CheckboxProps } from "@radix-ui/react-checkbox";
 import { Checkbox } from "../ui/checkbox";
-import { cn } from "@/lib/utils";
 import { Label } from "../ui/label";
+
+import { cn } from "@/lib/utils";
 
 const LinuxMacUpdater = ({
     className,

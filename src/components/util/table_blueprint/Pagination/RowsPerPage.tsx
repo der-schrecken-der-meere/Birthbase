@@ -1,19 +1,22 @@
-import { cn } from "@/lib/utils"
+import type { RowData, Table } from "@tanstack/react-table"
+import type { SelectProps } from "@radix-ui/react-select"
+
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select"
-import { RowData, Table } from "@tanstack/react-table"
-import { SelectProps } from "@radix-ui/react-select"
+
 import { useTranslation } from "react-i18next"
+
+import { cn } from "@/lib/utils"
 
 type RowsPerPageProps<TData> = React.HTMLAttributes<HTMLDivElement> & {
     table: Table<TData>,
     rowsPerPage: number[],
-}
+};
 
 const RowsPerPage = <TData,>({
     table,
@@ -44,8 +47,8 @@ const RowsPerPage = <TData,>({
                 </SelectContent>
             </Select>
         </div>
-    )
-}
+    );
+};
 
 const RowsPerPageSelect = <TData extends RowData>({
     table,

@@ -1,28 +1,38 @@
-import { check, DownloadEvent, Update } from "@tauri-apps/plugin-updater"
+import { type OsType } from "@tauri-apps/plugin-os";
+import { type VersionNumber } from "@/lib/types/number";
+
+import { useUpdateStore } from "@/stores/use_update_store";
+import { useToastStore, ToastType } from "@/stores/use_toast_store";
+import { useAppStore } from "@/stores/use_app_store";
+
+import { check, Update, type DownloadEvent } from "@tauri-apps/plugin-updater"
 import { relaunch } from "@tauri-apps/plugin-process"
-import { Platform } from "@tauri-apps/plugin-os";
-import { update_available, update_last_check, update_searching, use_update_store, update_version } from "@/hooks/use_update_store";
-import type { VersionNumber } from "@/lib/types/number";
-import { update_version as update_app_version } from "@/hooks/use_app_store";
 import { getCurrentWindow, ProgressBarStatus } from "@tauri-apps/api/window";
-import { create_toast, ToastType } from "@/hooks/use_app_toast";
+import i18n from "@/i18n/config";
 
 /**
  * Triggers the progress event for UI related updates and
  * returns the new download size and amount of downloaded content.
+ * 
+ * @param download_size Size of the download
+ * @param downloaded Amount of downloaded content
  */
 const handle_update_event = (type: DownloadEvent, download_size: number, downloaded: number) => {
+    const setProgress = useUpdateStore.getState().setProgress;
+    const setStartProgress = useUpdateStore.getState().setStartProgress;
+    const setFinishProgress = useUpdateStore.getState().setFinishProgress;
+
     switch (type.event) {
         case "Started":
-            use_update_store.getState().start_progress();
+            setStartProgress();
             return { download_size: type.data.contentLength as number, downloaded: 0, progress: 0 };
         case "Progress":
             const new_downloaded = downloaded + type.data.chunkLength;
             const progress = new_downloaded / download_size * 100;
-            use_update_store.getState().update_progress(progress);
+            setProgress(progress);
             return { download_size, downloaded: new_downloaded, progress };
         case "Finished":
-            use_update_store.getState().finish_progress();
+            setFinishProgress();
             return { download_size, downloaded: 100, progress: 100 };
     }
 };
@@ -34,11 +44,20 @@ const handle_update_event = (type: DownloadEvent, download_size: number, downloa
  * 
  * Notes: On Windows: the application will be restarted
  * 
- * @param restart Test
+ * @param restart Wether the application should be restarted after the update has been downloaded
  * 
  */
-const install_update = async (platform: Platform, restart: boolean = true) => {
-    use_update_store.getState().start_progress();
+const install_update = async (os_type: OsType, restart: boolean = true) => {
+    const setStartProgress = useUpdateStore.getState().setStartProgress;
+    const setFinishProgress = useUpdateStore.getState().setFinishProgress;
+    const setLastCheck = useUpdateStore.getState().setLastCheck;
+    const setAvailable = useUpdateStore.getState().setAvailable;
+
+    const setAppVersion = useAppStore.getState().setAppVersion;
+
+    const setToast = useToastStore.getState().setToast;
+
+    setStartProgress();
     try {
         const update = await check() as Update;
         const window = getCurrentWindow();
@@ -51,17 +70,17 @@ const install_update = async (platform: Platform, restart: boolean = true) => {
             n_download_size = download_size;
             n_downloaded += downloaded;
             await window.setProgressBar({ progress: Math.floor(progress), status: ProgressBarStatus.Error });
-        })
+        });
 
         const { version } = update;
-        update_app_version(version as VersionNumber);
+        setAppVersion(version as VersionNumber);
 
         // Clean up resource from memory
         update.close();
 
-        // Due Windows Installer the application must be restarted or closed
+        // Due to Windows Installer the application must be restarted or closed
         // after the update has been downloaded
-        if (platform === "windows") {
+        if (os_type === "windows") {
             restart = true;
         }
 
@@ -70,38 +89,48 @@ const install_update = async (platform: Platform, restart: boolean = true) => {
             return;
         }
     } catch (e) {
-        use_update_store.getState().finish_progress();
-        create_toast({
-            title: "Fehler beim installieren des Updates",
-            description: "Die Verbindung zum Server wurde unterbrochen. Bitte überprüfen Sie ihre Netzwerkverbindung",
+        setToast({
+            title: i18n.t("title", { ns: "toast.errors.install_update" }),
+            description: i18n.t("description", { ns: "toast.errors.install_update" }),
         }, ToastType.ERROR);
     }
-    update_last_check();
-    update_available(false);
+    setFinishProgress();
+    setLastCheck();
+    setAvailable(false);
 };
 
 const check_update = async () => {
-    update_searching(true);
-    update_available(false);
-    use_update_store.getState().set_update_notes("");
+    const setSearching = useUpdateStore.getState().setSearching;
+    const setAvailable = useUpdateStore.getState().setAvailable;
+    const setLastCheck = useUpdateStore.getState().setLastCheck;
+    const setVersion = useUpdateStore.getState().setVersion;
+    const setNotes = useUpdateStore.getState().setNotes;
+
+    const setToast = useToastStore.getState().setToast;
+
+    setSearching(true);
+    setAvailable(false);
+    setNotes("");
+
     try {
         const update = await check({
             timeout: 10_000,
         });
         if (update) {
             const { version, body } = update;
-            use_update_store.getState().set_update_notes(body ? body : "");
-            update_version(version as VersionNumber);
-            update_available(true);
+            setNotes(body ? body : "");
+            setVersion(version as VersionNumber);
+            setAvailable(true);
         }
     } catch (e) {
-        create_toast({
-            title: "Fehler beim Suchen nach Updates",
-            description: "Die Verbindung zum Server wurde unterbrochen. Bitte überprüfen Sie ihre Netzwerkverbindung",
+        setToast({
+            title: i18n.t("errors.search_update.title", { ns: "toast" }),
+            description: i18n.t("errors.search_update.description", { ns: "toast" }),
         }, ToastType.ERROR);
     }
-    update_searching(false);
-    update_last_check();
+
+    setSearching(false);
+    setLastCheck();
 };
 
 export {

@@ -1,27 +1,28 @@
-import { useCallback } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../ui/alert-dialog";
-import { use_app_confirm } from "@/hooks/use_app_confirm";
+
+import { useConfirmStore } from "@/stores/use_confirm_store";
+
 import { useTranslation } from "react-i18next";
 
 const ConfirmDialog = () => {
 
-    const open = use_app_confirm((state) => state.open);
-    const set_open = use_app_confirm((state) => state.set_open);
-    const { description, title, on_cancel, on_confirm } = use_app_confirm((state) => state.config);
-
     const { t } = useTranslation(["generally"]);
 
-    const on_cancel_click = useCallback(() => {
-        set_open(false);
+    const setOpen = useConfirmStore((state) => state.setOpen);
+    const { on_cancel, on_confirm, description, title } = useConfirmStore((state) => state.config);
+    const isOpen = useConfirmStore((state) => state.isOpen);
+
+    const on_cancel_click = () => {
+        setOpen(false);
         on_cancel();
-    }, [on_cancel]);
-    const on_action_click = useCallback(() => {
-        set_open(false);
+    };
+    const on_action_click = () => {
+        setOpen(false);
         on_confirm();
-    }, [on_confirm]);
+    };
 
     return (
-        <AlertDialog open={open} onOpenChange={set_open}>
+        <AlertDialog open={isOpen} onOpenChange={setOpen}>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>{title}</AlertDialogTitle>
@@ -33,7 +34,7 @@ const ConfirmDialog = () => {
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
-    )
-}
+    );
+};
 
 export { ConfirmDialog };

@@ -1,33 +1,29 @@
-import { Suspense, useMemo } from "react";
+import { Suspense } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
 import { Skeleton } from "../ui/skeleton";
 import BirthdayForm from "../forms/BirthdayForm";
-import { BirthdayFormMode, use_birthday_form } from "@/hooks/use_birthday_form";
+import { BirthdayFormMode, useBirthdayFormStore } from "@/stores/use_birthday_form_store";
 import { useTranslation } from "react-i18next";
 
 const BirthdayFormDialog = () => {
 
-    const open = use_birthday_form((state) => state.open);
-    const operation = use_birthday_form((state) => state.operation);
-    const set_open = use_birthday_form((state) => state.set_open);
+    const isOpen = useBirthdayFormStore((state) => state.isOpen);
+    const formMode = useBirthdayFormStore((state) => state.formMode);
+    const setOpen = useBirthdayFormStore((state) => state.setOpen);
 
     const { t } = useTranslation(["dialog"]);
 
-    const DialogTitleString = useMemo(() => {
-        return operation === BirthdayFormMode.CREATE
-            ? t("birthday_form.create_title")
-            : t("birthday_form.change_title");
-    }, [operation]);
+    const DialogTitleString = formMode === BirthdayFormMode.CREATE
+        ? t("birthday_form.create_title")
+        : t("birthday_form.change_title");
 
-    const DialogDescriptionString = useMemo(() => {
-        return operation === BirthdayFormMode.CREATE
-            ? t("birthday_form.create_description")
-            : t("birthday_form.change_description");
-    }, [operation]) 
+    const DialogDescriptionString = formMode === BirthdayFormMode.CREATE
+        ? t("birthday_form.create_description")
+        : t("birthday_form.change_description");
 
     return (
-        <Dialog open={open} onOpenChange={set_open}>
+        <Dialog open={isOpen} onOpenChange={setOpen}>
             <DialogContent className="p-0 overflow-hidden">
                 <ScrollArea className="max-h-screen h-full">
                     <div className="p-6">

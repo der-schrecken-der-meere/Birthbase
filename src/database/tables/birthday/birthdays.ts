@@ -1,38 +1,21 @@
-import { format_date_to_iso_midnight } from "@/lib/intl/date";
-import type { ISODateFullTZ, ISOMidnightFullTZ } from "@/lib/types/date";
+import { CoreRecord } from "@/database/db_types";
+import { create_birthday } from "@/lib/functions/birthday";
+import { MidnightTimestamp } from "@/lib/types/date";
 
-type Remember = ISODateFullTZ[];
-
-type Record = {
-    id: number,
-};
-
-type PartialRecord = Partial<Record>;
-
-type NoIDBirthday = {
+type BirthdayCore = {
     name: {
         first: string,
         last: string,
     },
-    date: ISOMidnightFullTZ,
-    marked: boolean,
-    remember: Remember,
+    timestamp: MidnightTimestamp,
 };
 
-type PartialIDBirthday = PartialRecord & NoIDBirthday;
+type Birthday = CoreRecord & BirthdayCore;
 
-type Birthday = Record & NoIDBirthday;
-
-const getDefaultBirthday = (): Birthday => ({
+const getDefaultBirthday = (): Birthday => create_birthday({
     id: -1,
-    name: {
-        first: "",
-        last: "",
-    },
-    date: format_date_to_iso_midnight("de", "Europe/Berlin"),
-    marked: false,
-    remember: [],
+    timestamp: Date.now(),
 });
 
-export type { Birthday, NoIDBirthday, PartialIDBirthday };
+export type { Birthday, BirthdayCore };
 export { getDefaultBirthday };

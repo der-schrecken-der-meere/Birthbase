@@ -27,7 +27,7 @@ const NotFound = () => {
         ) : (
             <div>Not Found 404</div>
         )
-    )
+    );
 };
 
 const BackToHome = () => {

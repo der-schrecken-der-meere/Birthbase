@@ -1,16 +1,17 @@
-import type { Birthday, NoIDBirthday, PartialIDBirthday } from "./birthdays";
+import type { Birthday } from "./birthdays";
 import { db, TABLES } from "@/database/db.ts";
 import { has_property } from "../../../lib/functions/object/hasProperty";
 
 /**
  * Add multiple birthdays
  */
-const add_birthdays_model = async (birthdays: PartialIDBirthday[]) => {
+const add_birthdays_model = async (birthdays: Birthday[]) => {
     // Remove the id from all birhtdays
-    const arr_birthdays: NoIDBirthday[] = birthdays.map((birthday) => {
+    const arr_birthdays: Birthday[] = birthdays.map((birthday) => {
         if (has_property(birthday, "id")) {
             // Dereference to prevent the change of the origin
             const obj_birthday = { ...birthday };
+            /** @ts-ignore */
             delete obj_birthday.id;
             return obj_birthday;
         }

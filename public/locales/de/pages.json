@@ -8,7 +8,7 @@
         "last_name": "Nachname...",
         "actions": "Aktionen",
         "copy_as_message": "Geburtstage als Nachricht kopieren",
-        "copy_message_zero": "{{firstname}} {{lastname}} ({{data}}) ist heute {{age}} geworden",
+        "copy_message_zero": "{{firstname}} {{lastname}} ({{date}}) ist heute {{age}} geworden",
         "copy_message_one": "{{firstname}} {{lastname}} ({{date}}) wird in einem Tag {{age}}",
         "copy_message_other": "{{firstname}} {{lastname}} ({{date}}) wird in {{until}} Tagen {{age}}",
         "date": "Datum",

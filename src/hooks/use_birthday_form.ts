@@ -1,52 +1,80 @@
-import { getDefaultBirthday, type Birthday } from "@/database/tables/birthday/birthdays";
-import { create } from "zustand";
+import { type Birthday } from "@/database/tables/birthday/birthdays";
+import { type UseSettingsFormProps } from "./core/use_form";
 
-enum BirthdayFormMode {
-    UPDATE,
-    CREATE,
-    READ,
-};
+import { z, type ZodType } from "zod";
 
-interface BirthdayForm {
-    operation: BirthdayFormMode,
-    birthday: Birthday,
-    open: boolean,
-    set_operation: (operation: BirthdayFormMode) => void,
-    set_birthday: (birthday: Birthday) => void,
-    set_open: (open: boolean) => void,
-};
+import { useRef } from "react";
+import { useBirthdayMutation } from "./use_birthday_mutation";
+import { useBirthdayFormStore } from "../stores/use_birthday_form_store";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-const use_birthday_form = create<BirthdayForm>()((set) => ({
-    operation: BirthdayFormMode.READ,
-    birthday: getDefaultBirthday(),
-    open: false,
-    set_operation: (operation) => set(() => ({ operation })),
-    set_birthday: (birthday) => set(() => ({ birthday })),
-    set_open: (open) => set(() => ({ open })),
-}));
+type FormMethod = "create"|"update"|"delete"|"read";
 
-const open_birthday_form_read = (birthday: Birthday) => {
-    use_birthday_form.getState().set_birthday(birthday);
-    use_birthday_form.getState().set_operation(BirthdayFormMode.READ);
-    use_birthday_form.getState().set_open(true);
-};
+const useBirthdayForm = <T extends ZodType<any, any, any>>({
+    form_schema,
+    on_submit,
+}: UseSettingsFormProps<Birthday, T>) => {
+    const method = useRef<FormMethod>("create");
 
-const open_birthday_form_create = () => {
-    use_birthday_form.getState().set_birthday(getDefaultBirthday());
-    use_birthday_form.getState().set_operation(BirthdayFormMode.CREATE);
-    use_birthday_form.getState().set_open(true);
-};
+    const setOpen = useBirthdayFormStore((state) => state.setOpen);
+    const birthday = useBirthdayFormStore((state) => state.birthday);
 
-const open_birthday_form_update = (birthday: Birthday) => {
-    use_birthday_form.getState().set_birthday(birthday);
-    use_birthday_form.getState().set_operation(BirthdayFormMode.UPDATE);
-    use_birthday_form.getState().set_open(true);
+    const cbs = {
+        onSuccess: () => {
+            setOpen(false);
+        },
+    };
+
+    const { upd, add, del } = useBirthdayMutation({
+        add_cbs: cbs,
+        upd_cbs: cbs,
+        del_cbs: cbs,
+    });
+    const form = useForm<z.infer<T>>({
+        resolver: zodResolver(form_schema),
+        defaultValues: (() => {
+            return {
+                id: birthday.id,
+                firstname: birthday.name.first,
+                lastname: birthday.name.last,
+                date: birthday.timestamp,
+            } as any;
+        })(),
+    });
+
+    const onSubmit = async (data: z.infer<T>) => {
+        if (method.current === "read") {
+            return;
+        }
+        const new_birthday = on_submit(data);
+        if (new_birthday) {
+            switch (method.current) {
+                case "create":
+                    await add(new_birthday);
+                    break;
+                case "update":
+                    await upd(new_birthday);
+                    break;
+                case "delete":
+                    await del(new_birthday);
+                    break;
+            }
+        }
+    };
+
+    const changeMethod = (new_method: FormMethod) => {
+        method.current = new_method;
+    };
+
+    return {
+        form,
+        onSubmit,
+        changeMethod,
+        birthday,
+    };
 };
 
 export {
-    BirthdayFormMode,
-    use_birthday_form,
-    open_birthday_form_create,
-    open_birthday_form_read,
-    open_birthday_form_update,
+    useBirthdayForm,
 };

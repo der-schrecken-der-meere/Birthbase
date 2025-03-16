@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 
 type MobileTableOptionsProps<TData> = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "children"> & {
     table: Table<TData>
-}
+};
 
 const MobileTableOptions = <TData,>({
     className,
@@ -48,7 +48,7 @@ const MobileTableOptions = <TData,>({
                 />
             </DialogContent>
         </Dialog>
-    )
-}
+    );
+};
 
 export default MobileTableOptions;

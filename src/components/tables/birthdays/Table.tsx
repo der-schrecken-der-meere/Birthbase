@@ -1,11 +1,8 @@
+import type { Birthday } from "@/database/tables/birthday/birthdays";
+import type { ColumnDef, ColumnFiltersState, SortingState, VisibilityState } from "@tanstack/react-table";
+
 import { useState } from "react";
 
-// React Router Dom
-
-// Tanstack Table
-import { ColumnDef, ColumnFiltersState, SortingState, VisibilityState } from "@tanstack/react-table";
-
-// Tableblueprints
 import { DataTable }        from "../../util/table_blueprint/DataTable";
 import RowsPerPage          from "../../util/table_blueprint/Pagination/RowsPerPage";
 import CurrentPage          from "../../util/table_blueprint/Pagination/CurrentPage";
@@ -14,9 +11,9 @@ import ValueFilter          from "../../util/table_blueprint/Filter/ValueFilter"
 import DataTableViewOptions from "../../util/table_blueprint/Filter/DataTableViewOptions";
 import MobileTableOptions   from "../../util/table_blueprint/MobileTableOptions";
 
-import columns from "./columns";
-import { Birthday } from "@/database/tables/birthday/birthdays";
 import { useTranslation } from "react-i18next";
+
+import columns from "./columns";
 
 const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">> & { 
     columns: ColumnDef<Birthday>[],
@@ -27,12 +24,11 @@ const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">> & 
     defaultSorting,
     data
 }) => {
-    const { t } = useTranslation(["pages"]);
-
     const sortingState = useState<SortingState>([]);
     const columnFilter = useState<ColumnFiltersState>([]);
-    const visibility = useState<VisibilityState>({})
-    // const birthdays = useSelector((state: RootState) => state.data.value);
+    const visibility = useState<VisibilityState>({});
+
+    const { t } = useTranslation(["pages"]);
 
     return (
         <DataTable

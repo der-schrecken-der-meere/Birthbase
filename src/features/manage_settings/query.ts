@@ -9,7 +9,7 @@ const c_query_key = "settings";
 
 
 // Functions
-const get_settings_query = () => {
+const useGetSettingsQuery = () => {
     return useQuery({
         queryKey: [c_query_key],
         queryFn: () => {
@@ -19,7 +19,7 @@ const get_settings_query = () => {
     });
 };
 
-const unset_settings_query = () => {
+const useUnsetSettingsQuery = () => {
     const obj_query_client = useQueryClient();
     return useMutation({
         mutationFn: () => {
@@ -33,7 +33,7 @@ const unset_settings_query = () => {
     });
 };
 
-const set_settings_query = () => {
+const useSetSettingsQuery = () => {
     const obj_query_client = useQueryClient();
     return useMutation({
         mutationFn: (settings: Partial<Settings>) => {
@@ -47,7 +47,7 @@ const set_settings_query = () => {
     });
 };
 
-const clear_settings_query = () => {
+const useClearSettingsQuery = () => {
     const obj_query_client = useQueryClient();
     return useMutation({
         mutationFn: () => {
@@ -60,8 +60,8 @@ const clear_settings_query = () => {
 };
 
 export {
-    set_settings_query,
-    get_settings_query,
-    unset_settings_query,
-    clear_settings_query,
+    useGetSettingsQuery,
+    useSetSettingsQuery,
+    useClearSettingsQuery,
+    useUnsetSettingsQuery,
 };

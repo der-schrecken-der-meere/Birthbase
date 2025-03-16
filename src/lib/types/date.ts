@@ -30,6 +30,8 @@ type TimeZone = `${"+"|"-"}${HourMinuteString}`;
 
 type ISODateFullTZ = `${ISODateFull}${TimeZone}`;
 
+type MidnightTimestamp = number & { readonly __type: unique symbol };
+
 export type {
     Millisecond,
     Second,
@@ -46,4 +48,5 @@ export type {
     ISODateFullTZ,
     TimeZone,
     ISOMidnightFullTZ,
+    MidnightTimestamp,
 };

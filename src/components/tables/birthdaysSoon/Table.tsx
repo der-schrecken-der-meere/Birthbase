@@ -1,12 +1,12 @@
-import { Birthday } from "@/database/tables/birthday/birthdays";
+import { type Birthday } from "@/database/tables/birthday/birthdays";
 import { DataTable } from "../../util/table_blueprint/DataTable";
 import { getColumns } from "./column";
-import { CSSProperties, useCallback, useMemo } from "react";
+import { type CSSProperties } from "react";
 import { TableBody, TableCell, TableRow } from "../../ui/table";
-import { flexRender, Row } from "@tanstack/react-table";
+import { flexRender, type Row } from "@tanstack/react-table";
 import { cn } from "@/lib/utils";
 import { birthdaysToGroups } from "@/lib/functions/birthdays/sorting";
-import { open_birthday_form_read } from "@/hooks/use_birthday_form";
+import { use_birthday_form_store } from "@/stores/use_birthday_form_store";
 
 const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">> & {
     data: Birthday[],
@@ -15,15 +15,17 @@ const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">> & 
     data,
 }) => {
 
-    const columns = useMemo(() => getColumns(), [])
+    const open_birthday_form_read = use_birthday_form_store((state) => state.open_birthday_form_read);
 
-    const groupBirhtdays = useCallback((birthdays: Row<Birthday>[]) => {
+    const columns = getColumns();
+
+    const groupBirhtdays = (birthdays: Row<Birthday>[]) => {
         return birthdaysToGroups(birthdays, (d) => d.original.date, "de", "Dieser Monat");
-    }, []);
+    };
 
-    const onRowClick = useCallback((data: Birthday) => {
+    const onRowClick = (data: Birthday) => {
         open_birthday_form_read(data);
-    }, []);
+    };
 
     return (
         <DataTable
@@ -74,6 +76,6 @@ const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">> & 
             }}
         />
     );
-}
+};
 
 export default Table;

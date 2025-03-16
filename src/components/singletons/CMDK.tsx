@@ -1,7 +1,6 @@
-import {
-    Power,
-} from "lucide-react";
+import { type FunctionComponent, useEffect, useState } from "react";
 
+import { Power } from "lucide-react";
 import {
     CommandDialog,
     CommandEmpty,
@@ -12,27 +11,25 @@ import {
     CommandSeparator,
     CommandShortcut,
 } from "../ui/command";
-
-import { FunctionComponent, useEffect, useState } from "react";
-
 import { Link } from "react-router-dom";
-
-import { exit } from "@tauri-apps/plugin-process";
-import { OsType, type } from "@tauri-apps/plugin-os";
-import { isTauri } from "@tauri-apps/api/core";
-
 import { ScrollArea } from "../ui/scroll-area";
 
-import { primitive_strict_or } from "@/lib/functions/logic/or";
+import { useNavEntriesStore } from "@/stores/use_nav_entries_store";
+
+import { useTranslation } from "react-i18next";
+
+import { exit } from "@tauri-apps/plugin-process";
 import { PageLinks } from "@/globals/constants/links";
-import { use_nav_entries } from "@/hooks/use_nav_entries";
+import { OnlyTauri } from "../OnlyTauri";
 
 const CMDK = () => {
 
-    const [open, setOpen] = useState(false);
+    const settingsLinks = useNavEntriesStore((state) => state.settingsLinks);
+    const mainLinks = useNavEntriesStore((state) => state.mainLinks);
 
-    const main_links = use_nav_entries((state) => state.main_links);
-    const settings_links = use_nav_entries((state) => state.settings_links);
+    const { t } = useTranslation(["navigation", "generally"]);
+
+    const [open, setOpen] = useState(false);
 
     const onClick = () => {
         setOpen(false);
@@ -51,13 +48,15 @@ const CMDK = () => {
     }, []);
 
     return (
-        <CommandDialog open={open} onOpenChange={setOpen} title="Suchmenü">
-            <CommandInput placeholder="Suchen Sie nach etwas..." />
+        <CommandDialog open={open} onOpenChange={setOpen} title={t("search.title")}>
+            <CommandInput placeholder={t("search.placeholder")} />
             <CommandList className="overflow-hidden">
                 <ScrollArea className="h-[300px]">
-                    <CommandEmpty>Keine Übereinstimmungen gefunden.</CommandEmpty>
-                    <CommandGroup heading={main_links.title}>
-                        {main_links.entries.map((link) => (
+                    <CommandEmpty>
+                        {t("search.no_results")}
+                    </CommandEmpty>
+                    <CommandGroup heading={mainLinks.title}>
+                        {mainLinks.entries.map((link) => (
                             <SearchEntry
                                 key={link.url}
                                 to={link.url}
@@ -70,8 +69,8 @@ const CMDK = () => {
                         ))}
                     </CommandGroup>
                     <CommandSeparator />
-                    <CommandGroup heading={settings_links.title}>
-                        {settings_links.entries.map((link) => (
+                    <CommandGroup heading={settingsLinks.title}>
+                        {settingsLinks.entries.map((link) => (
                             <SearchEntry
                                 key={link.url}
                                 to={link.url}
@@ -83,27 +82,27 @@ const CMDK = () => {
                             />
                         ))}
                     </CommandGroup>
-                    {!isTauri() ? null : 
-                       <>
-                            <CommandSeparator />
-                            <CommandGroup heading="Sonstiges">
-                                {!primitive_strict_or<OsType>(type(), "linux", "linux", "windows") ? null :
-                                    <CommandItem onSelect={() => {
-                                        (async () => {
-                                            try {
-                                                await exit(0)
-                                            } catch (e) {
-                                                console.error(e);
-                                            }
-                                        })();
-                                    }}>
-                                        <Power className="mr-2 h-4 w-4" />
-                                        <span>App schließen<span className="hidden">beenden</span></span>
-                                    </CommandItem>
-                                }
-                            </CommandGroup>
-                        </>
-                    }
+                    <OnlyTauri osTypes={["windows", "linux", "macos", "android", "ios"]}>
+                        <CommandSeparator />
+                        <CommandGroup heading={t("misc" , { ns: "generally" })}>
+                            <OnlyTauri osTypes={["windows", "linux", "macos"]}>
+                                <CommandItem onSelect={() => {
+                                    (async () => {
+                                        try {
+                                            await exit(0)
+                                        } catch (e) {
+                                            console.error(e);
+                                        }
+                                    })();
+                                }}>
+                                    <Power className="mr-2 h-4 w-4" />
+                                    <span>
+                                        {t("close_app", { ns: "generally" })}
+                                    </span>
+                                </CommandItem>
+                            </OnlyTauri>
+                        </CommandGroup>
+                    </OnlyTauri>
                 </ScrollArea>
             </CommandList>
         </CommandDialog>

@@ -1,29 +1,32 @@
-import { SelectProps, SelectTriggerProps } from "@radix-ui/react-select";
-import { Fragment, ReactNode } from "react";
+import type { CommonType } from "@/lib/types/object";
+import type { DialogTriggerProps } from "@radix-ui/react-dialog";
+import type { SelectProps, SelectTriggerProps } from "@radix-ui/react-select";
+
+import { Fragment, type ReactNode } from "react";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { RadioGroupProps } from "@radix-ui/react-radio-group";
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from "./ui/drawer";
-import { DialogTriggerProps } from "@radix-ui/react-dialog";
 import { ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { ScrollArea } from "./ui/scroll-area";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { NavigationEntry } from "@/pages/Settings/Settings";
 import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
+
 import { useSidebar } from "./ui/sidebar";
-import { CommonType } from "@/lib/types/object";
+
+import { cn } from "@/lib/utils";
 
 type ListItem<T> = {
     value: T;
     item: ReactNode;
     displayText: string;
-}
+};
 
 interface SelectShortendProps<T> extends Pick<SelectProps, "onValueChange"|"defaultValue"> {
     title: string;
     selectItems: ListItem<T>[];
-}
+};
 
 const SelectShortend = <T,>({
     defaultValue,
@@ -92,7 +95,7 @@ const SelectAsRadio = <T,>({
             <DrawerContent className='max-h-[80%] h-full mt-0 px-4 py-2 border-0'>
                 <DrawerHeader className="py-2 px-0">
                     <DrawerTitle className="text-left">{title}</DrawerTitle>
-                    <DrawerDescription className="hidden">Auswahlmenü für {title}</DrawerDescription>
+                    <DrawerDescription className="hidden">{title}</DrawerDescription>
                 </DrawerHeader>
                 <ScrollArea className='pr-2'>
                     <RadioGroup

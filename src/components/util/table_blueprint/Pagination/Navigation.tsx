@@ -14,7 +14,6 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from "@/components/ui/tooltip"
-import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 
 type LucideElement = React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
@@ -37,7 +36,7 @@ const Navigation = <TData,>({
 }: NavigationProps<TData>) => {
     const { t } = useTranslation(["table"]);
 
-    const buttons = useMemo<NavigationButtons>(() => ([
+    const buttons: NavigationButtons = [
         {
             id: "go-first",
             className: "",
@@ -68,7 +67,7 @@ const Navigation = <TData,>({
             onClick: () => table.setPageIndex(table.getPageCount() - 1),
             tooltip: t("to_last"),
         },
-    ]), [t]);
+    ];
 
     return (
         <div className={cn("flex items-center [&_>_button:not(:last-of-type)]:mr-2 relative", className)} {...props}>

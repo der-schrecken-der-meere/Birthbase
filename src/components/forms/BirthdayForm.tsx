@@ -1,19 +1,6 @@
-import { useCallback, useMemo, useRef } from 'react'
+import type { Matcher } from 'react-day-picker';
 
-// React Date
-import { format } from "date-fns";
-import { de, enGB } from "date-fns/locale";
-
-// React Forms
-import {
-    SubmitHandler,
-    useForm
-} from "react-hook-form"
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-
-// Shadcn UI
-import { Button, ButtonProps } from '../ui/button';
+import { type ButtonProps, Button } from '../ui/button';
 import { Calendar } from '../ui/calendar';
 import {
     Form,
@@ -25,201 +12,155 @@ import {
     FormMessage,
 } from "../ui/form";
 import { Input } from '../ui/input';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '../ui/popover';
-import { Checkbox } from '../ui/checkbox';
-
-// Database
-import { Birthday, getDefaultBirthday } from '@/database/tables/birthday/birthdays';
-
-// Hooks
-import { use_birthday_mutation } from '@/hooks/use_birthday_mutation';
-import { BirthdayFormMode, use_birthday_form } from '@/hooks/use_birthday_form';
-
-// Util functions
-import { cn } from '@/lib/utils';
-import { format_date_to_iso_midnight } from '@/lib/intl/date';
-import { CalendarDays } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { PulseLoader } from 'react-spinners';
-import { useTranslation } from 'react-i18next';
+import { CalendarDays } from 'lucide-react';
 
-type FormMethod = "create"|"update"|"delete"|"read";
+import { BirthdayFormMode, useBirthdayFormStore } from '@/stores/use_birthday_form_store';
+
+import { useTranslation } from 'react-i18next';
+import { useBirthdayForm } from '@/hooks/use_birthday_form';
+
+import { type Birthday, getDefaultBirthday } from '@/database/tables/birthday/birthdays';
+import { z } from "zod";
+import { format } from "date-fns";
+import { de, enGB } from "date-fns/locale";
+import { cn } from '@/lib/utils';
+import { midnight_utc } from '@/lib/functions/date';
 
 const BirthdayForm = () => {
 
-    const { t, i18n } = useTranslation(["birthday_form", "generally", "toast_msg"]);
+    const { t, i18n } = useTranslation(["birthday_form", "generally"]);
 
-    const formSchema = useMemo(() => {
-        return z.object({
-            id: z.number(),
-            firstname: z.string({
-                required_error: t("first_name_required_error"),
-                invalid_type_error: t("first_name_type_error"),
-            })
-            .min(1, {
-                message: t("first_name_required_error"),
-            }),
-            lastname: z.string({
-                required_error: t("last_name_required_error"),
-                invalid_type_error: t("last_name_type_error"),
-            }),
-            date: z.coerce.date({
-                message: t("date_format_error"),
-            }),
-            marked: z.coerce.boolean(),
-        });
-    }, [t]);
-
-    type T_Form = z.infer<typeof formSchema>
-
-    const date_picker_lang = useMemo(() => {
-        switch (i18n.language) {
-            case "de":
-                return de;
-            case "en":
-                return enGB;
-        }
-    }, [t]);
-
-    const set_open = use_birthday_form((state) => state.set_open);
-    const set_operation = use_birthday_form((state) => state.set_operation);
-    const operation = use_birthday_form((state) => state.operation);
-    const birthday = use_birthday_form((state) => state.birthday);
-
-    const methodRef = useRef<FormMethod>("create");
-
-    const {
-        add_birthday,
-        update_birthday,
-        delete_birthday,
-    } = use_birthday_mutation({
-        add: {
-            onSuccess: () => {
-                set_open(false);
-            }
-        },
-        remove: {
-            onSuccess: () => {
-                set_open(false);
-            }
-        },
-        update: {
-            onSuccess: () => {
-                set_open(false);
-            }
-        }
+    const formSchema = z.object({
+        id: z.number(),
+        firstname: z.string({
+            required_error: t("first_name_required_error"),
+            invalid_type_error: t("first_name_type_error"),
+        })
+        .min(1, {
+            message: t("first_name_required_error"),
+        }),
+        lastname: z.string({
+            required_error: t("last_name_required_error"),
+            invalid_type_error: t("last_name_type_error"),
+        }),
+        date: z.coerce.date({
+            message: t("date_format_error"),
+        }),
+        marked: z.coerce.boolean(),
     });
-
-    const form = useForm<T_Form>({
-        resolver: zodResolver(formSchema),
-        defaultValues: (() => {
-            return {
-                id: birthday.id,
-                firstname: birthday.name.first,
-                lastname: birthday.name.last,
-                date: birthday.date as unknown as Date,
-                marked: birthday.marked,
-            };
-        })(),
-        // disabled: operation === "read",
-    });
-
-    const onAddClick = useCallback(() => {
-        methodRef.current = "create";
-    }, []);
-
-    const onUpdateClick = useCallback(() => {
-        methodRef.current = "update";
-    }, []);
-
-    const onDeleteClick = useCallback(() => {
-        methodRef.current = "delete";
-    }, []);
-
-    const onReadClick = useCallback(() => {
-        set_operation(BirthdayFormMode.UPDATE);
-        methodRef.current = "read";
-    }, []);
-
-    const Buttons = useMemo(() => {
-        if (operation === BirthdayFormMode.CREATE) {
-            return (
-                <SubmitButton isSubmitting={form.formState.isSubmitting} onClick={onAddClick}>
-                    {t("add_btn", { ns: "generally" })}
-                </SubmitButton>
-            );
-        }
-        return (
-            <>
-                {operation === BirthdayFormMode.READ
-                    ?
-                        <SubmitButton isSubmitting={form.formState.isSubmitting} onClick={onReadClick}>
-                           {t("edit_btn", { ns: "generally" })}
-                        </SubmitButton>
-                    :
-                        <SubmitButton isSubmitting={form.formState.isSubmitting} disabled={!form.formState.isDirty} onClick={onUpdateClick}>
-                            {t("change_btn", { ns: "generally" })}
-                        </SubmitButton>
-                }
-                
-                <SubmitButton isSubmitting={form.formState.isSubmitting} onClick={onDeleteClick} variant="destructive" className='ml-auto'>
-                    {t("delete_btn", { ns: "generally" })}
-                </SubmitButton>
-            </>
-        );
-    }, [operation, form.formState.isDirty]);
-
-    const onSubmit: SubmitHandler<T_Form> = async (data) => {
-        if (methodRef.current === "read") {
-            return
-        }
-        try {
+    
+    const { form, onSubmit, changeMethod } = useBirthdayForm({
+        form_schema: formSchema,
+        on_submit: (data) => {
             const newObj: Birthday = {...getDefaultBirthday(), ...{
                 id: data.id,
                 name: {
                     first: data.firstname,
                     last: data.lastname,
                 },
-                date: format_date_to_iso_midnight("de", "Europe/Berlin", data.date),
-                marked: data.marked,
-            }}
-            
-            switch (methodRef.current) {
-                case "create":
-                    add_birthday(newObj);
-                    break;
-                case "delete":
-                    delete_birthday(newObj);
-                    break;
-                case "update":
-                    update_birthday(newObj);
-                break;
-                default:
-                    break;
-            }
-        } catch (e) {
-            console.error(e);
-            form.setError("root.serverError", {
-                type: (e as unknown as any).msg,
-            })
+                timestamp: midnight_utc(+data.date),
+            }};
+            return newObj;
+        },
+    });
+
+    // React day picker config
+    const start_month = new Date(1900, 0);
+    const end_month = new Date(new Date().getFullYear() + 100, 11);
+    const disabled: Matcher = (date) => {
+        return date < new Date("1900-01-01");
+    };
+    const date_picker_lang = (() => {
+        switch (i18n.language) {
+            case "de":
+                return de;
+            case "en":
+                return enGB;
         }
-    }
+    })();
+
+    // Handle which submit request will be send
+    const setFormMode = useBirthdayFormStore((state) => state.setFormMode);
+    const formMode = useBirthdayFormStore((state) => state.formMode);
+    
+    const onAddClick    = () => changeMethod("create");
+    const onUpdateClick = () => changeMethod("update");
+    const onDeleteClick = () => changeMethod("delete");
+    const onReadClick   = () => {
+        setFormMode(BirthdayFormMode.UPDATE);
+        changeMethod("read");
+    };
+
+    const Buttons = (() => {
+        if (formMode === BirthdayFormMode.CREATE) {
+            return (
+                <SubmitButton
+                    isSubmitting={form.formState.isSubmitting}
+                    onClick={onAddClick}
+                >
+                    {t("add_btn", { ns: "generally" })}
+                </SubmitButton>
+            );
+        }
+        let left_btn = (
+            <SubmitButton
+                isSubmitting={form.formState.isSubmitting}
+                disabled={!form.formState.isDirty}
+                onClick={onUpdateClick}
+            >
+                {t("change_btn", { ns: "generally" })}
+            </SubmitButton>
+        );
+        if (formMode === BirthdayFormMode.READ) {
+            left_btn = (
+                <SubmitButton
+                    isSubmitting={form.formState.isSubmitting}
+                    onClick={onReadClick}>
+                    {t("edit_btn", { ns: "generally" })}
+                </SubmitButton>
+            );
+        }
+        return (
+            <>
+                {left_btn}
+                <SubmitButton
+                    isSubmitting={form.formState.isSubmitting}
+                    onClick={onDeleteClick}
+                    variant="destructive"
+                    className='ml-auto'
+                >
+                    {t("delete_btn", { ns: "generally" })}
+                </SubmitButton>
+            </>
+        );
+    })();
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-                <fieldset className="space-y-8" disabled={operation === BirthdayFormMode.READ}>
+            <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className='space-y-8 mt-4'
+            >
+                <fieldset
+                    className="space-y-8"
+                    disabled={formMode === BirthdayFormMode.READ}
+                >
                     <FormField
                         control={form.control}
                         name="firstname"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>{t("first_name_title")}</FormLabel>
+                                <FormLabel>
+                                    {t("first_name_title")}
+                                </FormLabel>
                                 <FormControl>
-                                    <Input placeholder={t("first_name_placeholder")} className='text-sm' {...field}/>
+                                    <Input
+                                        placeholder={t("first_name_placeholder")}
+                                        className='text-sm'
+                                        {...field}
+                                    />
                                 </FormControl>
                                 <FormDescription>
                                     {t("first_name_description")}
@@ -233,9 +174,15 @@ const BirthdayForm = () => {
                         name="lastname"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>{t("last_name_title")}</FormLabel>
+                                <FormLabel>
+                                    {t("last_name_title")}
+                                </FormLabel>
                                 <FormControl>
-                                    <Input placeholder={t("last_name_placeholder")} className='text-sm' {...field}/>
+                                    <Input
+                                        placeholder={t("last_name_placeholder")}
+                                        className='text-sm'
+                                        {...field}
+                                    />
                                 </FormControl>
                                 <FormDescription>
                                     {t("last_name_description")}
@@ -249,13 +196,18 @@ const BirthdayForm = () => {
                         name="date"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>{t("date_title")}</FormLabel>
+                                <FormLabel>
+                                    {t("date_title")}
+                                </FormLabel>
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         <FormControl>
                                             <Button
                                                 variant="outline"
-                                                className={`w-full justify-start text-left font-normal ${!field.value && "text-muted-foreground"}`}
+                                                className={cn(
+                                                    "w-full justify-start text-left font-normal",
+                                                    !field.value && "text-muted-foreground"
+                                                )}
                                                 disabled={field.disabled}
                                             >
                                                 {field.value ? (
@@ -267,29 +219,22 @@ const BirthdayForm = () => {
                                             </Button>
                                         </FormControl>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="start" >
+                                    <PopoverContent
+                                        className="w-auto p-0"
+                                        align="start"
+                                    >
                                         <Calendar
+                                            timeZone='UTC'
                                             locale={date_picker_lang}
-
-                                            // timeZone={timezone}
-
-                                            // fromYear={1900}
-                                            startMonth={new Date(1900, 0)}
-
-                                            // toYear={new Date().getFullYear() + 100}
-                                            endMonth={new Date(new Date().getFullYear() + 100, 11)}
-
-                                            // captionLayout="dropdown-buttons"
+                                            startMonth={start_month}
+                                            endMonth={end_month}
                                             captionLayout="dropdown"
-
                                             fixedWeeks
                                             showWeekNumber
                                             mode="single"
                                             selected={field.value}
                                             onSelect={field.onChange}
-                                            disabled={(date) => {
-                                                return date < new Date("1900-01-01")
-                                            }}
+                                            disabled={disabled}
                                         />
                                     </PopoverContent>
                                 </Popover>
@@ -300,46 +245,14 @@ const BirthdayForm = () => {
                             </FormItem>
                         )}
                     />
-                    <FormField
-                        control={form.control}
-                        name="marked"
-                        render={({field}) => (
-                            <FormItem className='flex items-start space-x-3 space-y-0'>
-                                <FormControl>
-                                    <Checkbox
-                                        checked={!field.value}
-                                        onCheckedChange={field.onChange}
-                                        disabled={field.disabled}
-                                    />
-                                </FormControl>
-                                <div className="space-y-1 leading-none">
-                                    <FormLabel>
-                                        Auf der Startseite anzeigen
-                                    </FormLabel>
-                                    <FormDescription>
-                                        Zeigt den Geburtstag an, wenn er kurz bevorsteht
-                                    </FormDescription>
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="id"
-                        render={({field}) => (
-                            <FormControl>
-                                <Input type="hidden" {...field}/>
-                            </FormControl>
-                        )}
-                    />
                 </fieldset>
                 <div className='flex items-center'>
                     {Buttons}
                 </div>
             </form>
         </Form>
-    )
-}
+    );
+};
 
 type SubmitButtonProps = Omit<ButtonProps, "type"> & {
     isSubmitting: boolean,
@@ -353,7 +266,12 @@ const SubmitButton = ({
     ...props
 }: SubmitButtonProps) => {
     return (
-        <Button variant={variant} {...props} type="submit" className={cn("min-w-min w-20", className)}>
+        <Button 
+            variant={variant}
+            type="submit"
+            className={cn("min-w-min w-20", className)}
+            {...props}
+        >
             {isSubmitting
                 ? <PulseLoader
                     color='hsl(var(--destructive-foreground))'
@@ -362,7 +280,7 @@ const SubmitButton = ({
                 : children
             }
         </Button>
-    )
-}
+    );
+};
 
 export default BirthdayForm;

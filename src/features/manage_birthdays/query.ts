@@ -22,7 +22,7 @@ const c_query_key = "birthdays";
 
 
 // Functions
-const get_birthdays_query = () => {
+const useGetBirthdaysQuery = () => {
     return useQuery({
         queryKey: [c_query_key],
         queryFn: () => {
@@ -32,7 +32,7 @@ const get_birthdays_query = () => {
     });
 };
 
-const get_birthday_query = (id: number) => {
+const useGetBirthdayQuery = (id: number) => {
     const queryClient = useQueryClient();
     return useQuery({
         queryKey: [c_query_key, id],
@@ -45,7 +45,7 @@ const get_birthday_query = (id: number) => {
     })
 }
 
-const add_birthday_query = () => {
+const useAddBirthdayQuery = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (birthday: Birthday) => {
@@ -60,7 +60,7 @@ const add_birthday_query = () => {
     })
 }
 
-const upd_birthday_query = () => {
+const useUpdBirthdayQuery = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (birthday: Birthday)=> {
@@ -75,7 +75,7 @@ const upd_birthday_query = () => {
     });
 }
 
-const del_birthday_query = () => {
+const useDelBirthdayQuery = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (birthday: Birthday) => {
@@ -90,7 +90,7 @@ const del_birthday_query = () => {
     })
 };
 
-const clear_birthday_query = () => {
+const useClearBirthdayQuery = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async () => {
@@ -103,10 +103,10 @@ const clear_birthday_query = () => {
 };
 
 export {
-    get_birthday_query,
-    get_birthdays_query,
-    add_birthday_query,
-    upd_birthday_query,
-    del_birthday_query,
-    clear_birthday_query,
+    useAddBirthdayQuery,
+    useDelBirthdayQuery,
+    useUpdBirthdayQuery,
+    useClearBirthdayQuery,
+    useGetBirthdayQuery,
+    useGetBirthdaysQuery,
 };

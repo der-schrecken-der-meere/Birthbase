@@ -1,11 +1,11 @@
 import { Button, ButtonProps } from './ui/button';
 import { useNavigate } from 'react-router-dom';
-import { useHistory } from '../hooks/useHistory';
+import { useHistory } from '../hooks/core/use_history';
 import { ArrowLeft } from 'lucide-react';
 
 interface GoBackInHistoryProps {
     amount?: number;
-}
+};
 
 const GoBackInHistory = ({
     amount = 1,

@@ -9,9 +9,13 @@ pub fn run() {
     let _platform = tauri_plugin_os::platform();
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_http::init())
         .setup(|app| {
             #[cfg(desktop)]
-            let _ = app.handle().plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, Some(vec![])));
+            let _ = app.handle().plugin(tauri_plugin_autostart::init(
+                tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+                Some(vec![]),
+            ));
             Ok(())
         })
         .plugin(tauri_plugin_fs::init())

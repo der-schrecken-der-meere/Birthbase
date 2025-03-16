@@ -1,13 +1,14 @@
 import { has_property } from "@/lib/functions/object/hasProperty";
-import { type PartialIDNotification, type NoIDNotification, Notification } from "./notifications";
+import { type AppNotification } from "./notifications";
 import { db, TABLES } from "@/database/db";
 
-const add_notifications_model = async (notifications: PartialIDNotification[]) => {
+const add_notifications_model = async (notifications: AppNotification[]) => {
     // Remove the id from all notifications
-    const arr_notifications: NoIDNotification[] = notifications.map((notification) => {
+    const arr_notifications: AppNotification[] = notifications.map((notification) => {
         if (has_property(notification, "id")) {
             // Dereference to prevent the change of the origin
             const obj_notification = { ...notification };
+            /** @ts-ignore */
             delete obj_notification.id;
             return obj_notification;
         }
@@ -39,7 +40,7 @@ const del_notifications_model = async (notification_ids: number[]) => {
 /**
  * Update multiple notifications
  */
-const upd_notifications_model = async (notifications: Notification[]) => {
+const upd_notifications_model = async (notifications: AppNotification[]) => {
     try {
         const res = await db.upd(TABLES.NOTIFICATIONS, notifications);
         if (res.length === 1) {

@@ -1,10 +1,11 @@
+import { type FunctionComponent } from "react";
+
 import { PageLinks } from "@/globals/constants/links";
 import i18n from "@/i18n/config";
 import { is_desktop } from "@/lib/functions/logic/desktop";
 import { Bell, CalendarClock, HardDrive, House, Info, Languages, LayoutDashboard, LucideProps, Monitor, PartyPopper, RefreshCw, Settings } from "lucide-react";
 import { create } from "zustand";
-import { use_app_store } from "./use_app_store";
-import { FunctionComponent } from "react";
+import { useAppStore } from "./use_app_store";
 
 type LinkEntry = {
     title: string,
@@ -20,21 +21,21 @@ type Group = {
 };
 
 interface NavEntries {
-    main_links: Group,
-    settings_links: Group,
-    update_language: () => void,
+    mainLinks: Group,
+    settingsLinks: Group,
+    setTranslations: () => void,
 };
 
-const use_nav_entries = create<NavEntries>()((set) => ({
-    main_links: {
+const useNavEntriesStore = create<NavEntries>()((set) => ({
+    mainLinks: {
         title: "",
         entries: [],
     },
-    settings_links: {
+    settingsLinks: {
         title: "",
         entries: [],
     },
-    update_language: () => {
+    setTranslations: () => {
         const main_str = (key: string) => i18n.t("main." + key, { ns: "navigation" });
         const settings_str = (key: string) => i18n.t("settings." + key, { ns: "navigation" });
 
@@ -107,7 +108,7 @@ const use_nav_entries = create<NavEntries>()((set) => ({
                 search: settings_str("app_search")
             },
         ];
-        if (is_desktop(use_app_store.getState().os_type)) {
+        if (is_desktop(useAppStore.getState().osType)) {
             settings.push({
                 title: settings_str("update"),
                 url: PageLinks.SETTINGS_UPDATE,
@@ -116,11 +117,11 @@ const use_nav_entries = create<NavEntries>()((set) => ({
             });
         }
         set(() => ({
-            main_links: {
+            mainLinks: {
                 title: main_title,
                 entries: main
             },
-            settings_links: {
+            settingsLinks: {
                 title: settings_title,
                 entries: settings
             },
@@ -129,4 +130,4 @@ const use_nav_entries = create<NavEntries>()((set) => ({
 }));
 
 export type { LinkEntry };
-export { use_nav_entries };
+export { useNavEntriesStore };

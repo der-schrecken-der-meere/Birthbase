@@ -1,0 +1,19 @@
+{
+    "birthday": {
+        "title": "Birthday",
+        "body_zero": "{{firstname}} {{lastname}} has a birthday today",
+        "body_one": "{{firstname}} {{lastname}} has a birthday in one day",
+        "body_other": "{{firstname}} {{lastname}} has a birthday in {{count}} days"
+    },
+    "birthday_reminder": {
+        "title": "Reminder"
+    },
+    "update_available": {
+        "title": "Update available",
+        "description": "The new version {{version}} is available for download"
+    },
+    "update_installed": {
+        "title": "Update installed",
+        "description": "Version {{version}} is installed"
+    }
+}
