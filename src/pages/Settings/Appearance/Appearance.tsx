@@ -4,7 +4,7 @@ import { PaintbrushVertical, Palette } from 'lucide-react';
 import { Separator } from '@/components/ui/separator'
 import { type ListItem, SettingsFormElement, SettingsFormPageWrapper } from '../Settings';
 import { FormField } from '@/components/ui/form';
-import { UniSelect } from '@/components/Select';
+import { UniSelect } from '@/components/select/UniSelect';
 
 import { useSettingsBreadcrumbs } from '@/components/layouts/SettingsLayout';
 import { useNavbar } from '@/hooks/core/use_navbar';

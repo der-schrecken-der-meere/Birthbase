@@ -1,17 +1,24 @@
 import { create } from "zustand";
 
 type ConfirmConfig = {
+    /** Title of the confirm dialog */
     title: string,
+    /** Description of the confirm dialog */
     description: string,
+    /** Function that will be called after the user cancels the confirm dialog */
     on_cancel: () => void,
+    /** Function that will be called after the user confirmed the confirm dialog */
     on_confirm: () => void,
 };
 
 interface AppConfirm {
+    /** An object containing data for the confirm dialog */
     config: ConfirmConfig,
+    /** Whether the confirm dialog is open */
     isOpen: boolean, 
     setOpen: (open: boolean) => void,
     setConfig: (config: ConfirmConfig) => void,
+    /** Opens the confirm dialog and applies the current config object */
     setConfirm: (config: Partial<ConfirmConfig>) => void,
 };
 

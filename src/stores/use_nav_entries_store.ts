@@ -6,23 +6,34 @@ import { is_desktop } from "@/lib/functions/logic/desktop";
 import { Bell, CalendarClock, HardDrive, House, Info, Languages, LayoutDashboard, LucideProps, Monitor, PartyPopper, RefreshCw, Settings } from "lucide-react";
 import { create } from "zustand";
 import { useAppStore } from "./use_app_store";
+import { isTauri } from "@tauri-apps/api/core";
 
 type LinkEntry = {
+    /** Title of the link */
     title: string,
+    /** Url of the link */
     url: PageLinks,
+    /** Icon of the link */
     icon: FunctionComponent<LucideProps>,
+    /** Optional text for searching in CMDK */
     search?: string,
+    /** Optional shortcut text */
     shortcut?: string,
 };
 
 type Group = {
+    /** Heading of the group */
     title: string,
+    /** Groupitems */
     entries: LinkEntry[]
 };
 
 interface NavEntries {
+    /** Main group */
     mainLinks: Group,
+    /** Settings group */
     settingsLinks: Group,
+    /** Translates all titles and search texts to the currently used language */
     setTranslations: () => void,
 };
 
@@ -101,13 +112,8 @@ const useNavEntriesStore = create<NavEntries>()((set) => ({
                 icon: Info,
                 search: settings_str("info_search")
             },
-            {
-                title: settings_str("app"),
-                url: PageLinks.SETTINGS_APP,
-                icon: LayoutDashboard,
-                search: settings_str("app_search")
-            },
         ];
+        // Include update page only on desktop
         if (is_desktop(useAppStore.getState().osType)) {
             settings.push({
                 title: settings_str("update"),
@@ -116,6 +122,17 @@ const useNavEntriesStore = create<NavEntries>()((set) => ({
                 search: settings_str("update_search")
             });
         }
+
+        // Include app page only for apps
+        if (isTauri()) {
+            settings.push({
+                title: settings_str("app"),
+                url: PageLinks.SETTINGS_APP,
+                icon: LayoutDashboard,
+                search: settings_str("app_search")
+            });
+        }
+
         set(() => ({
             mainLinks: {
                 title: main_title,

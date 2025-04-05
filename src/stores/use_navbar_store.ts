@@ -22,8 +22,11 @@ type UpdateNavbarProps <T = BreadcrumbDisplayProps[]> = {
 }
 
 interface AppNavbar {
+    /** Current page title that will be shown in the upper navbar */
     pageTitle: string,
+    /** Document title (only useful for website) */
     documentTitle: string,
+    /** Breadcumbs that will be rendered */
     breadCrumbs: BreadcrumbDisplayProps[],
     setDocumentTitle: (documentTitle: string) => void,
     setPageTitle: (pageTitle: string) => void,

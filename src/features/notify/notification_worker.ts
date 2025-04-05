@@ -106,10 +106,21 @@ const upd_item = ({
     )
 };
 
-self.onmessage = (
-    e: MessageEvent<(AddNotificationRequest | UpdNotificationRequest | DelNotificationRequest)[]>
+let WorkerPort: MessagePort;
+
+const on_message = (
+    e: MessageEvent<
+        ((AddNotificationRequest | UpdNotificationRequest | DelNotificationRequest)[]) &
+        {code?: "port"}
+    >
 ) => {
     const requests = e.data;
+
+    if (requests?.code === "port") {
+        WorkerPort = e.ports[0];
+        WorkerPort.onmessage = on_message;
+        return;
+    }
 
     console.log(requests);
 
@@ -141,6 +152,8 @@ self.onmessage = (
         set_timeout();
     }
 };
+
+self.onmessage = on_message;
 
 // Logging
 setInterval(() => {

@@ -8,6 +8,7 @@ type BirthdayCore = {
         last: string,
     },
     timestamp: MidnightTimestamp,
+    reminder: number[],
 };
 
 type Birthday = CoreRecord & BirthdayCore;

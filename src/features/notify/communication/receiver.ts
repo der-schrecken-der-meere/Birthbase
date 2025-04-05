@@ -1,8 +1,9 @@
-import { send_notification } from "@/apis/tauri_notification";
+
+import { send_notification } from "@/apis/notification/send_notification";
 import { get_birthday_model } from "@/database/tables/birthday/db_model";
 import { create_default_notification, NotificationGroupType, NotificationType, type AppNotification, type AppNotificationProps } from "@/database/tables/notifications/notifications";
 import { addNotificationQueryClient } from "@/features/latest_notifications/query";
-import { queryClient } from "@/frontend/pre_react_init";
+import { queryClient } from "@/globals/constants/query_client";
 import i18n from "@/i18n/config";
 import { calculate_days_until_next_birthday } from "@/lib/functions/birthday";
 import { add_notification_middleware } from "@/middleware/notification";

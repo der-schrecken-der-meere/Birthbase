@@ -9,6 +9,7 @@ type CreateBirthdayProps = {
         first?: string,
         last?: string,
     },
+    reminder?: number[],
 };
 
 const create_birthday = ({
@@ -18,6 +19,7 @@ const create_birthday = ({
         first: "",
         last: ""
     },
+    reminder = [],
 }: CreateBirthdayProps): Birthday => {
     return {
         id,
@@ -26,6 +28,7 @@ const create_birthday = ({
             first: (name?.first || ""),
             last: (name?.last || ""),
         },
+        reminder: [...reminder],
     };
 };
 
@@ -39,9 +42,22 @@ const unify_birthday = (
     birthday: Birthday
 ): Birthday => {
 
+    const { timestamp, reminder } = birthday;
+
+    const new_reminders = reminder.reduce<number[]>((acc, cur) => {
+        if (!acc.includes(cur)) {
+            acc.push(cur);
+        }
+        return acc;
+    }, [])
+    .toSorted();
+
+    console.log(new_reminders);
+
     return create_birthday({
         ...birthday,
-        timestamp: midnight_utc(birthday.timestamp),
+        timestamp: midnight_utc(timestamp),
+        reminder: new_reminders,
     });
 };
 

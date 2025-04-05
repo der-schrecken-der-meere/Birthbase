@@ -4,7 +4,12 @@ import { useToastStore, ToastType } from "../../stores/use_toast_store";
 import { useTranslation } from "react-i18next";
 
 type UseQueryProps<T> = {
+    /** Query function that will return the data */
     useQueryFn: () => DefinedUseQueryResult<T, Error>,
+    /** Translation type
+     * 
+     * `test => errors.show.test`
+     */
     tKey: string,
 };
 

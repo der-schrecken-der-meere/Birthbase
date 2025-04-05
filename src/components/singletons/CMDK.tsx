@@ -1,8 +1,7 @@
-import { type FunctionComponent, useEffect, useState } from "react";
+import { type FunctionComponent } from "react";
 
 import { Power } from "lucide-react";
 import {
-    CommandDialog,
     CommandEmpty,
     CommandGroup,
     CommandInput,
@@ -22,33 +21,23 @@ import { exit } from "@tauri-apps/plugin-process";
 import { PageLinks } from "@/globals/constants/links";
 import { OnlyTauri } from "../OnlyTauri";
 
-const CMDK = () => {
+const CMDK = ({
+    setOpen
+}: {
+    setOpen: (open: boolean) => void,
+}) => {
 
     const settingsLinks = useNavEntriesStore((state) => state.settingsLinks);
     const mainLinks = useNavEntriesStore((state) => state.mainLinks);
 
     const { t } = useTranslation(["navigation", "generally"]);
 
-    const [open, setOpen] = useState(false);
-
     const onClick = () => {
         setOpen(false);
     };
 
-    useEffect(() => {
-        const down = (e: KeyboardEvent) => {
-            if (e.key === "f" && (e.metaKey || e.ctrlKey)) {
-                e.preventDefault();
-                setOpen(() => true);
-            }
-        };
-    
-        document.addEventListener("keydown", down);
-        return () => document.removeEventListener("keydown", down);
-    }, []);
-
     return (
-        <CommandDialog open={open} onOpenChange={setOpen} title={t("search.title")}>
+        <>
             <CommandInput placeholder={t("search.placeholder")} />
             <CommandList className="overflow-hidden">
                 <ScrollArea className="h-[300px]">
@@ -105,7 +94,7 @@ const CMDK = () => {
                     </OnlyTauri>
                 </ScrollArea>
             </CommandList>
-        </CommandDialog>
+        </>
     );
 };
 

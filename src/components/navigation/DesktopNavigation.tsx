@@ -1,5 +1,5 @@
 import type { BreadcrumbDisplayProps, BreadcrumbProps } from "@/stores/use_navbar_store";
-import type { UpperNavbarProps } from "./Navigation";
+import type { UpperNavbarProps } from "./UpperNavbar";
 
 import { type CSSProperties, Fragment } from "react";
 

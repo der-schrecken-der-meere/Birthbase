@@ -19,6 +19,15 @@ const useBirthdayForm = <T extends ZodType<any, any, any>>({
 
     const setOpen = useBirthdayFormStore((state) => state.setOpen);
     const birthday = useBirthdayFormStore((state) => state.birthday);
+    const { id, name: { first, last }, timestamp, reminder } = birthday;
+
+    console.log(reminder);
+
+    const reminders = reminder.map<{ reminder: number }>((reminder) => {
+        return {
+            reminder
+        };
+    });
 
     const cbs = {
         onSuccess: () => {
@@ -33,14 +42,13 @@ const useBirthdayForm = <T extends ZodType<any, any, any>>({
     });
     const form = useForm<z.infer<T>>({
         resolver: zodResolver(form_schema),
-        defaultValues: (() => {
-            return {
-                id: birthday.id,
-                firstname: birthday.name.first,
-                lastname: birthday.name.last,
-                date: birthday.timestamp,
-            } as any;
-        })(),
+        defaultValues: {
+            id,
+            firstname: first,
+            lastname: last,
+            date: timestamp,
+            reminders,
+        } as any,
     });
 
     const onSubmit = async (data: z.infer<T>) => {

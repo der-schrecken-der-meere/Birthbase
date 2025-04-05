@@ -1,6 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
+/** All JSON translation file names */
 const ns: readonly string[] = [
     "birthday_form",
     "confirm",
@@ -15,7 +16,7 @@ const ns: readonly string[] = [
 ];
 
 
-
+/** Fetches all JSON translation files for a specific language and return all as one object */
 const get_lng_ns = async (lng: string, ns: readonly string[]) => {
     const translation: any = {};
     for (const namespace of ns) {
@@ -35,6 +36,7 @@ i18n
             de: await get_lng_ns("de", ns),
             en: await get_lng_ns("en", ns),
         },
+        // React will handle by itself
         interpolation: {
             escapeValue: false,
         },

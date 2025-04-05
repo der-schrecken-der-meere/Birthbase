@@ -1,7 +1,7 @@
 import { AppNotificationProps, NotificationGroupType, NotificationType } from "@/database/tables/notifications/notifications";
 import { Action } from "../core";
-import { send_message } from "../notify";
 import { VersionNumber } from "@/lib/types/number";
+import { send_notification_msg } from "@/frontend/mangage_workers";
 
 type AddSignature<T extends NotificationGroupType> = (
     key: number | string,
@@ -19,7 +19,7 @@ const add_worker_notifications = <T extends NotificationGroupType>(
     group_type: T,
     data: Extract<AppNotificationProps, { group_type: T }>["data"]
 ) => {
-    send_message([{
+    send_notification_msg([{
         action: Action.ADD,
         /** @ts-ignore */
         new_data: {
@@ -35,7 +35,7 @@ const del_worker_notifications = (
     timestamp: number,
     group_type: NotificationGroupType
 ) => {
-    send_message([{
+    send_notification_msg([{
         action: Action.DEL,
         old_data: {
             group_type,
@@ -50,7 +50,7 @@ const upd_worker_notifications = (
     new_timestamp: number,
     group_type: NotificationGroupType,
 ) => {
-    send_message([{
+    send_notification_msg([{
         action: Action.UPD,
         old_data: {
             group_type,

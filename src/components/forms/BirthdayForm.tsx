@@ -14,7 +14,7 @@ import {
 import { Input } from '../ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { PulseLoader } from 'react-spinners';
-import { CalendarDays } from 'lucide-react';
+import { BellPlus, CalendarDays, X } from 'lucide-react';
 
 import { BirthdayFormMode, useBirthdayFormStore } from '@/stores/use_birthday_form_store';
 
@@ -27,6 +27,8 @@ import { format } from "date-fns";
 import { de, enGB } from "date-fns/locale";
 import { cn } from '@/lib/utils';
 import { midnight_utc } from '@/lib/functions/date';
+import { ControllerRenderProps, useFieldArray } from 'react-hook-form';
+import { ReactNode } from 'react';
 
 const BirthdayForm = () => {
 
@@ -48,24 +50,43 @@ const BirthdayForm = () => {
         date: z.coerce.date({
             message: t("date_format_error"),
         }),
-        marked: z.coerce.boolean(),
+        reminders: z.array(z.object({
+            reminder: z.coerce.number({
+                invalid_type_error: t("reminder_type_error"),
+            })
+            .min(1, {
+                message: t("reminder_to_low_error"),
+            }),
+        })),
     });
     
     const { form, onSubmit, changeMethod } = useBirthdayForm({
         form_schema: formSchema,
         on_submit: (data) => {
+            const { reminders, id, date, firstname, lastname } = data;
+            const reminder = reminders.reduce<number[]>((acc, cur) => {
+                const { reminder } = cur;
+                acc.push(reminder);
+                return acc;
+            }, []);
             const newObj: Birthday = {...getDefaultBirthday(), ...{
-                id: data.id,
+                id,
                 name: {
-                    first: data.firstname,
-                    last: data.lastname,
+                    first: firstname,
+                    last: lastname,
                 },
-                timestamp: midnight_utc(+data.date),
+                timestamp: midnight_utc(+date),
+                reminder,
             }};
             return newObj;
         },
     });
 
+    const { fields, append, remove } = useFieldArray({
+        control: form.control,
+        /** @ts-ignore */
+        name: "reminders",
+    });
     // React day picker config
     const start_month = new Date(1900, 0);
     const end_month = new Date(new Date().getFullYear() + 100, 11);
@@ -80,6 +101,16 @@ const BirthdayForm = () => {
                 return enGB;
         }
     })();
+
+    const onAddReminder = () => {
+        append({
+            reminder: 20,
+        });
+    };
+    const onRemoveReminder = (index: number) => {
+        console.log(index);
+        remove(index);
+    };
 
     // Handle which submit request will be send
     const setFormMode = useBirthdayFormStore((state) => state.setFormMode);
@@ -245,6 +276,41 @@ const BirthdayForm = () => {
                             </FormItem>
                         )}
                     />
+                    <div className='space-y-2'>
+                        <span className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block'>
+                            {t("reminder_title")}
+                        </span>
+                        {fields.map((field, i) => (
+                            <FormField
+                                key={field.id}
+                                control={form.control}
+                                name={`reminders.${i}.reminder`}
+                                render={({ field: { ...props } }) => (
+                                    <FormItem>
+                                        <FormControl>
+                                            <Reminder reminderId={i} onRemoveReminder={onRemoveReminder} {...props}>
+                                                <span className='grow'>{t("day", { ns: "generally", count: +props.value })}</span>
+                                            </Reminder>
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+                        ))}
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={onAddReminder}
+                            className='text-sm font-normal'
+                        >
+                            <BellPlus className='h-4 w-4 mr-2'/>
+                            {t("add_notification")}
+                        </Button>
+                        <p className='text-sm text-muted-foreground'>
+                            {t("reminder_description")}
+                        </p>
+                    </div>
                 </fieldset>
                 <div className='flex items-center'>
                     {Buttons}
@@ -252,6 +318,46 @@ const BirthdayForm = () => {
             </form>
         </Form>
     );
+};
+
+const Reminder = ({
+    reminderId,
+    onRemoveReminder,
+    children,
+    ...props
+}: ControllerRenderProps<{
+    id: number;
+    firstname: string;
+    lastname: string;
+    date: Date;
+    reminders: {
+        reminder: number;
+    }[];
+}, `reminders.${number}.reminder`> & {
+    reminderId: number,
+    onRemoveReminder: (index: number) => void,
+    children?: ReactNode,
+}) => {
+
+    const onClick = () => {
+        console.log(reminderId);
+        onRemoveReminder(reminderId);
+    }
+
+    return (
+        <div className='flex gap-2 items-center justify-stretch'>
+            <Input className='w-20' min={1} max={365} type='number' {...props} />
+            {children}
+            <Button
+                variant="ghost"
+                type='button'
+                onClick={onClick}
+                className='justify-self-end'
+            >
+                <X className='w-4 h-4'/>
+            </Button>
+        </div>
+    )
 };
 
 type SubmitButtonProps = Omit<ButtonProps, "type"> & {
@@ -265,6 +371,9 @@ const SubmitButton = ({
     className,
     ...props
 }: SubmitButtonProps) => {
+
+    console.log(props.value);
+
     return (
         <Button 
             variant={variant}

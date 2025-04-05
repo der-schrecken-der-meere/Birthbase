@@ -1,8 +1,5 @@
 import type { CSSProperties, FunctionComponent, HTMLAttributes, ReactNode } from "react";
-import type { UpperNavbarProps } from "./Navigation";
 
-import { GoBackInHistory } from "../History";
-import { CustomSidebarTrigger } from "../Sidebar";
 import { LinkProps, NavLink } from "react-router-dom";
 import { MobileAddBirthdayButton } from "../AddBirthdayButton";
 
@@ -13,22 +10,6 @@ import { useGetNotificationsQuery } from "@/features/latest_notifications/query"
 import { PageLinks } from "@/globals/constants/links";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "../ui/button";
-
-const MobileUpperNavbar = ({
-    pageTitle,
-}: UpperNavbarProps) => {
-    return (
-        <>
-            <GoBackInHistory
-                variant="ghost"
-                size="icon"
-                className='w-7 h-7'
-            />
-            <div className='whitespace-pre text-ellipsis overflow-hidden text-xl flex-1'>{pageTitle}</div>
-            <CustomSidebarTrigger className='h-7 w-7'/>
-        </>
-    );
-};
 
 const find_link = (page_link: PageLinks) => {
     const main_links = useNavEntriesStore.getState().mainLinks;
@@ -123,6 +104,5 @@ const MobileNavbarLink = ({
 };
 
 export {
-    MobileUpperNavbar,
     MobileLowerNavbar,
 };

@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 
 // Pages
-import Home from '../pages/Home';
+// import Home from '../pages/Home';
 import NotFound from "../pages/NotFound";
 
 // Components
@@ -20,9 +20,9 @@ import MainLayout from './layouts/MainLayout';
 // import ConfirmProvider from "./contexts/confirmContext";
 // import BirthdayFormProvider from "./contexts/birthdayFormContext";
 import { SettingsLayout } from "./layouts/SettingsLayout";
-import { delay_promise } from "@/lib/functions/promise/delay";
+import { SettingsEntriesSkeleton } from "./skeletons/SettingsEntriesSkeleton";
 import { MyBirthdaysSkeleton } from "./skeletons/MyBirthdaysSkeleton";
-import { PageLinks } from "@/globals/constants/links";
+import { HomeSkeleton } from "./skeletons/HomeSkeleton";
 
 import { useAppStore } from "@/stores/use_app_store";
 
@@ -30,21 +30,25 @@ import { Toast } from "./singletons/Toast";
 import { ConfirmDialog } from "./singletons/ConfirmDialog";
 import { BirthdayFormDialog } from "./singletons/BirthdayFormDialog";
 import { is_desktop } from "@/lib/functions/logic/desktop";
-import { SettingsEntriesSkeleton } from "./skeletons/SettingsEntriesSkeleton";
 import { useTranslation } from "react-i18next";
+import { isTauri } from "@tauri-apps/api/core";
+import { PageLinks } from "@/globals/constants/links";
 
-const MyBirthdays = lazy(() => delay_promise(() => import("../pages/MyBirthdays"), 0));
-const Notifications = lazy(() => delay_promise(() => import("../pages/Notifications"), 0));
-const Settings = lazy(() => delay_promise(() => import("../pages/Settings/Settings"), 0));
+// Main pages
+const Home =                    lazy(() => import("../pages/Home").catch(() => ({ default: () => <></> })));
+const MyBirthdays =             lazy(() => import("../pages/MyBirthdays").catch(() => ({ default: () => <></> })));
+const Notifications =           lazy(() => import("../pages/Notifications").catch(() => ({ default: () => <></> })));
+const Settings =                lazy(() => import("../pages/Settings/Settings").catch(() => ({ default: () => <></> })));
 
-const Appearance = lazy(() => delay_promise(() => import("../pages/Settings/Appearance/Appearance"), 0));
-const NotificationsSettings = lazy(() => delay_promise(() => import("../pages/Settings/Notifications/Notifications"), 0));
-const Storage = lazy(() => delay_promise(() => import("../pages/Settings/Storage/Storage"), 0));
-const Time = lazy(() => delay_promise(() => import("../pages/Settings/Time/Time"), 0));
-const Language = lazy(() => delay_promise(() => import("../pages/Settings/Language/Language"), 0));
-const Info = lazy(() => delay_promise(() => import("../pages/Settings/Info/Info"), 0));
-const SettingsApp = lazy(() => delay_promise(() => import("../pages/Settings/App/App"), 0));
-const Update = lazy(() => delay_promise(() => import("../pages/Settings/Update/Update"), 0));
+// Settings pages
+const Appearance =              lazy(() => import("../pages/Settings/Appearance/Appearance").catch(() => ({ default: () => <></> })));
+const NotificationsSettings =   lazy(() => import("../pages/Settings/Notifications/Notifications").catch(() => ({ default: () => <></> })));
+const Storage =                 lazy(() => import("../pages/Settings/Storage/Storage").catch(() => ({ default: () => <></> })));
+const Time =                    lazy(() => import("../pages/Settings/Time/Time").catch(() => ({ default: () => <></> })));
+const Language =                lazy(() => import("../pages/Settings/Language/Language").catch(() => ({ default: () => <></> })));
+const Info =                    lazy(() => import("../pages/Settings/Info/Info").catch(() => ({ default: () => <></> })));
+const SettingsApp =             lazy(() => import("../pages/Settings/__tauri__/App/App").catch(() => ({ default: () => <></> })));
+const Update =                  lazy(() => import("../pages/Settings/__tauri__/Update/Update").catch(() => ({ default: () => <></> })));
 
 const App = () => {
     const isBooting = useAppStore((state) => state.isBooting);
@@ -54,10 +58,12 @@ const App = () => {
     const { i18n } = useTranslation();
 
     useEffect(() => {
+        // Finish booting when virtual dom is ready
         setFinishedBooting();
     }, []);
 
     useEffect(() => {
+        // Change language and direction when detected language changes
         if (i18n.resolvedLanguage) {
             document.documentElement.lang = i18n.resolvedLanguage;
             document.documentElement.dir = i18n.dir(i18n.resolvedLanguage);
@@ -72,7 +78,13 @@ const App = () => {
                 errorElement={<NotFound/>}
             >
                 <Route errorElement={<NotFound/>}>
-                    <Route index element={<Home/>}/>
+                    <Route index element={
+                        <Suspense fallback={
+                            <HomeSkeleton/>
+                        }>
+                            <Home/>
+                        </Suspense>
+                    }/>
                     <Route
                         path={PageLinks.SETTINGS}
                         element={<SettingsLayout/>}
@@ -144,16 +156,18 @@ const App = () => {
                                 </Suspense>
                             }
                         />
-                        <Route
-                            path={PageLinks.SETTINGS_APP}
-                            element={
-                                <Suspense fallback={
-                                    <></>
-                                }>
-                                    <SettingsApp/>
-                                </Suspense>
-                            }
-                        />
+                        {isTauri() && 
+                            <Route
+                                path={PageLinks.SETTINGS_APP}
+                                element={
+                                    <Suspense fallback={
+                                        <></>
+                                    }>
+                                        <SettingsApp/>
+                                    </Suspense>
+                                }
+                            />
+                        }
                         {is_desktop(osType) && (
                             <Route
                                 path={PageLinks.SETTINGS_UPDATE}

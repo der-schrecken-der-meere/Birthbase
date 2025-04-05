@@ -1,19 +1,23 @@
 import { type HTMLAttributes, Suspense, lazy } from 'react'
 import { Outlet } from 'react-router-dom';
 
-import { Test_overlay } from '../test/test_overlay'
-import { CMDK } from '../singletons/CMDK';
-import { MobileLowerNavbar } from '../navigation/MobileNavigation'
-import { UpperNavbar } from '../navigation/Navigation';
+// import { Test_overlay } from '../test/test_overlay'
+import { UpperNavbar } from '../navigation/UpperNavbar';
 import { AppSidebar } from '../Sidebar'
 import { SidebarProvider, useSidebar } from '../ui/sidebar';
 
 import { useUpdateStore } from '@/stores/use_update_store'
 
 import { useShortcuts } from '../../hooks/core/use_shortcuts';
-import { OnlyTauri } from '../OnlyTauri';
+import { CMDKSuspense } from '../singletons/CMDKSuspense';
+import { Skeleton } from '../ui/skeleton';
 
-const Updater = lazy(() => import("../updater/Updater"));
+const MobileLowerNavbar = lazy(() => import('../navigation/MobileNavigation').then(module => ({ default: module.MobileLowerNavbar })));
+
+let Updater = lazy(() => Promise.resolve({ default: () => <></> }));
+if (__IS_TAURI__ && __TAURI_IS_DESKTOP__) {
+    Updater = lazy(() => import("../__tauri__desktop__updater/Updater").then(module => ({ default: module.Updater })));
+}
 
 const MainLayout = () => {
 
@@ -24,7 +28,7 @@ const MainLayout = () => {
     return (
         <>
             {/* <Test_overlay/> */}
-            <CMDK/>
+            <CMDKSuspense/>
             <SidebarProvider className='h-svh'>
                 <AppSidebar />
                 <main className='relative @container w-full flex flex-col *:px-4 h-full'>
@@ -33,11 +37,9 @@ const MainLayout = () => {
                         <Outlet />
                     </div>
                     {isAvailable &&
-                        <OnlyTauri osTypes={['windows', 'macos', 'linux']}>
-                            <Suspense fallback={null}>
-                                <Updater/>
-                            </Suspense>
-                        </OnlyTauri>
+                        <Suspense fallback={null}>
+                            <Updater/>
+                        </Suspense>
                     }
                     <MobileNav className='shrink-0 h-14 border-t' />
                 </main>
@@ -47,11 +49,22 @@ const MainLayout = () => {
 };
 
 const MobileNav = (props: HTMLAttributes<HTMLDivElement>) => {
-    
+
     const { isMobile } = useSidebar();
 
     return (isMobile
-        ? <MobileLowerNavbar {...props} />
+        ? 
+            <Suspense fallback={
+                <div className='h-14 py-1 flex items-center justify-between'>
+                    <Skeleton className='w-10 h-10' />
+                    <Skeleton className='w-10 h-10' />
+                    <Skeleton className='w-10 h-10' />
+                    <Skeleton className='w-10 h-10' />
+                    <Skeleton className='w-10 h-10' />
+                </div>
+            }>
+                <MobileLowerNavbar {...props} />
+            </Suspense>
         : null
     );
 };

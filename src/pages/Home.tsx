@@ -5,7 +5,6 @@ import type { TFunction } from 'i18next';
 
 import { Fragment } from 'react';
 
-import { Skeleton } from '../components/ui/skeleton';
 import { PartyPopper } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -21,6 +20,8 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { i18n } from 'i18next';
 import { calculate_age, calculate_days_until_next_birthday } from '@/lib/functions/birthday';
+import { type ButtonProps } from '@/components/ui/button';
+import { HomeSkeleton } from '@/components/skeletons/HomeSkeleton';
 
 const Home = () => {
 
@@ -56,11 +57,11 @@ const BirthdayList = () => {
         setReadMode(data);
     };
 
-    if (isFetching) {
+    if (
+        isFetching
+    ) {
         return (
-            <>
-                <Skeleton className='w-full h-36' />
-            </>
+            <HomeSkeleton/>
         );
     }
 
@@ -119,7 +120,7 @@ const BirthdayEntry = ({
     until,
     date,
     ...props
-}: HTMLAttributes<HTMLDivElement> & {
+}: ButtonProps & {
     age: number,
     until: number,
     date: MidnightTimestamp,
@@ -139,7 +140,7 @@ const BirthdayEntry = ({
     }
 
     return (
-        <div className={cn("border border-border mt-4 rounded-xl px-4 py-2 flex gap-2 items-center", className)} {...props}>
+        <button className={cn("border border-border mt-4 rounded-xl px-4 py-2 flex gap-2 items-center w-full", className)} {...props}>
             <div className="flex flex-col gap-1 items-start mr-2">
                 <div className="font-medium text-lg text-wrap">
                     {children}
@@ -151,7 +152,7 @@ const BirthdayEntry = ({
             <div className="flex flex-col justify-center items-center ml-auto">
                 {days_badge}
             </div>
-        </div>
+        </button>
     );
 };
 

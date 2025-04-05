@@ -12,5 +12,10 @@
     "date_title": "Date",
     "date_placeholder": "Select date",
     "date_format_error": "Wrong date format",
-    "date_description": "Date of the birthday"
+    "date_description": "Date of the birthday",
+    "reminder_title": "Reminders",
+    "reminder_description": "When you will be reminded",
+    "reminder_to_low_error": "The reminder must be atleast one day",
+    "reminder_type_error": "The reminder must be of type number",
+    "add_notification": "Add reminder"
 }

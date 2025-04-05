@@ -1,10 +1,11 @@
-import { Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
 import { Skeleton } from "../ui/skeleton";
-import BirthdayForm from "../forms/BirthdayForm";
 import { BirthdayFormMode, useBirthdayFormStore } from "@/stores/use_birthday_form_store";
 import { useTranslation } from "react-i18next";
+
+const BirthdayForm = lazy(() => import("../forms/BirthdayForm").then((module) => module).catch(() => ({ default: () => <></> })));
 
 const BirthdayFormDialog = () => {
 

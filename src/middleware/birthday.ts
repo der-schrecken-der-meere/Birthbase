@@ -9,13 +9,15 @@ import { get_next_birthday, unify_birthday } from "@/lib/functions/birthday";
 import { del_notification_middleware } from "./notification";
 import { del_query_client_notification } from "@/features/latest_notifications/query";
 import { AppNotification, NotificationGroupType } from "@/database/tables/notifications/notifications";
-import { queryClient } from "@/frontend/pre_react_init";
+import { queryClient } from "@/globals/constants/query_client";
 
 
 const add_birthday_middleware = async (birthday: Birthday): Promise<Birthday> => {
     try {
 
         const unified_birthday = unify_birthday(birthday);
+
+        // return unified_birthday;
 
         const new_birthday = await add_birthdays_model([unified_birthday]) as Birthday;
 

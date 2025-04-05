@@ -1,3 +1,4 @@
+/** All page links */
 enum PageLinks {
     HOME = "/",
     MY_BIRTHDAYS = "/my_birthdays",

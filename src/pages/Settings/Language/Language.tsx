@@ -3,7 +3,7 @@ import { type Settings } from '@/database/tables/settings/settings';
 import { ListItem, SettingsFormElement, SettingsFormPageWrapper } from '../Settings';
 import { Languages } from 'lucide-react';
 import { FormField } from '@/components/ui/form';
-import { UniSelect } from '@/components/Select';
+import { UniSelect } from '@/components/select/UniSelect';
 
 import { useSettingsBreadcrumbs } from '@/components/layouts/SettingsLayout';
 import { useNavbar } from '@/hooks/core/use_navbar';

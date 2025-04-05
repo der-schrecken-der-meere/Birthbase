@@ -1,7 +1,7 @@
 type useHistoryReturnProps = {
     /** Shows whether the user can go back in the history on this tab */
     canGoBack: boolean,
-}
+};
 
 const useHistory = (): useHistoryReturnProps => {
     const canGoBack = (() => {

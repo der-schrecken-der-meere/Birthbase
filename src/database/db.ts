@@ -54,6 +54,7 @@ enum Errors {
 };
 
 const c_db_name = "BirthdayDB";
+const currrent_version = 13;
 
 
 
@@ -71,14 +72,14 @@ class DexieDB extends Dexie implements Birthbase {
         this.version(8).stores({
             notifications: "++id,timestamp",
         });
-        this.version(12).stores({
+        this.version(currrent_version).stores({
             birthdays: "++id,timestamp",
         }).upgrade(async trans => {
             return trans.table(TABLES.BIRTHDAYS).toCollection().modify((birthday: Birthday) => {
                 /** @ts-ignore */
                 const timestamp = midnight_utc(+new Date(birthday.date));
                 const { id, name: { first, last } } = birthday;
-                const new_birthday = { id, name: { first, last }, timestamp };
+                const new_birthday: Birthday = { id, name: { first, last }, timestamp, reminder: [] };
                 birthday = unify_birthday(new_birthday);
             });
         })

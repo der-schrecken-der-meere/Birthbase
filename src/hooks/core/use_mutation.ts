@@ -4,8 +4,11 @@ import { ToastType, useToastStore } from "../../stores/use_toast_store";
 import { useTranslation } from "react-i18next";
 
 type UseMutationProps = {
+    /** Callback that will be triggered for deleting operations */
     del_cbs?: MutationCallbacks,
+    /** Callback that will be triggered for updating operations */
     upd_cbs?: MutationCallbacks,
+    /** Callback that will be triggered for adding operations */
     add_cbs?: MutationCallbacks,
 };
 
@@ -16,8 +19,11 @@ type UseMutationReturn<T> = {
 };
 
 type MutationCallbacks = {
+    /** Callback that will be triggerd after a successful operation */
     onSuccess?: () => void,
+    /** Callback that will be triggerd after a unsuccessful operation */
     onError?: () => void, 
+    /** Whether a toast will be shown on successful operation */
     successToast?: boolean,
 };
 

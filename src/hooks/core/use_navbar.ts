@@ -14,7 +14,6 @@ const useNavbar = ({
     const setPageTitle = useNavbarStore((state) => state.setPageTitle);
 
     useEffect(() => {
-        console.log("use_navbar");
         if (breadcrumbDisplay) {
             let new_bread_crumbs = breadCrumbs;
             if (typeof breadcrumbDisplay === "function") {

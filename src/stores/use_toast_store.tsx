@@ -3,16 +3,22 @@ import { CircleCheck, CircleX, Info } from "lucide-react";
 import { create } from "zustand";
 
 enum ToastType {
+    /** Information messages */
     INFO,
+    /** Successful messages */
     SUCCESS,
+    /** Error messages */
     ERROR,
+    /** Normal messages */
     NORMAL,
 };
 
 interface AppToast {
     /** Indicates whether a toast is already created */
     isCreated: boolean,
-    toastConfig: Omit<ToasterToast, "id">, 
+    /** Toast config */
+    toastConfig: Omit<ToasterToast, "id">,
+    /** Creates a new toast message */
     setToast: (toast_config: Omit<ToasterToast, "id">, type: ToastType) => void,
     setNotCreated: () => void,
 };

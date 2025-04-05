@@ -11,7 +11,7 @@ const Time = () => {
     });
 
     return (
-        null
+        <></>
     );
 };
 

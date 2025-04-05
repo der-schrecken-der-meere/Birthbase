@@ -12,5 +12,10 @@
     "date_title": "Datum",
     "date_placeholder": "Datum auswählen",
     "date_format_error": "Falsches Datumsformat",
-    "date_description": "Das Datum des Geburtstages"
+    "date_description": "Das Datum des Geburtstages",
+    "reminder_title": "Erinnerungen",
+    "reminder_description": "Wann Sie erinnert werden",
+    "reminder_to_low_error": "Die Erinnerung muss mindestens 1 Tag sein",
+    "reminder_type_error": "Die Erinnerung muss eine Zahl sein",
+    "add_notification": "Erinnerung hinzufügen"
 }

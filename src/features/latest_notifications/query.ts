@@ -139,7 +139,7 @@ const del_query_client_notification = <T extends NotificationGroupType>(
     queryClient:  QueryClient
 ) => {
     let app_id: AppNotification|null = null;
-    const _ = queryClient.setQueryData<NotificationFilterChache>([c_query_key], (old_data) => {
+    queryClient.setQueryData<NotificationFilterChache>([c_query_key], (old_data) => {
         if (!old_data) return initialize_structure([]);
         const { data, filters, not_read } = old_data;
 
