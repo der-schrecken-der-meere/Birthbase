@@ -346,3 +346,44 @@
     @apply bg-background text-foreground;
   }
 }
+
+@property --scrollbar-color {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: white;
+}
+
+@layer components {
+  .scrollbar-visible {
+    & {
+      transition: --scrollbar-color .2s;
+      /* scrollbar-color: hsla(var(--accent-foreground) / 0.1) transparent; */
+      scrollbar-gutter: stable;
+      --scrollbar-color: color-mix(in oklab, hsl(var(--border)) 0%, transparent);
+    }
+    &:hover {
+      --scrollbar-color: color-mix(in oklab, hsl(var(--border)) 70%, transparent);
+    }
+    &::-webkit-scrollbar {
+      @apply w-2 h-2;
+    }
+    &::-webkit-scrollbar-button {
+      @apply hidden;
+    }
+    &::-webkit-scrollbar-track {
+      @apply bg-transparent;
+    }
+    &::-webkit-scrollbar-track-piece {
+      @apply bg-transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--scrollbar-color);
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      --scrollbar-color: color-mix(in oklab, hsl(var(--border)) 100%, transparent);
+    }
+    &::-webkit-scrollbar-corner {
+      @apply !hidden;
+    }
+  }
+}

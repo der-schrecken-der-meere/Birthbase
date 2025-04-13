@@ -6,7 +6,6 @@ import type { TFunction } from 'i18next';
 import { Fragment } from 'react';
 
 import { PartyPopper } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 import { useBirthdayFormStore } from '@/stores/use_birthday_form_store';
 
@@ -75,7 +74,7 @@ const BirthdayList = () => {
     }
 
     return (
-        <ScrollArea className='h-full'>
+        <div className='h-full scrollbar-visible overflow-auto'>
             {groupBirthdays(data, t, i18n).map((month, index) => (
                 <Fragment key={`${month.month}-${index}`}>
                     <MonthDivider className='bg-muted/80 text-muted-foreground text-sm my-2'>
@@ -97,7 +96,7 @@ const BirthdayList = () => {
                     ))}
                 </Fragment>
             ))}
-        </ScrollArea>
+        </div>
     );
 };
 
@@ -128,7 +127,7 @@ const BirthdayEntry = ({
 
     const { t } = useTranslation(["pages", "generally"]);
 
-    let days_badge: ReactNode = <PartyPopper/>;
+    let days_badge: ReactNode = <PartyPopper className='w-6 h-6'/>;
 
     if (until !== 0) {
         days_badge = (
@@ -140,8 +139,14 @@ const BirthdayEntry = ({
     }
 
     return (
-        <button className={cn("border border-border mt-4 rounded-xl px-4 py-2 flex gap-2 items-center w-full", className)} {...props}>
-            <div className="flex flex-col gap-1 items-start mr-2">
+        <button
+            className={cn(
+                "border border-border mt-4 rounded-xl px-4 py-2 flex gap-4 items-center w-full justify-between",
+                className
+            )}
+            {...props}
+        >
+            <div className="flex flex-col gap-1 items-start">
                 <div className="font-medium text-lg text-wrap">
                     {children}
                 </div>
@@ -149,7 +154,7 @@ const BirthdayEntry = ({
                     {t("home.turns", { new_age: age + 1, date: format(new Date(date), "dd.MM") })}
                 </div>
             </div>
-            <div className="flex flex-col justify-center items-center ml-auto">
+            <div className="flex flex-col justify-center items-center">
                 {days_badge}
             </div>
         </button>

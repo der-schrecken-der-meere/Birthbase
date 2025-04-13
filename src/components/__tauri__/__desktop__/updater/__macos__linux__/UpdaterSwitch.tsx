@@ -1,7 +1,7 @@
 import type { CheckboxProps } from "@radix-ui/react-checkbox";
 
-import { Checkbox } from "../../ui/checkbox";
-import { Label } from "../../ui/label";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import { cn } from "@/lib/utils";
 
@@ -11,9 +11,9 @@ const LinuxMacUpdater = ({
     ...props
 }: CheckboxProps) => {
     return (
-        <Label className="flex flex-nowrap text-sm text-muted-foreground">
+        <Label className="flex gap-2 flex-nowrap text-sm text-muted-foreground">
             <Checkbox
-                className={cn("shrink-0 mr-2 mt-0.5", className)}
+                className={cn("shrink-0 mt-0.5", className)}
                 {...props}
             />
             {children}

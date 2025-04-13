@@ -18,7 +18,7 @@ const CurrentPage = <TData,>({
     const max = table.getPageCount();
 
     return (
-        <div className={cn("flex w-[100px] items-center justify-center text-sm font-medium", className)} {...props}>
+        <div className={cn("flex items-center justify-center text-sm font-medium", className)} {...props}>
             {t("current_page", { current, max: max === 0 ? max + 1 : max })}
         </div>
     );

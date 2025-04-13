@@ -1,12 +1,15 @@
-import { type Settings } from '@/database/tables/settings/settings';
+import type { Settings } from '@/database/tables/settings/type';
 
-import { CollapsibleNavEntry, SettingsFormElement, SettingsFormPageWrapper } from '../Settings'
 import { Switch } from '@/components/ui/switch';
 import { Bell, Info, AlarmClock } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { FormField } from '@/components/ui/form';
+import { SettingsEntriesSkeleton } from '@/components/skeletons/SettingsEntriesSkeleton';
+import { CollapsibleNavigationEntry } from '@/components/settings/CollapsibleNavigationEntry';
+import { SettingsFormWrapper } from '@/components/settings/SettingsFormWrapper';
+import { SettingsFormElement } from '@/components/settings/SettingsFormElement';
 
 import { useNavbar } from '@/hooks/core/use_navbar';
 import { useSettingsForm } from '@/hooks/use_settings_form';
@@ -14,17 +17,24 @@ import { useTranslation } from 'react-i18next';
 import { useSettingsBreadcrumbs } from '@/components/layouts/SettingsLayout';
 
 import { obj_is_empty } from '@/lib/functions/object/empty';
-import { isTauri } from '@tauri-apps/api/core';
 import { z } from 'zod';
 
 const Notifications = () => {
+    const { breadcrumbs } = useSettingsBreadcrumbs();
 
-    const { t } = useTranslation(["pages"])
-    const { breadcrumbs } = useSettingsBreadcrumbs()
     useNavbar({
         pageTitle: "settings.notifications",
         breadcrumbDisplay: breadcrumbs,
     });
+
+    return (
+        <NotificationsForm/>
+    );
+};
+
+const NotificationsForm = () => {
+
+    const { t } = useTranslation(["pages", "generally"])
 
     const ts = (key: string) => {
         return t(`settings_notifications.${key}`);
@@ -41,8 +51,8 @@ const Notifications = () => {
     });
 
     const { form, isFetching, onSubmit } = useSettingsForm({
-        form_schema: formSchema,
-        on_submit: (data) => {
+        formSchema,
+        checkSubmitValues: (data) => {
             const new_settings: Partial<Settings> = {};
 
             if (form.formState.dirtyFields.notification) {
@@ -56,16 +66,23 @@ const Notifications = () => {
                 return new_settings;
             }
         },
+        reducer: (data) => {
+            const { notification, remember } = data;
+            return {
+                notification,
+                remember,
+            };
+        },
     });
 
     if (isFetching) {
         return (
-            <div>Loading...</div>
+            <SettingsEntriesSkeleton entries={2} />
         );
     }
 
     return (
-        <SettingsFormPageWrapper
+        <SettingsFormWrapper
             onSubmit={onSubmit}
             form={form}
         >
@@ -74,8 +91,8 @@ const Notifications = () => {
                 name="notification"
                 render={({ field: { onChange, value, ...props } }) => (
                     <SettingsFormElement
-                        icon={<Bell/>}
-                        rightElement={
+                        icon={Bell}
+                        actionNode={
                             <Switch 
                                 aria-label={ts("notification_aria")}
                                 checked={value}
@@ -87,9 +104,9 @@ const Notifications = () => {
                     >
                         <div className='flex items-center gap-2'>
                             <span className='overflow-hidden text-ellipsis whitespace-pre'>{ts("notification_title")}</span>
-                            {!isTauri() && (
+                            {!__IS_TAURI__ && (
                                 <Popover>
-                                    <PopoverTrigger className='shrink-0 mr-1'><Info size={16} /></PopoverTrigger>
+                                    <PopoverTrigger className='shrink-0 mx-1'><Info className='w-4 h-4' /></PopoverTrigger>
                                     <PopoverContent className="text-sm" side="bottom">
                                         {ts("notification_hint_description")}
                                         <Separator className="my-2"/>
@@ -108,24 +125,25 @@ const Notifications = () => {
             <FormField
                 control={form.control}
                 name="remember"
-                render={({ field: { onChange, value, ...props } }) => (
-                    <CollapsibleNavEntry
-                        icon={<AlarmClock/>}
+                render={({ field: { onChange, ...props } }) => (
+                    <CollapsibleNavigationEntry
+                        icon={AlarmClock}
                         caption={ts("reminder_description")}
                         title={ts("reminder_title")}
+                        aria-label={t("history_back_aria", { ns: "generally" })}
                     >
                         <SettingsFormElement
                             caption={
-                                <div className='flex items-center'>
-                                    <Input type="number" className='w-14 text-right p-1 h-8 mx-1' onChange={(e) => {onChange(+e.target.value)}} defaultValue={value} {...props}/>
-                                    <span className='ml-2'>{ts("reminder_input_description")}</span>
+                                <div className='flex items-center gap-2'>
+                                    <Input type="number" min={0} max={365} className='w-14 p-1 h-8 mx-1' onChange={(e) => {onChange(+e.target.value)}} {...props}/>
+                                    <span>{ts("reminder_input_description")}</span>
                                 </div>
                             }
                         />
-                    </CollapsibleNavEntry>
+                    </CollapsibleNavigationEntry>
                 )}
             />
-        </SettingsFormPageWrapper>
+        </SettingsFormWrapper>
     );
 };
 

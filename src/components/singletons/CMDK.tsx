@@ -11,7 +11,6 @@ import {
     CommandShortcut,
 } from "../ui/command";
 import { Link } from "react-router-dom";
-import { ScrollArea } from "../ui/scroll-area";
 
 import { useNavEntriesStore } from "@/stores/use_nav_entries_store";
 
@@ -40,7 +39,7 @@ const CMDK = ({
         <>
             <CommandInput placeholder={t("search.placeholder")} />
             <CommandList className="overflow-hidden">
-                <ScrollArea className="h-[300px]">
+                <div className="h-[300px] scrollbar-visible overflow-y-auto overflow-x-hidden">
                     <CommandEmpty>
                         {t("search.no_results")}
                     </CommandEmpty>
@@ -75,16 +74,19 @@ const CMDK = ({
                         <CommandSeparator />
                         <CommandGroup heading={t("misc" , { ns: "generally" })}>
                             <OnlyTauri osTypes={["windows", "linux", "macos"]}>
-                                <CommandItem onSelect={() => {
-                                    (async () => {
-                                        try {
-                                            await exit(0)
-                                        } catch (e) {
-                                            console.error(e);
-                                        }
-                                    })();
-                                }}>
-                                    <Power className="mr-2 h-4 w-4" />
+                                <CommandItem
+                                    className="gap-2"
+                                    onSelect={() => {
+                                        (async () => {
+                                            try {
+                                                await exit(0)
+                                            } catch (e) {
+                                                console.error(e);
+                                            }
+                                        })();
+                                    }}
+                                >
+                                    <Power className="h-4 w-4" />
                                     <span>
                                         {t("close_app", { ns: "generally" })}
                                     </span>
@@ -92,7 +94,7 @@ const CMDK = ({
                             </OnlyTauri>
                         </CommandGroup>
                     </OnlyTauri>
-                </ScrollArea>
+                </div>
             </CommandList>
         </>
     );
@@ -120,8 +122,9 @@ const SearchEntry = ({
             <Link
                 to={to}
                 onClick={onClick}
+                className="gap-2"
             >
-                <Icon className="mr-2 h-4 w-4" />
+                <Icon className="h-4 w-4" />
                 <span>
                     {title}
                     {hidden && <span className="hidden">{hidden}</span>}

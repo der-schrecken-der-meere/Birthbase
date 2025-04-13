@@ -90,8 +90,8 @@ const install_update = async (os_type: OsType, restart: boolean = true) => {
         }
     } catch (e) {
         setToast({
-            title: i18n.t("title", { ns: "toast.errors.install_update" }),
-            description: i18n.t("description", { ns: "toast.errors.install_update" }),
+            title: i18n.t("errors.install_update.title", { ns: "toast" }),
+            description: i18n.t("errors.install_update.description", { ns: "toast" }),
         }, ToastType.ERROR);
     }
     setFinishProgress();

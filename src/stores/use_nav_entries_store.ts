@@ -2,11 +2,8 @@ import { type FunctionComponent } from "react";
 
 import { PageLinks } from "@/globals/constants/links";
 import i18n from "@/i18n/config";
-import { is_desktop } from "@/lib/functions/logic/desktop";
 import { Bell, CalendarClock, HardDrive, House, Info, Languages, LayoutDashboard, LucideProps, Monitor, PartyPopper, RefreshCw, Settings } from "lucide-react";
 import { create } from "zustand";
-import { useAppStore } from "./use_app_store";
-import { isTauri } from "@tauri-apps/api/core";
 
 type LinkEntry = {
     /** Title of the link */
@@ -113,24 +110,22 @@ const useNavEntriesStore = create<NavEntries>()((set) => ({
                 search: settings_str("info_search")
             },
         ];
-        // Include update page only on desktop
-        if (is_desktop(useAppStore.getState().osType)) {
-            settings.push({
-                title: settings_str("update"),
-                url: PageLinks.SETTINGS_UPDATE,
-                icon: RefreshCw,
-                search: settings_str("update_search")
-            });
-        }
 
-        // Include app page only for apps
-        if (isTauri()) {
+        if (__IS_TAURI__) {
             settings.push({
                 title: settings_str("app"),
                 url: PageLinks.SETTINGS_APP,
                 icon: LayoutDashboard,
                 search: settings_str("app_search")
             });
+            if (__TAURI_IS_DESKTOP__) {
+                settings.push({
+                    title: settings_str("update"),
+                    url: PageLinks.SETTINGS_UPDATE,
+                    icon: RefreshCw,
+                    search: settings_str("update_search")
+                });
+            }
         }
 
         set(() => ({

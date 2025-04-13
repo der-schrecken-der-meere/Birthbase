@@ -1,24 +1,27 @@
-import type { Settings } from '@/database/tables/settings/settings';
+import type { ListItem } from '@/components/select/types';
+import type { Settings } from '@/database/tables/settings/type';
 
 import { PaintbrushVertical, Palette } from 'lucide-react';
 import { Separator } from '@/components/ui/separator'
-import { type ListItem, SettingsFormElement, SettingsFormPageWrapper } from '../Settings';
 import { FormField } from '@/components/ui/form';
 import { UniSelect } from '@/components/select/UniSelect';
+import { SettingsEntriesSkeleton } from '@/components/skeletons/SettingsEntriesSkeleton';
+import { SettingsFormWrapper } from '@/components/settings/SettingsFormWrapper';
+import { SettingsFormElement } from '@/components/settings/SettingsFormElement';
 
 import { useSettingsBreadcrumbs } from '@/components/layouts/SettingsLayout';
 import { useNavbar } from '@/hooks/core/use_navbar';
 import { useTranslation } from 'react-i18next';
 import { useSettingsForm } from '@/hooks/use_settings_form';
 
+import { type Colors, colors } from '@/globals/constants/colors';
+import { type Modes, modes } from '@/globals/constants/modes';
 import { z } from 'zod';
-import { colors } from '@/globals/constants/colors';
 import { cn } from '@/lib/utils';
 import { obj_is_empty } from '@/lib/functions/object/empty';
 
 const Appearance = () => {
-    
-    const { t } = useTranslation(["pages", "generally"]);
+
     const { breadcrumbs } = useSettingsBreadcrumbs();
 
     useNavbar({
@@ -26,45 +29,37 @@ const Appearance = () => {
         breadcrumbDisplay: breadcrumbs,
     });
 
+    return (
+        <AppearanceForm/>
+    );
+};
+
+const AppearanceForm = () => {
+
+    const { t } = useTranslation(["pages", "generally"]);
+
     const ts = (key: string) => {
         return t(`settings_appearance.${key}`);
     };
 
-    const mode_items: ListItem[] = (() => {
-        const t_modes = (key: string) => t(`modes.${key}`, { ns: "generally" });
-        const list_item = (key: string) => ({
-            item: t_modes(key),
+    const mode_items: ListItem<Modes>[] = modes.map((key) => {
+        return {
+            item: t(`modes.${key}`, { ns: "generally" }),
             value: key,
-            displayText: t_modes(key),
-        });
+            displayText: t(`modes.${key}`, { ns: "generally" }),
+        };
+    });
 
-        return [
-            list_item("dark"),
-            list_item("light"),
-            list_item("system"),
-        ]
-    })();
-
-    const color_items: ListItem[] = (() => {
-        const t_colors = (key: string) => t(`colors.${key}`, { ns: "generally" });
-        const list_item = (key: string) => ({
-            item: <ColorSelectEntry text={t_colors(key)} className={key} />,
+    const color_items: ListItem<Colors>[] = colors.map((key) => {
+        return {
+            item: <ColorSelectEntry text={t(`colors.${key}`, { ns: "generally" })} className={key} />,
             value: key,
-            displayText: t_colors(key),
-        });
-
-        return [
-            list_item("purple"),
-            list_item("blue"),
-            list_item("green"),
-            list_item("orange"),
-            list_item("red"),
-            list_item("gray"),
-        ];
-    })();
+            displayText: t(`colors.${key}`, { ns: "generally" }),
+        };
+    });
 
     const formSchema = z.object({
-        mode: z.enum(["dark", "light", "system"], {
+        mode: z.enum(modes, {
             required_error: ts("mode_required_error"),
         }),
         color: z.enum(colors, {
@@ -73,46 +68,54 @@ const Appearance = () => {
     });
 
     const { form, isFetching, onSubmit } = useSettingsForm({
-        form_schema: formSchema,
-        on_submit: (data) => {
+        formSchema,
+        checkSubmitValues: (data) => {
+            const { color, mode } = data;
             const new_settings: Partial<Settings> = {};
 
             if (form.formState.dirtyFields.color) {
-                new_settings.color = data.color;
+                new_settings.color = color;
             }
             if (form.formState.dirtyFields.mode) {
-                new_settings.mode = data.mode;
+                new_settings.mode = mode;
             }
 
             if (!obj_is_empty(new_settings)) {
                 return new_settings;
             }
         },
+        reducer: (data) => {
+            const { mode, color } = data;
+            return {
+                mode,
+                color,
+            };
+        },
     });
 
     if (isFetching) {
         return (
-            <div>Loading...</div>
+            <SettingsEntriesSkeleton entries={2}/>
         );
     }
 
     return (
-        <SettingsFormPageWrapper
+        <SettingsFormWrapper
             onSubmit={onSubmit}
             form={form}
         >
             <FormField
                 control={form.control}
                 name="mode"
-                render={({ field }) => (
+                render={({ field: { onChange, ...props }}) => (
                     <SettingsFormElement
-                        icon={<PaintbrushVertical/>}
-                        rightElement={
+                        icon={PaintbrushVertical}
+                        actionNode={
                             <UniSelect
-                                defaultValue={field.value}
-                                onValueChange={field.onChange}
+                                onValueChange={onChange}
                                 placeholder={ts("mode_placeholder")}
                                 listItems={mode_items}
+                                {...props}
                             />
                         }
                         caption={ts("mode_description")}
@@ -125,15 +128,15 @@ const Appearance = () => {
             <FormField
                 control={form.control}
                 name="color"
-                render={({ field }) => (
+                render={({ field: { onChange, ...props }}) => (
                     <SettingsFormElement
-                        icon={<Palette/>}
-                        rightElement={
+                        icon={Palette}
+                        actionNode={
                             <UniSelect
-                                defaultValue={field.value}
-                                onValueChange={field.onChange}
+                                onValueChange={onChange}
                                 placeholder={ts("color_placeholder")}
                                 listItems={color_items}
+                                {...props}
                             />
                         }
                         caption={ts("color_description")}
@@ -142,7 +145,7 @@ const Appearance = () => {
                     </SettingsFormElement>
                 )}
             />
-        </SettingsFormPageWrapper>
+        </SettingsFormWrapper>
     );
 };
 
@@ -156,7 +159,7 @@ const ColorSelectEntry = ({
     return (
         <>
             <span>{text}</span>
-            <span className={cn('bg-primary ml-auto', className)}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span className={cn('bg-primary justify-self-end', className)}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
         </>
     );
 };

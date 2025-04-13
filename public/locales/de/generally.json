@@ -26,6 +26,12 @@
         "light": "Hell"
 
     },
+    "languages": {
+        "de": "Deutsch",
+        "en": "English"
+    },
     "misc": "Sonstiges",
-    "close_app": "App schließen"
+    "close_app": "App schließen",
+    "history_back_aria": "Ein Schritt im Verlauf zurückgehen",
+    "collapsible_aria": "Öffnet oder schließt ein zuklappbares Element"
 }

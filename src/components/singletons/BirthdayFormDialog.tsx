@@ -1,6 +1,5 @@
 import { lazy, Suspense } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
-import { ScrollArea } from "../ui/scroll-area";
 import { Skeleton } from "../ui/skeleton";
 import { BirthdayFormMode, useBirthdayFormStore } from "@/stores/use_birthday_form_store";
 import { useTranslation } from "react-i18next";
@@ -26,7 +25,7 @@ const BirthdayFormDialog = () => {
     return (
         <Dialog open={isOpen} onOpenChange={setOpen}>
             <DialogContent className="p-0 overflow-hidden">
-                <ScrollArea className="max-h-screen h-full">
+                <div className="max-h-screen h-full overflow-auto scrollbar-visible">
                     <div className="p-6">
                         <DialogHeader>
                             <DialogTitle>{DialogTitleString}</DialogTitle>
@@ -56,7 +55,7 @@ const BirthdayFormDialog = () => {
                             <BirthdayForm/>
                         </Suspense>
                     </div>
-                </ScrollArea>
+                </div>
             </DialogContent>
         </Dialog>
     );

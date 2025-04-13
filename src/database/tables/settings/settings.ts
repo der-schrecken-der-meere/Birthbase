@@ -1,19 +1,4 @@
-import { colors } from "../../../globals/constants/colors.ts";
-import type { CoreRecord } from "../../db_types.ts";
-
-type Color = typeof colors[number];
-type Mode = "dark"|"light"|"system";
-
-interface Settings extends CoreRecord {
-    mode: Mode;
-    color: Color;
-    remember: number;
-    notification: boolean;
-    relaunch: boolean;
-    autostart: boolean,
-    auto_search: boolean,
-    language: "de" | "en",
-};
+import type { Settings } from "./type.ts";
 
 const get_default_settings = (): Omit<Settings, "id"> => {
     return {
@@ -28,5 +13,4 @@ const get_default_settings = (): Omit<Settings, "id"> => {
     };
 };
 
-export type { Color, Mode, Settings };
 export { get_default_settings };

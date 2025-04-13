@@ -95,7 +95,7 @@ const AppSidebar = () => {
                     )}
                 </SidebarMenu>
             </SidebarHeader>
-            <SidebarContent>
+            <SidebarContent className='scrollbar-visible'>
                 <SidebarGroup>
                     <SidebarGroupLabel>{mainLinks.title}</SidebarGroupLabel>
                     <SidebarGroupContent>
@@ -138,10 +138,12 @@ const AppSidebar = () => {
                         <SidebarMenuItem>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <SidebarMenuButton>
-                                        <Ellipsis/>
-                                        {t("misc", { ns: "generally" })}
-                                        <ChevronUp className='ml-auto' />
+                                    <SidebarMenuButton className='justify-between'>
+                                        <div className='flex gap-2 items-center'>
+                                            <Ellipsis className='h-4 w-4'/>
+                                            {t("misc", { ns: "generally" })}
+                                        </div>
+                                        <ChevronUp/>
                                     </SidebarMenuButton>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent
@@ -151,9 +153,7 @@ const AppSidebar = () => {
                                     <OnlyTauri osTypes={["linux", "windows", "macos"]}>
                                         <DropdownMenuItem className='gap-2' onClick={() => (async () => {await exit(0)})()}>
                                             <Power className='h-4 w-4'/>
-                                            <span>
                                                 {t("close_app", { ns: "generally" })}
-                                            </span>
                                         </DropdownMenuItem>
                                     </OnlyTauri>
                                 </DropdownMenuContent>

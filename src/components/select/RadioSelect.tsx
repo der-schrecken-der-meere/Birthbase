@@ -5,21 +5,21 @@ import { Fragment } from "react/jsx-runtime";
 import { ChevronRight } from "lucide-react";
 
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from "../ui/drawer";
-import { ScrollArea } from "../ui/scroll-area";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
-
-import { NavigationEntry } from "@/pages/Settings/Settings";
+import { NavigationEntryCore } from "../settings/core/NavigationEntryCore";
 
 import { cn } from "@/lib/utils";
 
 const SelectAsRadio = <T,>({
     title,
     radioItems,
-    defaultValue,
+    value,
     onValueChange,
     className,
+    placeholder,
+    defaultValue,
     ...props
 }: SelectAsRadioProps<T>) => {
     return (
@@ -29,28 +29,29 @@ const SelectAsRadio = <T,>({
                 {...props}
             >
                 <span className='text-sm text-muted-foreground'>
-                    {radioItems.find((e) => e.value === defaultValue)?.displayText}
+                    {radioItems.find((e) => e.value === value)?.displayText}
                 </span>
                 <ChevronRight className='h-4 w-4 text-muted-foreground'/>
             </DrawerTrigger>
             <DrawerContent className='max-h-[80%] h-full mt-0 px-4 py-2 border-0'>
                 <DrawerHeader className="py-2 px-0">
-                    <DrawerTitle className="text-left">{title}</DrawerTitle>
-                    <DrawerDescription className="hidden">{title}</DrawerDescription>
+                    <DrawerTitle className="text-start">{placeholder}</DrawerTitle>
+                    <DrawerDescription className="hidden">{placeholder}</DrawerDescription>
                 </DrawerHeader>
-                <ScrollArea className='pr-2'>
+                <div className='scrollbar-visible overflow-auto'>
                     <RadioGroup
                         onValueChange={onValueChange}
-                        defaultValue={defaultValue}
+                        defaultValue={defaultValue as string}
+                        value={value as string}
                         className="flex flex-col py-2"
                     >
                         {radioItems.map((v, i) => {
                             const id = `${title}-${v.value}`;
                             return (
                                 <Fragment key={id}>
-                                    <NavigationEntry
+                                    <NavigationEntryCore
                                         className='min-h-0'
-                                        rightElement={
+                                        actionNode={
                                             <RadioGroupItem
                                                 value={v.value as string}
                                                 id={id}
@@ -59,18 +60,18 @@ const SelectAsRadio = <T,>({
                                         }
                                     >
                                         <Label
-                                            className='flex items-center'
+                                            className='flex items-center justify-between'
                                             htmlFor={id}
                                         >
                                             {v.item}
                                         </Label>
-                                    </NavigationEntry>
+                                    </NavigationEntryCore>
                                     {i !== radioItems.length - 1 && <Separator/>}
                                 </Fragment>
                             );
                         })}
                     </RadioGroup>
-                </ScrollArea>
+                </div>
             </DrawerContent>
         </Drawer>
     );

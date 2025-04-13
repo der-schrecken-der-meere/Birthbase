@@ -41,10 +41,10 @@ const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">> & 
             filter={columnFilter}
             visibility={visibility}
             headerElements={(table) => (
-                <div className='flex items-center mb-2'>
+                <div className='flex items-center mb-2 gap-2 justify-between'>
                     <ValueFilter
                         table={table}
-                        className="w-60 min-w-40 mr-2 text-sm"
+                        className="w-60 min-w-40 text-sm"
                         columnId="lastname"
                         placeholder={t("my_birthdays.last_name")}
                     />
@@ -59,15 +59,15 @@ const Table: React.FC<React.HTMLAttributes<Pick<HTMLDivElement, "className">> & 
                 </div>
             )}
             footerElements={(table) => (
-                <div className="flex items-center justify-between py-2 mt-auto h-12">
-                    <div className="flex items-center space-x-4 @xl:space-x-8 ml-auto">
+                <div className="flex items-center justify-end py-2 mt-auto h-12">
+                    <div className="flex items-center gap-8">
                         <RowsPerPage
                             className="hidden @lg:flex"
                             rowsPerPage={[5, 10, 20, 30, 40, 50]}
                             table={table}
                         />
                         <CurrentPage
-                            className="w-[120px] hidden @xs:block"
+                            className="hidden @xs:block"
                             table={table}
                         />
                         <Navigation

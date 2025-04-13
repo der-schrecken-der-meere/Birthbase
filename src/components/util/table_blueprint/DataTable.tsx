@@ -24,7 +24,6 @@ import {
     TableRow,
 } from "@/components/ui/table.jsx"
 import React, { ReactNode, useMemo, type Dispatch, type SetStateAction } from "react";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -129,43 +128,44 @@ const DataTable = <TData, TValue>({
     return (
         <>
             {return_headerElements()}
-            <ScrollArea className={cn("rounded-md border h-full max-h-max", className)}>
-                <Table>
-                    <TableHeader className={cn(headerScreenReaderOnly && "sr-only")}>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                return (
-                                    <TableHead
-                                        key={header.id}
-                                        className={cn("sticky top-0 bg-background shadow-[inset_0_-2px_0_-1px_hsl(var(--border))]", headerScreenReaderOnly && "p-0")} style={{ width: header?.getSize() ? `${header.getSize()}rem` : "max-content" }}>
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext()
-                                            )}
-                                    </TableHead>
-                                )
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    {table.getRowModel().rows?.length ? (
-                        tbody(table.getRowModel().rows)
-                    ) : (
-                        <TableBody>
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    {t("empty")}
-                                </TableCell>
-                            </TableRow>
-                        </TableBody>
-                        
-                    )}
-                </Table>
-                <ScrollBar orientation="horizontal" />
-            </ScrollArea>
+            <div className={cn("rounded-md border h-full max-h-max overflow-hidden", className)}>
+                <div className="scrollbar-visible overflow-auto h-full">
+                    <Table>
+                        <TableHeader className={cn(headerScreenReaderOnly && "sr-only")}>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => {
+                                    return (
+                                        <TableHead
+                                            key={header.id}
+                                            className={cn("sticky top-0 bg-background shadow-[inset_0_-2px_0_-1px_hsl(var(--border))]", headerScreenReaderOnly && "p-0")} style={{ width: header?.getSize() ? `${header.getSize()}rem` : "max-content" }}>
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
+                                        </TableHead>
+                                    )
+                                    })}
+                                </TableRow>
+                            ))}
+                        </TableHeader>
+                        {table.getRowModel().rows?.length ? (
+                            tbody(table.getRowModel().rows)
+                        ) : (
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                                        {t("empty")}
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
+                            
+                        )}
+                    </Table>
+                </div>
+            </div>
             {return_footerElements()}
         </>
     );

@@ -12,7 +12,6 @@ import {
     FormMessage,
 } from "../ui/form";
 import { Input } from '../ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { PulseLoader } from 'react-spinners';
 import { BellPlus, CalendarDays, X } from 'lucide-react';
 
@@ -29,10 +28,11 @@ import { cn } from '@/lib/utils';
 import { midnight_utc } from '@/lib/functions/date';
 import { ControllerRenderProps, useFieldArray } from 'react-hook-form';
 import { ReactNode } from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 
 const BirthdayForm = () => {
 
-    const { t, i18n } = useTranslation(["birthday_form", "generally"]);
+    const { t, i18n } = useTranslation(["birthday_form", "generally", "dialog"]);
 
     const formSchema = z.object({
         id: z.number(),
@@ -160,7 +160,6 @@ const BirthdayForm = () => {
                     isSubmitting={form.formState.isSubmitting}
                     onClick={onDeleteClick}
                     variant="destructive"
-                    className='ml-auto'
                 >
                     {t("delete_btn", { ns: "generally" })}
                 </SubmitButton>
@@ -230,13 +229,13 @@ const BirthdayForm = () => {
                                 <FormLabel>
                                     {t("date_title")}
                                 </FormLabel>
-                                <Popover>
-                                    <PopoverTrigger asChild>
+                                <Dialog>
+                                    <DialogTrigger asChild>
                                         <FormControl>
                                             <Button
                                                 variant="outline"
                                                 className={cn(
-                                                    "w-full justify-start text-left font-normal",
+                                                    "w-full justify-start font-normal gap-2",
                                                     !field.value && "text-muted-foreground"
                                                 )}
                                                 disabled={field.disabled}
@@ -246,29 +245,34 @@ const BirthdayForm = () => {
                                                 ) : (
                                                     <span>{t("date_placeholder")}</span>
                                                 )}
-                                                <CalendarDays className='ml-1 h-4 w-4 opacity-50' />
+                                                <CalendarDays className='h-4 w-4 opacity-50' />
                                             </Button>
                                         </FormControl>
-                                    </PopoverTrigger>
-                                    <PopoverContent
-                                        className="w-auto p-0"
-                                        align="start"
-                                    >
-                                        <Calendar
-                                            timeZone='UTC'
-                                            locale={date_picker_lang}
-                                            startMonth={start_month}
-                                            endMonth={end_month}
-                                            captionLayout="dropdown"
-                                            fixedWeeks
-                                            showWeekNumber
-                                            mode="single"
-                                            selected={field.value}
-                                            onSelect={field.onChange}
-                                            disabled={disabled}
-                                        />
-                                    </PopoverContent>
-                                </Popover>
+                                    </DialogTrigger>
+                                    <DialogContent className='p-0 pt-2 overflow-hidden max-w-screen w-max'>
+                                        <div className="max-h-screen h-full overflow-auto scrollbar-visible">
+                                            <DialogHeader className='px-4 py-2'>
+                                                <DialogTitle>{t("calendar.title", { ns: "dialog" })}</DialogTitle>
+                                                <DialogDescription>{t("calendar.description", { ns: "dialog" })}</DialogDescription>
+                                            </DialogHeader>
+                                            <div className='relative'>
+                                                <Calendar
+                                                    timeZone='UTC'
+                                                    locale={date_picker_lang}
+                                                    startMonth={start_month}
+                                                    endMonth={end_month}
+                                                    captionLayout="dropdown"
+                                                    fixedWeeks
+                                                    showWeekNumber
+                                                    mode="single"
+                                                    selected={field.value}
+                                                    onSelect={field.onChange}
+                                                    disabled={disabled}
+                                                />
+                                            </div>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
                                 <FormDescription>
                                     {t("date_description")}
                                 </FormDescription>
@@ -288,8 +292,16 @@ const BirthdayForm = () => {
                                 render={({ field: { ...props } }) => (
                                     <FormItem>
                                         <FormControl>
-                                            <Reminder reminderId={i} onRemoveReminder={onRemoveReminder} {...props}>
-                                                <span className='grow'>{t("day", { ns: "generally", count: +props.value })}</span>
+                                            <Reminder
+                                                reminderId={i}
+                                                onRemoveReminder={onRemoveReminder}
+                                                {...props}
+                                            >
+                                                <span
+                                                    className='grow'
+                                                >
+                                                    {t("day", { ns: "generally", count: +props.value })}
+                                                </span>
                                             </Reminder>
                                         </FormControl>
                                         <FormMessage/>
@@ -302,9 +314,9 @@ const BirthdayForm = () => {
                             variant="outline"
                             size="sm"
                             onClick={onAddReminder}
-                            className='text-sm font-normal'
+                            className='text-sm font-normal gap-2'
                         >
-                            <BellPlus className='h-4 w-4 mr-2'/>
+                            <BellPlus className='h-4 w-4'/>
                             {t("add_notification")}
                         </Button>
                         <p className='text-sm text-muted-foreground'>
@@ -312,7 +324,7 @@ const BirthdayForm = () => {
                         </p>
                     </div>
                 </fieldset>
-                <div className='flex items-center'>
+                <div className='flex items-center justify-between'>
                     {Buttons}
                 </div>
             </form>

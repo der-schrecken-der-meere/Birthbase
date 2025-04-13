@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 type UseQueryProps<T> = {
     /** Query function that will return the data */
     useQueryFn: () => DefinedUseQueryResult<T, Error>,
-    /** Translation type
+    /** Translation key for the error message
      * 
      * `test => errors.show.test`
      */
@@ -21,7 +21,17 @@ const useQuery = <T>({
     const setToast = useToastStore((state) => state.setToast);
     const { t } = useTranslation(["toast", "generally"]);
     
-    const { data, isFetching, error, isError } = useQueryFn();
+    const {
+        error,
+        errorUpdateCount,
+        errorUpdatedAt,
+        failureCount,
+        failureReason,
+        isError,
+        isLoadingError,
+        isRefetchError,
+        ...props
+    } = useQueryFn();
     
     useEffect(() => {
         if (isError) {
@@ -34,8 +44,7 @@ const useQuery = <T>({
     }, [isError, error]);
 
     return {
-        data,
-        isFetching,
+        ...props
     };
 };
 

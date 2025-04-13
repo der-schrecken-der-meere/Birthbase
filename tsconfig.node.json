@@ -10,7 +10,13 @@
       "noEmit": true,
       "baseUrl": ".",
       "paths": {
-        "@/*": ["./src/*"]
+        "@/*": ["./src/*"],
+        "@com/*": ["./src/components/*"],
+        "@hooks/*": ["./src/hooks/*"],
+        "@stores/*": ["./src/stores/*"],
+        "@features/*": ["./src/features/*"],
+        "@apis/*": ["./src/apis/*"],
+        "@lib/*": ["./src/lib/*"],
       },
       "lib": ["WebWorker"]
     },

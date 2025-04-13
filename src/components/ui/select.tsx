@@ -120,6 +120,7 @@ const SelectItem = React.forwardRef<
     if (itemTextRef.current) {
       itemTextRef.current.style.display = "flex";
       itemTextRef.current.style.width = "100%";
+      itemTextRef.current.style.justifyContent = "space-between";
     }
   }, []);
 

@@ -6,9 +6,6 @@ import { SelectAsRadio } from "./RadioSelect";
 import { SelectShortend } from "./Select";
 
 const UniSelect = <T,>({
-    defaultValue,
-    onValueChange,
-    placeholder,
     listItems,
     ...props
 }: UniSelectProps<T>) => {
@@ -17,18 +14,12 @@ const UniSelect = <T,>({
     return (
         isMobile ? (
             <SelectAsRadio
-                title={placeholder}
                 radioItems={listItems}
-                defaultValue={defaultValue as string}
-                onValueChange={onValueChange}
                 {...props}
             />
         ) : (
             <SelectShortend
-                title={placeholder}
                 selectItems={listItems}
-                defaultValue={defaultValue as string}
-                onValueChange={onValueChange}
                 {...props}
             />
         )

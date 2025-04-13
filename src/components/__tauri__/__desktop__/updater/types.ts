@@ -1,5 +1,5 @@
+import { ButtonProps } from "@/components/ui/button";
 import { ProgressProps } from "@radix-ui/react-progress";
-import { ButtonProps } from "../ui/button";
 
 type UpdateProgressProps = ProgressProps & {
 

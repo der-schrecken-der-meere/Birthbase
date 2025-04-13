@@ -7,6 +7,7 @@ import {
     ArrowUpNarrowWide,
     ArrowDown01,
     ArrowDownAZ,
+    LucideProps,
 } from "lucide-react";
 import { Column } from "@tanstack/react-table"
 
@@ -19,9 +20,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import React, { createElement } from "react";
+import React, { createElement, FunctionComponent } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { type DropdownMenuItemProps } from "@radix-ui/react-dropdown-menu";
 
 
 export type ColumnType = "string"|"number"|"date"|"mixed";
@@ -42,11 +44,13 @@ const HeaderDownSymbol = ({
     type,
     className
 }: HeaderSymbol) => {
-    let el = ArrowDownWideNarrow
-    if      (type === "number")     el = ArrowDown10;
-    else if (type === "string")     el = ArrowDownZA;
-    else if (type === "date")       el = ArrowDown10;
-    return createElement(el, { className: className });
+    let El = ArrowDownWideNarrow
+    if      (type === "number")     El = ArrowDown10;
+    else if (type === "string")     El = ArrowDownZA;
+    else if (type === "date")       El = ArrowDown10;
+    return (
+        <El className={className} />
+    );
 };
 
 const HeaderUpSymbol = ({
@@ -75,6 +79,41 @@ const DataTableColumnHeader = <TData, TValue>({
 
     const { t } = useTranslation("table");
 
+    const headerEntries = [
+        {
+            id: "asc",
+            text: t("ascending"),
+            onClick: () => {
+                column.toggleSorting(false);
+                setSearchParams({"col": column.id, "sort": "asc"});
+                new URL(".", window.origin + location.pathname + location.search);
+            },
+            icon: HeaderUpSymbol,
+            colType
+        },
+        {
+            id: "desc",
+            text: t("descending"),
+            onClick: () => {
+                column.toggleSorting(true);
+                setSearchParams({"col": column.id, "sort": "desc"});
+                new URL(".", window.origin + location.pathname + location.search);
+            },
+            icon: HeaderDownSymbol,
+            colType
+        },
+        {
+            id: "reset",
+            text: t("reset"),
+            onClick: () => {
+                column.clearSorting();
+                setSearchParams({"col": column.id});
+                new URL(".", window.origin + location.pathname + location.search);
+            },
+            icon: ChevronsUpDown,
+        }
+    ];
+
     return (
         <div className={cn("flex items-center space-x-2", className)}>
             <DropdownMenu>
@@ -82,44 +121,68 @@ const DataTableColumnHeader = <TData, TValue>({
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="-ml-3 h-8 data-[state=open]:bg-accent"
+                        className="h-8 data-[state=open]:bg-accent gap-2"
                     >
                         <span>{title}</span>
                         {column.getIsSorted() === "desc" ? (
-                            <HeaderDownSymbol type={colType} className="ml-2 h-4 w-4" />
+                            <HeaderDownSymbol type={colType} className="h-4 w-4" />
                         ) : column.getIsSorted() === "asc" ? (
-                            <HeaderUpSymbol type={colType} className="ml-2 h-4 w-4" />
+                            <HeaderUpSymbol type={colType} className="h-4 w-4" />
                         ) : (
-                            <ChevronsUpDown className="ml-2 h-4 w-4" />
+                            <ChevronsUpDown className="h-4 w-4" />
                         )}
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
-                    <DropdownMenuItem onClick={() => {column.toggleSorting(false);setSearchParams({"col": column.id, "sort": "asc"});new URL(".", window.origin + location.pathname + location.search)}}>
-                        <HeaderUpSymbol type={colType} className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-                        {t("ascending")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => {column.toggleSorting(true);setSearchParams({"col": column.id, "sort": "desc"});new URL(".", window.origin + location.pathname + location.search)}}>
-                        <HeaderDownSymbol type={colType} className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-                        {t("descending")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => {column.clearSorting();setSearchParams({"col": column.id});new URL(".", window.origin + location.pathname + location.search)}}>
-                        <ChevronsUpDown className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-                        {t("reset")}
-                    </DropdownMenuItem>
+                    {headerEntries.map((entry) => (
+                        <HeaderEntry
+                            key={entry.id}
+                            onClick={entry.onClick}
+                            Icon={entry.icon}
+                            colType={entry.colType}
+                        >
+                            {entry.text}
+                        </HeaderEntry>
+                    ))}
                     {column.getCanHide() && (
                         <>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-                                <EyeOff className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+                            <HeaderEntry
+                                onClick={() => column.toggleVisibility(false)}
+                                Icon={EyeOff}
+                            >
                                 {t("hide")}
-                            </DropdownMenuItem>
+                            </HeaderEntry>
                         </>
                     )}
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
     );
+};
+
+const HeaderEntry = ({
+    children,
+    className,
+    Icon,
+    colType,
+    ...props
+}: DropdownMenuItemProps & {
+    Icon: FunctionComponent<HeaderSymbol & LucideProps>,
+    colType?: ColumnType
+}) => {
+    return (
+        <DropdownMenuItem
+            className={cn("gap-2", className)}
+            {...props}
+        >
+            {colType
+                ? <Icon type={colType} className="h-3.5 w-3.5 text-muted-foreground/70" />
+                : <Icon className="h-3.5 w-3.5 text-muted-foreground/70" />
+            }
+            {children}
+        </DropdownMenuItem>
+    )
 };
 
 export {

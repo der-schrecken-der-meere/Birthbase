@@ -13,12 +13,6 @@
     "os:allow-os-type",
     "os:allow-platform",
     "process:allow-restart",
-    "process:allow-exit",
-    "sql:default",
-    "fs:default",
-    {
-      "identifier": "fs:scope-appdata-recursive",
-      "allow": [{ "path": "$APPCONFIG/*" }]
-    }
+    "process:allow-exit"
   ]
 }

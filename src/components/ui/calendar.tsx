@@ -1,18 +1,13 @@
 import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DateLib, DayPicker, DropdownOption, useDayPicker } from "react-day-picker"
+import { type DateLib, DayPicker, DropdownProps } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "../ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
-import { addMonths, getMonth, getYear, subMonths } from "date-fns"
 import { format_number_to_month_lll } from "@/lib/functions/date/timezone";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
-export type Arr_Years = {
-  label: string,
-  value: string,
-}[]
 
 function Calendar({
   className,
@@ -28,21 +23,21 @@ function Calendar({
         },
       }}
       showOutsideDays={showOutsideDays}
-      className={cn("p-3", className)}
+      className={cn("relative p-3 w-max", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4 m-0!",
         month_caption: "flex justify-center pt-1 relative items-center w-min mx-auto",
         caption_label: "text-sm font-medium hidden",
         // nav: "space-x-1 flex items-center",
-        nav: "flex items-center absolute top-6 left-0 w-full px-4",
+        nav: "flex items-center absolute top-6 left-0 w-full px-4 justify-between",
         button_previous: cn(
           buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-1 top-1"
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
         ),
         button_next: cn(
           buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-1 top-1"
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
         ),
         month_grid: "w-full border-collapse space-y-1",
         weekdays: "flex",
@@ -66,87 +61,38 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        PreviousMonthButton: () => {
-
-          const { goToMonth, months } = useDayPicker();
-
-          const onClick = React.useCallback(() => {
-            goToMonth(subMonths(months[0].date, 1));
-          }, [months]);
-
+        PreviousMonthButton: ({ ...props }) => {
           return (
-            <Button onClick={onClick} variant="outline" className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100">
+            <Button
+              variant="outline"
+              {...props}
+            >
               <ChevronLeft className="h-4 w-4" />
             </Button>
           );
         },
-        NextMonthButton: () => {
-
-          const { goToMonth, months } = useDayPicker();
-
-          const onClick = React.useCallback(() => {
-            goToMonth(addMonths(months[0].date, 1));
-          }, [months]);
-
+        NextMonthButton: ({ ...props }) => {
           return (
-            <Button onClick={onClick} variant="outline" className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 ml-auto">
+            <Button
+              variant="outline"
+              {...props}
+            >
               <ChevronRight className="h-4 w-4" />
             </Button>
           );
         },
-        Dropdown: (props) => {
-
-          const { goToMonth, months } = useDayPicker();
-
-          if (props.className === "rdp-months_dropdown") {
-            const currentMonth = getMonth(months[0].date);
-
-            return (
-              <Select
-                onValueChange={(newValue) => {
-                  const newDate = months[0].date;
-                  newDate.setMonth(parseInt(newValue));
-                  goToMonth(newDate);
-                }}
-                value={(props.options as DropdownOption[])[currentMonth].value.toString()}
-              >
-                <SelectTrigger>
-                  {(props.options as DropdownOption[])[currentMonth].label}
-                </SelectTrigger>
-                <SelectContent>
-                  {props.options && props.options.map((selectItem) => (
-                    <SelectItem key={selectItem.value} value={selectItem.value.toString()} disabled={selectItem.disabled}>
-                      {selectItem.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            );
-          }
-
-          const currentYear = getYear(months[0].date);
-          const yearOptions = (props.options as DropdownOption[]).find((year) => year.value === currentYear);
-
+        YearsDropdown: ({ classNames, components, ...props }) => {
           return (
-            <Select
-              onValueChange={(newValue) => {
-                const newDate = months[0].date;
-                newDate.setFullYear(parseInt(newValue));
-                goToMonth(newDate);
-              }}
-              value={(yearOptions as DropdownOption).value.toString()}
-            >
-              <SelectTrigger>
-                {(yearOptions as DropdownOption).label}
-              </SelectTrigger>
-              <SelectContent>
-                {props.options && props.options.map((selectItem) => (
-                  <SelectItem key={selectItem.value} value={selectItem.value.toString()} disabled={selectItem.disabled}>
-                    {selectItem.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <DropDown
+              {...props as any}
+            />
+          );
+        },
+        MonthsDropdown: ({ classNames, components, ...props }) => {
+          return (
+            <DropDown
+              {...props as any}
+            />
           );
         },
       }}
@@ -155,5 +101,42 @@ function Calendar({
   )
 }
 Calendar.displayName = "Calendar"
+
+const DropDown = ({
+  disabled,
+  onChange,
+  value,
+  options,
+  ...props
+}: DropdownProps) => {
+  const onValueChange = (value: string) => {
+    if (onChange) {
+      onChange({ target: { value } } as any);
+    }
+  }
+
+  return (
+    <Select
+      disabled={disabled}
+      onValueChange={onValueChange}
+      value={value as any}
+    >
+      <SelectTrigger {...props as any}>
+        {options?.find((option) => option.value === value)?.label || props["aria-label"] || ""}
+      </SelectTrigger>
+      <SelectContent>
+        {options && options.map((selectItem) => (
+          <SelectItem
+            key={selectItem.value}
+            value={selectItem.value as any}
+            disabled={selectItem.disabled}
+          >
+            {selectItem.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
 
 export { Calendar }

@@ -1,5 +1,12 @@
-/** All availalbe color accents */
-const colors = ["blue", "gray", "green", "orange", "purple", "red"] as const;
+/** All available color accents */
+const colors = [
+    "purple",
+    "blue",
+    "green",
+    "orange",
+    "red",
+    "gray",
+] as const;
 type Colors = typeof colors[number];
 
 export type { Colors }

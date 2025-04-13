@@ -6,7 +6,6 @@ import { Fragment } from "react/jsx-runtime";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "../ui/breadcrumb";
 import { BreadcrumbListItem } from "./BreadcrumbListItem";
 import { GoBackInHistory } from "../History";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { AddBirthdayButton } from "../AddBirthdayButton";
 import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
@@ -39,17 +38,16 @@ const UpperDesktopNavbar = ({
                 size="icon"
                 className='w-7 h-7'
             />
-            <ScrollArea className='flex-1' dir={document.documentElement.dir as any || "ltr"}>
+            <div className='scrollbar-visible flex-1 overflow-auto'>
                 <Breadcrumb className='px-1'>
                     <BreadcrumbList className='flex-nowrap'>
                         {renderBreadcrumbs(breadcrumbs)}
                         <BreadcrumbItem>
-                            <BreadcrumbPage className='text-xl flex-1'>{pageTitle}</BreadcrumbPage>
+                            <BreadcrumbPage className='text-xl flex-1 text-nowrap'>{pageTitle}</BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
-                <ScrollBar orientation="horizontal" />
-            </ScrollArea>
+            </div>
             <AddBirthdayButton className='hidden @md:flex'/>
             <Button
                 asChild

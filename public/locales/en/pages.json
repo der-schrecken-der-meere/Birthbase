@@ -54,10 +54,12 @@
     },
     "settings_storage": {
         "storage_description": "{{usage}}/{{quotas}} used",
-        "empty_storage": "Empty storage"
+        "empty_storage": "Empty storage",
+        "progress_aria": "Describes how much storage the app reserves from the storage"
     },
     "settings_language": {
         "language_title": "Language",
+        "language_placeholder": "Language",
         "language_required_error": "Please select a language",
         "language_description": "Display language of the app"
     },

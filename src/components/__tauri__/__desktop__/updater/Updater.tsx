@@ -1,9 +1,8 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import {  useEffect, useState } from 'react';
 
-import { Button } from '../ui/button';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Skeleton } from '../ui/skeleton';
-import { OnlyTauri } from '../OnlyTauri';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 
 import { useUpdateStore } from '@/stores/use_update_store';
 import { useAppStore } from '@/stores/use_app_store';
@@ -16,11 +15,16 @@ import { UpdateNotes } from './UpdateNotes';
 import { UpdaterProgress } from './UpdateProgress';
 import { DownloadUpdate } from './DownloadUpdate';
 
-const LinuxMacUpdater = lazy(() => import("./__linux_macos__/UpdaterSwitch").then(module => ({ default: module.LinuxMacUpdater })).catch(() => ({ default: () => <></> })));
+let LinuxMacUpdater = null;
+if (
+    __TAURI_IS_MAC__ || __TAURI_IS_LINUX__
+) {
+    LinuxMacUpdater = await import("./__macos__linux__/UpdaterSwitch").then(module => module.LinuxMacUpdater);
+}
 
 const Updater = () => {
     const isDownloading = useUpdateStore((state) => state.isDownloading);
-    const isPrompting = useUpdateStore((state) => state.isPrompting); 
+    const isPrompting = true;
     const update_version = useUpdateStore((state) => state.version);
     const setPrompting = useUpdateStore((state) => state.setPrompting);
 
@@ -45,20 +49,14 @@ const Updater = () => {
 
     const Status = isDownloading
         ? (<UpdaterProgress/>)
-        : (
-            <OnlyTauri osTypes={["linux", "macos"]}>
-                <Suspense
-                    fallback={<Skeleton className='w-full h-4' />}
-                >
-                    <LinuxMacUpdater
-                        onCheckedChange={on_relaunch_change}
-                        defaultChecked={relaunch}
-                    >
-                        {t("restart_app")}
-                    </LinuxMacUpdater>
-                </Suspense>
-            </OnlyTauri>
-        );
+        : (LinuxMacUpdater && (
+            <LinuxMacUpdater
+                onCheckedChange={on_relaunch_change}
+                defaultChecked={relaunch}
+            >
+                {t("restart_app")}
+            </LinuxMacUpdater>
+        ));
 
     const Content = isFetching
         ? (<Skeleton className='w-full h-10'/>)

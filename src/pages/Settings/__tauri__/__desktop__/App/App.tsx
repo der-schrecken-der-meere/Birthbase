@@ -1,4 +1,4 @@
-import type { Settings } from "@/database/tables/settings/settings";
+
 
 // import { SettingsFormElement, SettingsFormPageWrapper } from "../Settings";
 import { FormField } from "@/components/ui/form";
@@ -9,11 +9,13 @@ import { useSettingsForm } from "@/hooks/use_settings_form";
 import { useNavbar } from "@/hooks/core/use_navbar";
 import { useTranslation } from "react-i18next";
 import { useSettingsBreadcrumbs } from "@/components/layouts/SettingsLayout";
-import { OnlyTauri } from "@/components/OnlyTauri";
 
 import { z } from "zod";
 import { obj_is_empty } from "@/lib/functions/object/empty";
-import { SettingsFormElement, SettingsFormPageWrapper } from "../../Settings";
+import { SettingsFormWrapper } from "@/components/settings/SettingsFormWrapper";
+import { SettingsFormElement } from "@/components/settings/SettingsFormElement";
+import { Settings } from "@/database/tables/settings/type";
+import { SettingsEntriesSkeleton } from "@/components/skeletons/SettingsEntriesSkeleton";
 
 const App = () => {
     const { breadcrumbs } = useSettingsBreadcrumbs();
@@ -24,11 +26,7 @@ const App = () => {
     });
 
     return (
-        <OnlyTauri
-            osTypes={["windows", "linux", "macos"]}
-        >
-            <AppForm/>
-        </OnlyTauri>
+        <AppForm/>
     );
 };
 
@@ -44,8 +42,8 @@ const AppForm = () => {
     });
 
     const { form, isFetching, onSubmit } = useSettingsForm({
-        form_schema: formSchema,
-        on_submit: (data) => {
+        formSchema,
+        checkSubmitValues: (data) => {
             const new_settings: Partial<Settings> = {};
 
             if (form.formState.dirtyFields.autostart) {
@@ -55,17 +53,23 @@ const AppForm = () => {
             if (!obj_is_empty(new_settings)) {
                 return new_settings;
             }
-        }
+        },
+        reducer: (data) => {
+            const { autostart } = data;
+            return {
+                autostart,
+            };
+        },
     });
 
     if (isFetching) {
         return (
-            <div>Loading...</div>
+            <SettingsEntriesSkeleton entries={1} />
         );
     }
 
     return (
-        <SettingsFormPageWrapper
+        <SettingsFormWrapper
             onSubmit={onSubmit}
             form={form}
         >
@@ -74,8 +78,8 @@ const AppForm = () => {
                 name="autostart"
                 render={({ field: { value, onChange, ...props } }) => (
                     <SettingsFormElement
-                        icon={<Rocket/>}
-                        rightElement={
+                        icon={Rocket}
+                        actionNode={
                             <Switch
                                 aria-label={ts("autostart_aria")}
                                 checked={value}
@@ -89,7 +93,7 @@ const AppForm = () => {
                     </SettingsFormElement>
                 )}
             />
-        </SettingsFormPageWrapper>
+        </SettingsFormWrapper>
     );
 };
 

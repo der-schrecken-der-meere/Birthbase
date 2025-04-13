@@ -44,6 +44,12 @@ export default defineConfig(({ command, mode, isPreview }) => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
+        "@com": path.resolve(__dirname, "./src/components"),
+        "@hooks": path.resolve(__dirname, "./src/hooks"),
+        "@stores": path.resolve(__dirname, "./src/stores"),
+        "@features": path.resolve(__dirname, "./src/features"),
+        "@apis": path.resolve(__dirname, "./src/apis"),
+        "@lib": path.resolve(__dirname, "./src/lib"),
       },
     },
     envPrefix: ['VITE_', 'TAURI_PLATFORM', 'TAURI_ARCH', 'TAURI_FAMILY', 'TAURI_PLATFORM_VERSION', 'TAURI_PLATFORM_TYPE', 'TAURI_DEBUG', 'TAURI_'],
@@ -83,38 +89,31 @@ export default defineConfig(({ command, mode, isPreview }) => {
             if (/_(desktop|mobile|macos|linux|windows|android|ios)_/.test(id)) {
               if (is_mobile) {
                 if (/desktop/.test(id)) {
-                  console.log("exclude desktop", id);
                   return true;
                 }
                 if (is_android) {
                   if (/^(?!.*android).*(ios)/.test(id)) {
-                    console.log("exclude ios", id);
                     return true;
                   }
                 } else if (is_ios) {
                   if (/^(?!.*ios).*(android)/.test(id)) {
-                    console.log("exclude android", id);
                     return true;
                   }
                 }
               } else if (is_desktop) {
                 if (/mobile/.test(id)) {
-                  console.log("exclude mobile", id);
                   return true;
                 }
                 if (is_windows) {
                   if (/^(?!.*windows).*(macos|linux)/i.test(id)) {
-                    console.log("exclude macos and linux", id);
                     return true;
                   }
                 } else if (is_linux) {
                   if (/^(?!.*linux).*(macos|windows)/i.test(id)) {
-                    console.log("exclude macos and linux", id);
                     return true;
                   }
                 } else if (is_macos) {
                   if (/^(?!.*macos).*(macos|linux)/i.test(id)) {
-                    console.log("exclude macos and linux", id);
                     return true;
                   }
                 }
@@ -122,7 +121,6 @@ export default defineConfig(({ command, mode, isPreview }) => {
             }
           } else {
             if (/_(desktop|mobile|macos|linux|windows|android|ios|tauri)_/i.test(id)) {
-              console.log("exclude tauri", id);
               return false;
             }
           }

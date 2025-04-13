@@ -1,6 +1,6 @@
 import type { DownloadUpdateProps } from "./types";
 
-import { Button } from "../ui/button";
+import { Button } from "../../../ui/button";
 
 import { useAppStore } from "@/stores/use_app_store";
 

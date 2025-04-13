@@ -1,6 +1,6 @@
 import type { UpdateProgressProps } from "./types";
 
-import { Progress } from "../ui/progress";
+import { Progress } from "@/components/ui/progress";
 
 import { useUpdateStore } from "@/stores/use_update_store";
 

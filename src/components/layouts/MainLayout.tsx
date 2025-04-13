@@ -14,9 +14,9 @@ import { Skeleton } from '../ui/skeleton';
 
 const MobileLowerNavbar = lazy(() => import('../navigation/MobileNavigation').then(module => ({ default: module.MobileLowerNavbar })));
 
-let Updater = lazy(() => Promise.resolve({ default: () => <></> }));
+let Updater = null;
 if (__IS_TAURI__ && __TAURI_IS_DESKTOP__) {
-    Updater = lazy(() => import("../__tauri__desktop__updater/Updater").then(module => ({ default: module.Updater })));
+    Updater = lazy(() => import("../__tauri__/__desktop__/updater/Updater").then(module => ({ default: module.Updater })));
 }
 
 const MainLayout = () => {
@@ -33,10 +33,10 @@ const MainLayout = () => {
                 <AppSidebar />
                 <main className='relative @container w-full flex flex-col *:px-4 h-full'>
                     <UpperNavbar className='shrink-0 border-b' />
-                    <div className='flex-1 w-full flex flex-col overflow-hidden py-2 max-w-[100vw] md:max-w-[1024px] md:mx-auto @container'>
+                    <div className='flex-1 w-full flex flex-col overflow-hidden py-2 max-w-[100vw] md:max-w-[64rem] md:mx-auto @container'>
                         <Outlet />
                     </div>
-                    {isAvailable &&
+                    {(isAvailable && Updater) &&
                         <Suspense fallback={null}>
                             <Updater/>
                         </Suspense>

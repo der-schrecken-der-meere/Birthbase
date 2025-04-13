@@ -94,7 +94,7 @@ export const columns: ColumnDef<Birthday>[] = [
         meta: getMeta("age"),
         header: ({ column }) => <ColumnHeader colType="number" column={column} t_key="age" />,
         cell: ({ cell }) => {
-            return <div className='text-right font-medium'>{cell.getValue() as number}</div>
+            return <div className='text-end font-medium'>{cell.getValue() as number}</div>
         }
     },
     {
@@ -107,7 +107,7 @@ export const columns: ColumnDef<Birthday>[] = [
         sortingFn: "alphanumeric",
         header: ({ column }) => <ColumnHeader colType="number" column={column} t_key="until" />,
         cell: ({ cell }) => {
-            return <div className='text-right font-medium'>{cell.getValue() as number}</div>
+            return <div className='text-end font-medium'>{cell.getValue() as number}</div>
         }
     },
     {

@@ -29,10 +29,9 @@ import { useAppStore } from "@/stores/use_app_store";
 import { Toast } from "./singletons/Toast";
 import { ConfirmDialog } from "./singletons/ConfirmDialog";
 import { BirthdayFormDialog } from "./singletons/BirthdayFormDialog";
-import { is_desktop } from "@/lib/functions/logic/desktop";
 import { useTranslation } from "react-i18next";
-import { isTauri } from "@tauri-apps/api/core";
 import { PageLinks } from "@/globals/constants/links";
+import { NotificationSkeleton } from "./skeletons/NotificationSkeleton";
 
 // Main pages
 const Home =                    lazy(() => import("../pages/Home").catch(() => ({ default: () => <></> })));
@@ -47,12 +46,42 @@ const Storage =                 lazy(() => import("../pages/Settings/Storage/Sto
 const Time =                    lazy(() => import("../pages/Settings/Time/Time").catch(() => ({ default: () => <></> })));
 const Language =                lazy(() => import("../pages/Settings/Language/Language").catch(() => ({ default: () => <></> })));
 const Info =                    lazy(() => import("../pages/Settings/Info/Info").catch(() => ({ default: () => <></> })));
-const SettingsApp =             lazy(() => import("../pages/Settings/__tauri__/App/App").catch(() => ({ default: () => <></> })));
-const Update =                  lazy(() => import("../pages/Settings/__tauri__/Update/Update").catch(() => ({ default: () => <></> })));
+
+let Update = null;
+let UpdateRoute = null;
+let SettingsApp = null;
+let SettingsAppRoute = null;
+let SettingsEntries = 6;
+if (__IS_TAURI__) {
+    if (__TAURI_IS_DESKTOP__) {
+        Update = lazy(() => import("../pages/Settings/__tauri__/__desktop__/Update/Update"));
+        UpdateRoute = <Route
+            path={PageLinks.SETTINGS_UPDATE}
+            element={
+                <Suspense fallback={
+                    <SettingsEntriesSkeleton entries={2}/>
+                }>
+                    <Update/>
+                </Suspense>
+            }
+        />;
+        SettingsApp = lazy(() => import("../pages/Settings/__tauri__/__desktop__/App/App"));
+        SettingsAppRoute = <Route
+            path={PageLinks.SETTINGS_APP}
+            element={
+                <Suspense fallback={
+                    <SettingsEntriesSkeleton entries={1}/>
+                }>
+                    <SettingsApp/>
+                </Suspense>
+            }
+        />;
+        SettingsEntries = 8;
+    }
+}
 
 const App = () => {
     const isBooting = useAppStore((state) => state.isBooting);
-    const osType = useAppStore((state) => state.osType);
     const setFinishedBooting = useAppStore((state) => state.setFinishedBooting);
 
     const { i18n } = useTranslation();
@@ -91,7 +120,7 @@ const App = () => {
                     >
                         <Route index element={
                             <Suspense fallback={
-                                <SettingsEntriesSkeleton entries={8}/>
+                                <SettingsEntriesSkeleton entries={SettingsEntries}/>
                             }>
                                 <Settings/>
                             </Suspense>
@@ -120,7 +149,7 @@ const App = () => {
                             path={PageLinks.SETTINGS_INFO}
                             element={
                                 <Suspense fallback={
-                                    <></>
+                                    <SettingsEntriesSkeleton entries={2} />
                                 }>
                                     <Info/>
                                 </Suspense>
@@ -150,36 +179,14 @@ const App = () => {
                             path={PageLinks.SETTINGS_LANGUAGE}
                             element={
                                 <Suspense fallback={
-                                    <></>
+                                    <SettingsEntriesSkeleton entries={1} />
                                 }>
                                     <Language/>
                                 </Suspense>
                             }
                         />
-                        {isTauri() && 
-                            <Route
-                                path={PageLinks.SETTINGS_APP}
-                                element={
-                                    <Suspense fallback={
-                                        <></>
-                                    }>
-                                        <SettingsApp/>
-                                    </Suspense>
-                                }
-                            />
-                        }
-                        {is_desktop(osType) && (
-                            <Route
-                                path={PageLinks.SETTINGS_UPDATE}
-                                element={
-                                    <Suspense fallback={
-                                        <></>
-                                    }>
-                                        <Update/>
-                                    </Suspense>
-                                }
-                            />
-                        )}
+                        {SettingsAppRoute}
+                        {UpdateRoute}
                     </Route>
                     <Route path={PageLinks.MY_BIRTHDAYS} element={
                         <Suspense fallback={
@@ -193,7 +200,7 @@ const App = () => {
                         element={
                             <Suspense
                                 fallback={
-                                    <></>
+                                    <NotificationSkeleton/>
                                 }
                             >
                                 <Notifications/>

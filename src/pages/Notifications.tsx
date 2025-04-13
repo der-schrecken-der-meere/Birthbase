@@ -6,7 +6,6 @@ import { type PopoverTriggerProps } from "@radix-ui/react-popover";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Eye, Mailbox, Trash2 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -24,6 +23,7 @@ import { format_number_to_relative_time } from "@/lib/intl/date";
 import { get_relative_time_string } from "@/lib/functions/date/relative_time";
 import { cn } from "@/lib/utils";
 import { calculate_days_until_next_birthday } from "@/lib/functions/birthday";
+import { NotificationSkeleton } from "@/components/skeletons/NotificationSkeleton";
 
 type FilterButtonProps = {
     onClick: () => void;
@@ -134,7 +134,7 @@ const Notifications = () => {
 
     if (isFetching) {
         return (
-            <Skeleton className='w-full h-36' />
+            <NotificationSkeleton/>
         )
     }
 
@@ -146,7 +146,7 @@ const Notifications = () => {
 
     return (
         <>
-            <ScrollArea className="shrink-0 mb-2 table-fixed">
+            <div className="shrink-0 mb-2 table-fixed overflow-auto scrollbar-visible">
                 <div className="flex gap-2">
                     {filter_buttons.map((filter_button, index) => {
                         return (
@@ -159,9 +159,8 @@ const Notifications = () => {
                         );
                     })}
                 </div>
-                <ScrollBar orientation="horizontal" />
-            </ScrollArea>
-            <ScrollArea className="h-full">
+            </div>
+            <div className="h-full scrollbar-visible overflow-auto">
                 {filtered_data.length === 0
                     ? (
                         <div className="h-full flex flex-col justify-center items-center text-center margin-auto rounded-md text-muted-foreground text-sm">
@@ -169,7 +168,7 @@ const Notifications = () => {
                             {ts("empty")}
                         </div>
                     ) : (
-                        <div className="space-y-4 w-full table table-fixed mr-2">
+                        <div className="space-y-4 w-full table table-fixed">
                             {filtered_data.map((notification) => {
                                 switch (notification.group_type) {
                                     case NotificationGroupType.BIRTHDAY:
@@ -201,8 +200,16 @@ const Notifications = () => {
                         </div>
                     )
                 }
-            </ScrollArea>
+            </div>
         </>
+    );
+};
+
+const NotificationEntrySkeleton = () => {
+    return (
+        <Skeleton
+            className="w-full h-16"
+        />
     );
 };
 
@@ -227,9 +234,7 @@ const BirthdayWrapper = ({
 
     if (isLoading || isFetching) {
         return (
-            <Skeleton
-                className="w-full h-16"
-            />
+            <NotificationEntrySkeleton/>
         )
     }
 
@@ -260,7 +265,7 @@ const BirthdayRemindeWrapper = ({
     if (isLoading || isFetching) {
         return (
             <Skeleton
-                className="w-full h-16"
+                className="w-full h-19"
             />
         )
     }
@@ -346,10 +351,10 @@ const NotificationMessage = ({
             >
                 <Icon className="h-8 w-8 self-center shrink-0" />
                 <div className="w-full">
-                    <div className="float-right w-40 h-5 text-right text-muted-foreground text-sm mr-2">
+                    <div className="float-end w-max h-5 text-end text-muted-foreground text-sm mx-2">
                         {str_time_pasted}
                     </div>
-                    <div className="text-left text-current/80">
+                    <div className="text-start text-current/80">
                         <div className="font-bold">
                             {title}
                         </div>
@@ -363,8 +368,9 @@ const NotificationMessage = ({
                         onClick={on_read}
                         size="sm"
                         variant="outline"
+                        className="gap-2"
                     >
-                        <Eye className="w-4 h-4 mr-2"/>
+                        <Eye className="w-4 h-4"/>
                         {t("notifications.mark_read", { ns: "pages" })}
                     </Button>
                 )}
@@ -372,8 +378,9 @@ const NotificationMessage = ({
                     onClick={on_delete}
                     size="sm"
                     variant="outline"
+                    className="gap-2"
                 >
-                    <Trash2 className="w-4 h-4 mr-2"/>
+                    <Trash2 className="w-4 h-4"/>
                     {t("delete_btn", { ns: "generally" })}
                 </Button>
             </PopoverContent>

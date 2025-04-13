@@ -4,5 +4,9 @@
         "change_description": "Bearbeiten oder Löschen Sie den ausgewählten Geburtstag. Die neuen Daten werden nach dem erfolgreichen Aktualisieren oder Löschen auf der Startseite oder unter \"Meine Geburtstage\" angezeigt.",
         "create_title": "Geburtstag erstellen",
         "create_description": "Erstellen Sie einen neuen Geburtstag. Dieser wird nach dem erfolgreichen Erstellen auf der Startseite oder unter \"Meine Geburtstage\" angezeigt."
+    },
+    "calendar": {
+        "title": "Datumswähler",
+        "description": "Wählen Sie ein Datum aus"
     }
 }

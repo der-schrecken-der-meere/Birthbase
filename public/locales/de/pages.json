@@ -7,7 +7,7 @@
     "my_birthdays": {
         "last_name": "Nachname...",
         "actions": "Aktionen",
-        "copy_as_message": "Geburtstage als Nachricht kopieren",
+        "copy_as_message": "Geburtstag als Nachricht kopieren",
         "copy_message_zero": "{{firstname}} {{lastname}} ({{date}}) ist heute {{age}} geworden",
         "copy_message_one": "{{firstname}} {{lastname}} ({{date}}) wird in einem Tag {{age}}",
         "copy_message_other": "{{firstname}} {{lastname}} ({{date}}) wird in {{until}} Tagen {{age}}",
@@ -54,10 +54,12 @@
     },
     "settings_storage": {
         "storage_description": "{{usage}}/{{quotas}} benutzt",
-        "empty_storage": "Speicher leeren"
+        "empty_storage": "Speicher leeren",
+        "progress_aria": "Beschreibt wie viel Speicher die App vom Speicher reserviert"
     },
     "settings_language": {
         "language_title": "Sprache",
+        "language_placeholder": "Sprache",
         "language_required_error": "Bitte wählen Sie eine Sprache aus",
         "language_description": "Anzeigesprache der App"
     },

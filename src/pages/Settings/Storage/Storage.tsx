@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 
 import { Progress } from "@/components/ui/progress";
-import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { NavigationEntry } from '../Settings';
 import { Trash2 } from 'lucide-react';
+import { NavigationEntryCore } from '@/components/settings/core/NavigationEntryCore';
 
 import { useConfirmStore } from '@/stores/use_confirm_store';
 
@@ -21,21 +20,28 @@ import { to_smallest_byte_type } from '@/lib/functions/storage/unit';
 import { calc_app_storage_size } from '@/lib/functions/storage/calculations';
 
 const Storage = () => {
+    const { breadcrumbs } = useSettingsBreadcrumbs();
+
+    useNavbar({
+        pageTitle: "settings.storage",
+        breadcrumbDisplay: breadcrumbs,
+    });
+
+    return (
+        <StorageForm/>
+    );
+};
+
+const StorageForm = () => {
     const [value, setValue] = useState<StorageEstimate>({usage: 0, quota: 0});
 
     const { mutate: clear_notifications } = useClearNotificationQuery();
     const { mutate: clear_birthdays } = useClearBirthdayQuery();
     const { mutate: clear_settings } = useClearSettingsQuery();
 
-    const { t, i18n } = useTranslation(["pages", "confirm"]);
-
-    const { breadcrumbs } = useSettingsBreadcrumbs();
     const setConfirm = useConfirmStore((state) => state.setConfirm);
 
-    useNavbar({
-        pageTitle: "settings.storage",
-        breadcrumbDisplay: breadcrumbs,
-    });
+    const { t, i18n } = useTranslation(["pages", "confirm"]);
 
     useEffect(() => {
         (async () => {
@@ -68,22 +74,26 @@ const Storage = () => {
 
     return (
         <>
-            <NavigationEntry>
+            <NavigationEntryCore>
                 <div className='text-sm text-muted-foreground'>
                     {t("settings_storage.storage_description", { usage: storage_size_to_string(value.usage as number), quotas: storage_size_to_string(value.quota as number) })}
                 </div>
-                <Progress value={calc_usage_quota_ratio(value.usage as number, value.quota as number)} className="w-full h-2 mt-2"/>
-            </NavigationEntry>
-            <Separator/>
-            <NavigationEntry
+                <Progress
+                    value={calc_usage_quota_ratio(value.usage as number, value.quota as number)}
+                    className="w-full h-2 mt-2"
+                    aria-label={t("settings_storage.progress_aria")}
+                />
+            </NavigationEntryCore>
+            <NavigationEntryCore
                 className='mt-auto flex'
-                rightElement={
+                actionNode={
                     <Button
                         variant="destructive"
                         size="sm"
                         onClick={onDeleteClick}
+                        className='gap-2'
                     >
-                        <Trash2 className='w-4 h-4 mr-1'/>
+                        <Trash2 className='w-4 h-4'/>
                         {t("settings_storage.empty_storage")}
                     </Button>
                 }

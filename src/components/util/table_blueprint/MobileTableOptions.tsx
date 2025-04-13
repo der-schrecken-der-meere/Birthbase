@@ -32,7 +32,7 @@ const MobileTableOptions = <TData,>({
                 <Button
                     variant="outline"
                     size="sm"
-                    className={cn("ml-auto h-full", className)}
+                    className={cn("h-full", className)}
                     {...props}
                 >
                     <SlidersHorizontal className="h-4 w-4" />

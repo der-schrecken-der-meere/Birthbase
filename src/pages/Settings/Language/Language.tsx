@@ -1,9 +1,12 @@
-import { type Settings } from '@/database/tables/settings/settings';
+import type { Settings } from '@/database/tables/settings/type';
+import type { ListItem } from '@/components/select/types';
 
-import { ListItem, SettingsFormElement, SettingsFormPageWrapper } from '../Settings';
-import { Languages } from 'lucide-react';
+import { Languages as LanguageIcon } from 'lucide-react';
 import { FormField } from '@/components/ui/form';
 import { UniSelect } from '@/components/select/UniSelect';
+import { SettingsEntriesSkeleton } from '@/components/skeletons/SettingsEntriesSkeleton';
+import { SettingsFormWrapper } from '@/components/settings/SettingsFormWrapper';
+import { SettingsFormElement } from '@/components/settings/SettingsFormElement';
 
 import { useSettingsBreadcrumbs } from '@/components/layouts/SettingsLayout';
 import { useNavbar } from '@/hooks/core/use_navbar';
@@ -12,47 +15,47 @@ import { useTranslation } from 'react-i18next';
 
 import { z } from 'zod';
 import { obj_is_empty } from '@/lib/functions/object/empty';
+import { type Languages, languages } from '@/globals/constants/language';
 
 const Language = () => {
-
-    const { t } = useTranslation(["pages"]);
     const { breadcrumbs } = useSettingsBreadcrumbs();
-
-    const ts = (key: string) => {
-        return t(`settings_language.${key}`);
-    };
-
-    const formSchema = z.object({
-        language: z.enum(["de", "en"], {
-            required_error: ts("language_required"),
-        }),
-    });
 
     useNavbar({
         pageTitle: "settings.language",
         breadcrumbDisplay: breadcrumbs,
     });
 
-    const languages = {
-        en: "English",
-        de: "Deutsch",
-    };
+    return (
+        <LanguageForm/>
+    );
+};
 
-    const list_items = (() => {
-        const list: ListItem[] = [];
-        Object.entries(languages).forEach(([key, title]) => {
-            list.push({
-                displayText: title,
-                item: title,
-                value: key,
-            })
-        });
-        return list;
-    })();
+const LanguageForm = () => {
+
+    const { t } = useTranslation(["pages", "generally"]);
+
+    const ts = (key: string) => {
+        return t(`settings_language.${key}`);
+    };
+    
+    const language_items: ListItem<Languages>[] = languages.map((key) => {
+        const text = t(`languages.${key}`, { ns: "generally" });
+        return {
+            item: text,
+            value: key,
+            displayText: text,
+        };
+    });
+
+    const formSchema = z.object({
+        language: z.enum(languages, {
+            required_error: ts("language_required_error"),
+        }),
+    });
 
     const { form, isFetching, onSubmit } = useSettingsForm({
-        form_schema: formSchema,
-        on_submit: (data) => {
+        formSchema,
+        checkSubmitValues: (data) => {
             const new_settings: Partial<Settings> = {};
 
             if (form.formState.dirtyFields.language) {
@@ -62,32 +65,38 @@ const Language = () => {
             if (!obj_is_empty(new_settings)) {
                 return new_settings;
             }
-        }
+        },
+        reducer: (data) => {
+            const { language } = data;
+            return {
+                language,
+            }
+        },
     });
 
     if (isFetching) {
         return (
-            <div>Loading...</div>
+            <SettingsEntriesSkeleton entries={1} />
         );
     }
 
     return (
-        <SettingsFormPageWrapper
+        <SettingsFormWrapper
             onSubmit={onSubmit}
             form={form}
         >
             <FormField
                 control={form.control}
                 name="language"
-                render={({ field }) => (
+                render={({ field: { onChange, ...props } }) => (
                     <SettingsFormElement
-                        icon={<Languages/>}
-                        rightElement={
+                        icon={LanguageIcon}
+                        actionNode={
                             <UniSelect
-                                defaultValue={field.value}
-                                onValueChange={field.onChange}
-                                placeholder={languages.en}
-                                listItems={list_items}
+                                onValueChange={onChange}
+                                placeholder={ts("language_placeholder")}
+                                listItems={language_items}
+                                {...props}
                             />
                         }
                         caption={ts("language_description")}
@@ -96,7 +105,7 @@ const Language = () => {
                     </SettingsFormElement>
                 )}
             />
-        </SettingsFormPageWrapper>
+        </SettingsFormWrapper>
     );
 };
 

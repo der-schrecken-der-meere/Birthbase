@@ -30,15 +30,15 @@ const DataTableViewOptions = <TData,>({
         <Button
           variant="outline"
           size="sm"
-          className={cn("ml-auto h-full", className)}
+          className={cn("h-full gap-2", className)}
           {...props}
         >
-          <SlidersHorizontal className="mr-2 h-4 w-4" />
+          <SlidersHorizontal className="h-4 w-4" />
           {t("view")}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[150px]">
-        <DropdownMenuLabel>{t("show_columns")}</DropdownMenuLabel>
+      <DropdownMenuContent align="end" className="w-40">
+        <DropdownMenuLabel className="text-nowrap">{t("show_columns")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table
           .getAllColumns()

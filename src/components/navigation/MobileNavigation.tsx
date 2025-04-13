@@ -10,6 +10,7 @@ import { useGetNotificationsQuery } from "@/features/latest_notifications/query"
 import { PageLinks } from "@/globals/constants/links";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "../ui/button";
+import { LucideProps } from "lucide-react";
 
 const find_link = (page_link: PageLinks) => {
     const main_links = useNavEntriesStore.getState().mainLinks;
@@ -17,7 +18,7 @@ const find_link = (page_link: PageLinks) => {
 };
 
 type NotificationIconProps = {
-    Icon: FunctionComponent,
+    Icon: FunctionComponent<LucideProps>,
 };
 
 const NotificationIcon = ({
@@ -28,9 +29,9 @@ const NotificationIcon = ({
 
     return (
         <div className="relative">
-            <Icon/>
+            <Icon className="h-4 w-4"/>
             {notification_data.data.length > 0 && (
-                <div className='bg-[hsl(var(--text))] w-2 h-2 rounded-full absolute right-1 bottom-1 outline-offset-0 outline-3 outline-[hsl(var(--bg))]'></div>
+                <div className='bg-[hsl(var(--text))] w-2 h-2 rounded-full absolute right-0 bottom-0 outline-offset-0 outline-3 outline-[hsl(var(--bg))]'></div>
             )}
         </div>
     );
@@ -48,16 +49,16 @@ const MobileLowerNavbar = ({
             switch (i) {
                 case 0:
                     const home = find_link(PageLinks.HOME);
-                    return { ...home, ...{icon: <home.icon/>} }
+                    return { ...home, ...{icon: <home.icon className="h-4 w-4"/>} }
                 case 1:
                     const birthdays = find_link(PageLinks.MY_BIRTHDAYS_PARAMS);
-                    return { ...birthdays, ...{icon: <birthdays.icon/>} }
+                    return { ...birthdays, ...{icon: <birthdays.icon className="h-4 w-4"/>} }
                 case 3:
                     const notifications = find_link(PageLinks.NOTIFICATIONS);
                     return { ...notifications, ...{icon: <NotificationIcon Icon={notifications.icon}/>} }
                 case 4:
                     const settings = find_link(PageLinks.SETTINGS);
-                    return { ...settings, ...{icon: <settings.icon/>} };
+                    return { ...settings, ...{icon: <settings.icon className="h-4 w-4"/>} };
                 default:
                     return null;
             }
@@ -68,13 +69,17 @@ const MobileLowerNavbar = ({
         <div className={cn("flex items-center justify-between", className)} {...props}>
             {arr_nav_entries.map((entry) => {
                 if (entry) {
+
+                    const { url, invisible, icon, title } = entry;
+
                     return (
                         <MobileNavbarLink
-                            key={entry.url}
-                            to={entry.url}
-                            className={entry.invisible ? "pointer-events-none invisible" : ""}
+                            key={url}
+                            to={url}
+                            className={invisible ? "pointer-events-none invisible" : ""}
+                            aria-label={title}
                         >
-                            {entry.icon}
+                            {icon}
                         </MobileNavbarLink>
                     );
                 }
@@ -88,6 +93,7 @@ const MobileNavbarLink = ({
     children,
     to,
     className,
+    ...props
 }: LinkProps) => {
     return (
         <NavLink
@@ -97,6 +103,7 @@ const MobileNavbarLink = ({
                 "--bg": isActive ? "var(--primary)" : "var(--background)",
                 "--text": isActive ? "var(--primary-foreground)" : "var(--primary)",
             }) as CSSProperties}
+            {...props}
         >
             {children}
         </NavLink>

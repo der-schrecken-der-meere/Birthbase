@@ -1,28 +1,41 @@
+import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { SelectShortendProps } from "./types";
 
 const SelectShortend = <T,>({
     defaultValue,
     onValueChange,
-    title,
+    placeholder,
     selectItems,
+    disabled,
+    value,
+    name,
     children,
+    className,
     ...props
 }: SelectShortendProps<T>) => {
+
+    const handleChange = (value: string) => {
+        if (value) {
+            onValueChange(value);
+        }
+    };
+
     return (
         <Select
-            defaultValue={defaultValue}
-            onValueChange={onValueChange}
+            value={value as string}
+            onValueChange={handleChange}
+            disabled={disabled}
+            name={name}
         >
             <SelectTrigger
-                className="w-[180px] gap-2"
+                className={cn("w-48 gap-2", className)}
                 {...props}
             >
                 <SelectValue
-                    placeholder={title}
-                    className='flex w-full'
+                    placeholder={placeholder}
                 >
-                    {selectItems.find((v) => v.value === defaultValue)?.displayText}
+                    {selectItems.find((v) => v.value === value)?.displayText}
                 </SelectValue>
             </SelectTrigger>
             <SelectContent>

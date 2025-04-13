@@ -26,6 +26,11 @@
         "light": "Light",
         "system": "System"
     },
+    "languages": {
+        "de": "Deutsch",
+        "en": "English"
+    },
     "misc": "Miscellaneous",
-    "close_app": "Close app"
+    "close_app": "Close app",
+    "history_back_aria": "Opens or closes a collapsible element"
 }

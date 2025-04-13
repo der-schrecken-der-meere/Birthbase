@@ -27,6 +27,7 @@ const BasicAddBirthdayButton = ({
 };
 
 const AddBirthdayButton = ({
+    className,
     ...props
 }: ButtonProps) => {
 
@@ -36,9 +37,10 @@ const AddBirthdayButton = ({
         <BasicAddBirthdayButton
             size="sm"
             variant="secondary"
+            className={cn("gap-1", className)}
             {...props}
         >
-            <span className="ml-1">{t("create_btn")}</span>
+            {t("create_btn")}
         </BasicAddBirthdayButton>
     );
 };

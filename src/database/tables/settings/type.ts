@@ -1,8 +1,8 @@
-import type { Colors, Mode } from "@/lib/app/types";
+import type { Colors, Modes } from "@/lib/app/types";
 import type { CoreRecord } from "@/lib/util/types";
 
 interface Settings extends CoreRecord {
-    mode: Mode;
+    mode: Modes;
     color: Colors;
     remember: number;
     notification: boolean;

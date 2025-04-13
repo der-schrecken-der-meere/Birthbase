@@ -1,9 +1,9 @@
 import { useState } from "react";
 
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { Button } from "../ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
-import { ScrollArea } from "../ui/scroll-area";
+import { Button } from "../../../ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../../../ui/collapsible";
+import { ScrollArea } from "../../../ui/scroll-area";
 import Markdown from "react-markdown";
 
 import { useUpdateStore } from "@/stores/use_update_store";
@@ -27,11 +27,10 @@ const UpdateNotes = () => {
             open={open}
             onOpenChange={set_open}
         >
-            <div className='flex items-center shrink-0'>
+            <div className='flex items-center shrink-0 justify-between'>
                 {t("update_notes")}
                 <CollapsibleTrigger asChild>
                     <Button
-                        className='ml-auto'
                         variant="secondary"
                         size="icon"
                     >

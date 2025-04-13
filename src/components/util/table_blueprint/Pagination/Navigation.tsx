@@ -70,7 +70,7 @@ const Navigation = <TData,>({
     ];
 
     return (
-        <div className={cn("flex items-center [&_>_button:not(:last-of-type)]:mr-2 relative", className)} {...props}>
+        <div className={cn("flex items-center gap-2 relative", className)} {...props}>
             <TooltipProvider>
                 {buttons.map((e) => (
                     <Tooltip key={e.id}>
@@ -80,6 +80,7 @@ const Navigation = <TData,>({
                                 className={cn("h-8 w-8 p-0", e?.className)}
                                 onClick={e.onClick}
                                 disabled={!e.disabled()}
+                                aria-label={e.tooltip}
                             >
                                 <e.chevron className="h-4 w-4"/>
                             </Button>

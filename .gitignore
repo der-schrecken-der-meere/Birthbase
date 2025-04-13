@@ -14,6 +14,10 @@ dist-ssr
 _secrets
 package-lock.json
 
+# Not available
+wip
+obsolete
+
 # Automation
 automation
 test
@@ -32,3 +36,5 @@ test
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+.unlighthouse
+coverage
