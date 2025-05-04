@@ -15,10 +15,10 @@ val tauriProperties = Properties().apply {
 
 android {
     compileSdk = 34
-    namespace = "com.maxvoigt.Birthbase"
+    namespace = "com.klyro.birthalert"
     defaultConfig {
         manifestPlaceholders["usesCleartextTraffic"] = "false"
-        applicationId = "com.maxvoigt.Birthbase"
+        applicationId = "com.klyro.birthalert"
         minSdk = 24
         targetSdk = 34
         versionCode = tauriProperties.getProperty("tauri.android.versionCode", "1").toInt()
@@ -37,7 +37,7 @@ android {
             }
         }
         getByName("release") {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             proguardFiles(
                 *fileTree(".") { include("**/*.pro") }
                     .plus(getDefaultProguardFile("proguard-android-optimize.txt"))

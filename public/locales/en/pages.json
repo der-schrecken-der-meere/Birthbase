@@ -69,6 +69,17 @@
         "tauri_version_title": "Tauri version",
         "tauri_version_description": "Current version"
     },
+    "settings_backup": {
+        "create_backup_title": "Create backup",
+        "create_backup_description": "Creates a backup file and downloads it afterwards",
+        "create_backup_aria": "Create and download backup",
+        "create_backup_progress": "Creating backup file",
+        "import_backup_title": "Import backup",
+        "import_backup_description": "Imports the data of a backup file",
+        "import_backup_aria": "Opens a form for uploading a backup file",
+        "import_backup_progress": "Importing backup file",
+        "import_backup_btn": "Upload File"
+    },
     "settings_app": {
         "autostart_title": "Autostart",
         "autostart_description": "Opens the app automaticly after the start of the system",

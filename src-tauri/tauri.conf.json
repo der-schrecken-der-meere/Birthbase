@@ -16,8 +16,15 @@
         "use": "brownfield"
       }
     },
+    "trayIcon": {
+      "iconAsTemplate": false,
+      "iconPath": "icons/icon.ico",
+      "tooltip": "BirthAlert v0.2.1"
+    },
     "windows": [
       {
+        "backgroundColor": "#020817",
+        "browserExtensionsEnabled": false,
         "closable": true,
         "decorations": true,
         "focus": true,
@@ -26,11 +33,10 @@
         "minHeight": 600,
         "minimizable": true,
         "minWidth": 340,
-        "proxyUrl": "http://birthbase.app",
         "resizable": true,
         "shadow": true,
         "theme": "Dark",
-        "title": "Birthbase",
+        "title": "BirthAlert",
         "width": 800,
         "x": 0,
         "y": 0,
@@ -47,6 +53,9 @@
   },
   "bundle": {
     "active": true,
+    "android": {
+      "minSdkVersion": 24
+    },
     "category": "Utility",
     "createUpdaterArtifacts": true,
     "icon": [
@@ -63,7 +72,7 @@
         "files": {}
       }
     },
-    "longDescription": "An Application for managing and storing birthdays and messaging yourself if a birthday is soon",
+    "longDescription": "An Application for managing and storing birthdays and messaging you if there are birthdays soon. This includes to configure reminders for birthdays, displaying age of people",
     "macOS": {
       "dmg": {
         "appPosition": {
@@ -81,6 +90,7 @@
       },
       "minimumSystemVersion": "10.13"
     },
+    "shortDescription": "Store birthdays and be reminded",
     "targets": "all",
     "windows": {
       "allowDowngrades": true,
@@ -97,7 +107,7 @@
       "wix": null
     }
   },
-  "identifier": "com.maxvoigt.Birthbase",
+  "identifier": "com.klyro.birthalert",
   "plugins": {
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDcwN0Q3MDdEOTM2ODQ2QTcKUldTblJtaVRmWEI5Y0t0MEorK0JjRC96Q1dQNDFvNExLMDRTWG9OajR2b0JXM2dyNWVKSlZTNFoK",
@@ -109,6 +119,6 @@
       }
     }
   },
-  "productName": "birthbases",
+  "productName": "BirthAlert",
   "version": "0.2.1"
 }

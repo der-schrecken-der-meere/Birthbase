@@ -3,7 +3,7 @@ import path from "path"
 import react from '@vitejs/plugin-react'
 import tailwindcss from "@tailwindcss/vite";
 
-const host = process.env.TAURI_ENV_HOST;
+const host = process.env.TAURI_DEV_HOST;
 const platform = process.env.TAURI_ENV_PLATFORM;
 
 const is_mobile = (platform === "android" || platform === "ios");
@@ -16,8 +16,6 @@ const is_macos = platform === "macos";
 const is_windows = platform === "windows";
 const is_android = platform === "android";
 const is_ios = platform === "ios";
-
-console.log(platform);
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode, isPreview }) => {
@@ -60,7 +58,7 @@ export default defineConfig(({ command, mode, isPreview }) => {
     clearScreen: false,
   //   // 2. tauri expects a fixed port, fail if that port is not available
     server: {
-      host: platform === "android" ? '0.0.0.0' : (host || false),
+      host: host || false,
       // host: mobile === (host || false),
       port: 1420,
       strictPort: true,

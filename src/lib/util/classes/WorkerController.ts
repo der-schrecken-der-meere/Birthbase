@@ -3,24 +3,27 @@ type OnError = (event: ErrorEvent) => void;
 
 class WorkerController<Req, Res> {
     private worker: Worker|null;
-    worker_file: Worker;
+    worker_builder: () => Worker;
     on_message: OnMessage<Res>;
     on_error: OnError;
     
     constructor(
-        worker: Worker,
+        worker_builder: () => Worker,
         on_message: OnMessage<Res>,
         on_error: OnError,
     ) {
         this.worker = null;
-        this.worker_file = worker;
+        this.worker_builder = worker_builder;
         this.on_message = on_message;
         this.on_error = on_error;
     }
 
     create_worker() {
+        if (this.worker !== null) return;
+
         const { on_error, on_message } = this;
-        this.worker = this.worker_file;
+
+        this.worker = this.worker_builder();
         this.worker.onmessage = on_message;
         this.worker.onerror = on_error;
     }

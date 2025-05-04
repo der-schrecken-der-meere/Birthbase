@@ -46,6 +46,7 @@ const Storage =                 lazy(() => import("../pages/Settings/Storage/Sto
 const Time =                    lazy(() => import("../pages/Settings/Time/Time").catch(() => ({ default: () => <></> })));
 const Language =                lazy(() => import("../pages/Settings/Language/Language").catch(() => ({ default: () => <></> })));
 const Info =                    lazy(() => import("../pages/Settings/Info/Info").catch(() => ({ default: () => <></> })));
+const Backup =                  lazy(() => import("../pages/Settings/Backup/Backup").catch(() => ({ default: () => <></> })));
 
 let Update = null;
 let UpdateRoute = null;
@@ -182,6 +183,16 @@ const App = () => {
                                     <SettingsEntriesSkeleton entries={1} />
                                 }>
                                     <Language/>
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path={PageLinks.SETTINGS_BACKUP}
+                            element={
+                                <Suspense fallback={
+                                    <SettingsEntriesSkeleton entries={2} />
+                                }>
+                                    <Backup/>
                                 </Suspense>
                             }
                         />

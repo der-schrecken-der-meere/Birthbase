@@ -1,0 +1,8 @@
+{
+    "backup": {
+        "import_running": "Data import is running. No other backup function can be used at this time.",
+        "export_running": "Data export is running. No other backup function can be used at this time.",
+        "file_type": "The file type is not allowed.",
+        "file_structure": "The structure of the file is not correct."
+    }
+}

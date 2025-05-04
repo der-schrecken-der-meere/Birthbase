@@ -8,5 +8,17 @@
     "calendar": {
         "title": "Datumswähler",
         "description": "Wählen Sie ein Datum aus"
+    },
+    "file_uploader": {
+        "title": "Datei hochladen",
+        "description_one": "Ziehen Sie die Datei in das Feld oder klicken Sie auf das Feld, um die Datei einzufügen",
+        "description_other": "Ziehen Sie die Dateien in das Feld oder klicken Sie auf das Feld, um die Dateien einzufügen",
+        "area_description_one": "Datei einfügen",
+        "area_description_other": "Dateien einfügen",
+        "accepted_files_title": "Akzeptierte Dateien",
+        "file_not_accepted": "Datei nicht erlaubt!",
+        "to_many_files_one": "Es ist maximal eine Datei erlaubt",
+        "to_many_files_other": "Es sind maximal {{count}} Dateien erlaubt",
+        "to_few_files": "Es muss mindestens eine Datei vorhanden sein"
     }
 }

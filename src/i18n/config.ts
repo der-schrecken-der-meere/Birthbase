@@ -13,6 +13,7 @@ const ns: readonly string[] = [
     "table",
     "toast",
     "updater",
+    "error",
 ];
 
 

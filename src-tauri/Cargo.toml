@@ -1,6 +1,6 @@
 [package]
-name = "birthday"
-version = "0.1.0"
+name = "birthalert"
+version = "0.2.1"
 description = "Storing and Managing Birthdays"
 authors = ["Max Voigt"]
 edition = "2021"

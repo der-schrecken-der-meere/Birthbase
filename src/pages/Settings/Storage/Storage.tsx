@@ -15,9 +15,8 @@ import { useClearSettingsQuery } from '@/features/manage_settings/query';
 import { useNavbar } from '@/hooks/core/use_navbar';
 import { clear_app_storage } from '@/lib/functions/storage/clear';
 
-import { byte_format } from '@/lib/intl/storage';
-import { to_smallest_byte_type } from '@/lib/functions/storage/unit';
 import { calc_app_storage_size } from '@/lib/functions/storage/calculations';
+import { storage_size_to_string } from '@/lib/functions/storage/storageToString';
 
 const Storage = () => {
     const { breadcrumbs } = useSettingsBreadcrumbs();
@@ -63,11 +62,6 @@ const StorageForm = () => {
         });
     };
 
-    const storage_size_to_string = (value: number) => {
-        const obj_size = to_smallest_byte_type(value);
-        return byte_format(i18n.language, obj_size.u, obj_size.v);
-    };
-
     const calc_usage_quota_ratio = (usage: number, quota: number) => {
         return usage / quota * 100;
     };
@@ -76,7 +70,10 @@ const StorageForm = () => {
         <>
             <NavigationEntryCore>
                 <div className='text-sm text-muted-foreground'>
-                    {t("settings_storage.storage_description", { usage: storage_size_to_string(value.usage as number), quotas: storage_size_to_string(value.quota as number) })}
+                    {t("settings_storage.storage_description", {
+                        usage: storage_size_to_string(i18n.language, value.usage as number),
+                        quotas: storage_size_to_string(i18n.language, value.quota as number)
+                    })}
                 </div>
                 <Progress
                     value={calc_usage_quota_ratio(value.usage as number, value.quota as number)}

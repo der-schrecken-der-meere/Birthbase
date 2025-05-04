@@ -1,0 +1,8 @@
+{
+    "backup": {
+        "import_running": "Daten werden importiert. Es kann derzeit keine andere Backupfunktion genutzt werden.",
+        "export_running": "Daten werden exportiert. Es kann derzeit keine andere Backupfunktion genutzt werden.",
+        "file_type": "Der Datei-Typ ist nicht zugelassen.",
+        "file_structure": "Der Aufbau der Datei ist nicht korrekt."
+    }
+}

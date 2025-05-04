@@ -46,12 +46,18 @@ const useToastStore = create<AppToast>()((set) => ({
                 break;
         };
 
-        set(() => ({ toastConfig: { title: (
-            <div className="flex items-center gap-2">
-                {new_title}
-                {title}
-            </div>
-        ) as any, ...props }, isCreated: true }));
+        set(() => ({
+            toastConfig: {
+                title: (
+                    <div className="flex items-center gap-2">
+                        {new_title}
+                        {title}
+                    </div>
+                ) as any,
+                ...props
+            },
+            isCreated: true
+        }));
     },
     setNotCreated: () => set(() => ({ isCreated: false, toastConfig: {} })),
 }));

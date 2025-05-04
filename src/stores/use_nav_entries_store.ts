@@ -2,7 +2,7 @@ import { type FunctionComponent } from "react";
 
 import { PageLinks } from "@/globals/constants/links";
 import i18n from "@/i18n/config";
-import { Bell, CalendarClock, HardDrive, House, Info, Languages, LayoutDashboard, LucideProps, Monitor, PartyPopper, RefreshCw, Settings } from "lucide-react";
+import { Bell, CalendarClock, DatabaseBackup, HardDrive, House, Info, Languages, LayoutDashboard, LucideProps, Monitor, PartyPopper, RefreshCw, Settings } from "lucide-react";
 import { create } from "zustand";
 
 type LinkEntry = {
@@ -108,6 +108,11 @@ const useNavEntriesStore = create<NavEntries>()((set) => ({
                 url: PageLinks.SETTINGS_INFO,
                 icon: Info,
                 search: settings_str("info_search")
+            },
+            {
+                title: settings_str("backup"),
+                url: PageLinks.SETTINGS_BACKUP,
+                icon: DatabaseBackup,
             },
         ];
 

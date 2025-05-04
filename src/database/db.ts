@@ -2,7 +2,7 @@ import Dexie from "dexie";
 import type { BulkError, Collection, ModifyError } from "dexie";
 
 import type { Birthday } from "./tables/birthday/birthdays.ts";
-import type { Settings } from "./tables/settings/settings.ts";
+import type { Settings } from "./tables/settings/type.ts";
 
 // import calcDaysUntilNextBirthday from "../lib/functions/birthdays/calcDaysUntilNextBirthday.ts";
 import { MidnightTimestamp } from "@/lib/types/date.ts";

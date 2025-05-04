@@ -1,4 +1,4 @@
-/src/main/java/com/maxvoigt/Birthbase/generated
+/src/main/java/com/klyro/birthalert/generated
 /src/main/jniLibs/**/*.so
 /src/main/assets/tauri.conf.json
 /tauri.build.gradle.kts

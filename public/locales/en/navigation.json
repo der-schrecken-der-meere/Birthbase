@@ -29,6 +29,8 @@
 
         "info": "Info",
         "info_search": "Current version",
+        "backup": "Backup",
+
         "app": "App",
         "app_search": "Autostart",
         "update": "Update",

@@ -1,3 +1,3 @@
-package com.maxvoigt.Birthbase
+package com.klyro.birthalert
 
 class MainActivity : TauriActivity()

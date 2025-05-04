@@ -8,5 +8,17 @@
     "calendar": {
         "title": "Datepicker",
         "description": "Select a date"
+    },
+    "file_uploader": {
+        "title": "File uploader",
+        "description_one": "Drag the file into the field or click the field to add the file",
+        "description_other": "Drag the files into the field or click the field to add the files",
+        "area_description_one": "Add file",
+        "area_description_other": "Add files",
+        "accepted_files_title": "Accepted files",
+        "file_not_accepted": "File not accepted!",
+        "to_many_files_one": "A maximum of one file is allowed",
+        "to_many_files_other": "A maximum of {{count}} files are allowed",
+        "to_few_files": "There must be at least one file"
     }
 }

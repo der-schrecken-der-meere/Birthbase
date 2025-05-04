@@ -1,16 +1,16 @@
 import type { Request, Response } from "./type";
 
 import { WorkerController } from "@/lib/util/classes/WorkerController";
-import Worker from "./worker?worker";
 
 import { ToastType, useToastStore } from "@/stores/use_toast_store";
 import { get_settings_model } from "@/database/tables/settings/db_model";
 import { send_notifications } from "@/features/notify/communication/receiver";
 import { Errors } from "@/features/notify/errors";
 import i18n from "@/i18n/config";
+import Worker from "./worker?worker";
 
 const NotificationSchedulerWorker = new WorkerController<Request, Response>(
-    new Worker({ name: "NotificationSchedulerWorker" }),
+    () => new Worker({ name: "NotificationSchedulerWorker" }),
     async (ev) => {
         console.log("NotificationSchedulerWorker Response: ", ev.data);
 
