@@ -1,7 +1,8 @@
+// External features
+import { type Dexie } from "dexie";
+import { type ExportProgress, exportDB } from "dexie-export-import";
 import { TABLES } from "@/database/db";
 import { objectDiff } from "@/lib/functions/object/diff";
-import type { Dexie } from "dexie";
-import { type ExportProgress, exportDB } from "dexie-export-import";
 
 /**
  * Exports the database data as an ArrayBuffer.

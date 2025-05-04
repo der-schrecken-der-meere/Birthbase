@@ -1,8 +1,11 @@
-import { BackupError } from "@/globals/constants/errors/backup";
+// External features
+import { type Dexie } from "dexie";
+import { type ImportProgress } from "dexie-export-import/dist/import";
 import { Mime } from "@/globals/constants/mime";
-import type { Dexie } from "dexie";
 import { importInto, peakImportFile } from "dexie-export-import";
-import { ImportProgress } from "dexie-export-import/dist/import";
+
+// Internal features
+import { BackupError } from "../../constants/enums/errors";
 
 /**
  * 

@@ -1,12 +1,15 @@
+// External features
 import { WorkerController } from "@/lib/util/classes/WorkerController";
-import { Request, Response } from "./type";
-import { useBackupStore } from "@/stores/use_backup_store";
 import { Mime } from "@/globals/constants/mime";
 import { ToastType, useToastStore } from "@/stores/use_toast_store";
 import i18n from "@/i18n/config";
-import Worker from "./worker?worker"
 
-const BackupWorker = new WorkerController<Request, Response>(
+// Internal features
+import type { WorkerRequest, WorkerResponse } from "./types/worker";
+import { useBackupStore } from "./stores/use_backup";
+import Worker from "./workers/worker?worker";
+
+const BackupWorker = new WorkerController<WorkerRequest, WorkerResponse>(
     () => new Worker({ name: "BackupWorker" }),
     async (ev) => {
 
