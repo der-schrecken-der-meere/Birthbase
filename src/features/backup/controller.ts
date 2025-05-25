@@ -1,8 +1,6 @@
 // External features
-import { WorkerController } from "@/lib/util/classes/WorkerController";
+import { WorkerController } from "@/lib/classes/WorkerController";
 import { Mime } from "@/globals/constants/mime";
-import { ToastType, useToastStore } from "@/stores/use_toast_store";
-import i18n from "@/i18n/config";
 
 // Internal features
 import type { WorkerRequest, WorkerResponse } from "./types/worker";
@@ -11,31 +9,19 @@ import Worker from "./workers/worker?worker";
 
 const BackupWorker = new WorkerController<WorkerRequest, WorkerResponse>(
     () => new Worker({ name: "BackupWorker" }),
-    async (ev) => {
-
-        console.log("Backup", ev.data);
-
-        // Check if any error occurred
-        if (ev.data.error) {
-            console.error("BackupWorker Error:", ev.data.error);
-            useToastStore.getState().setToast({
-                title: i18n.t("error", { ns: "generally" }),
-                description: i18n.t(`${ev.data.error}`, { ns: "error" }),
-            }, ToastType.ERROR);
-            return;
-        }
+    async (data) => {
 
         // Check if progress callback is triggered
-        if (ev.data.progress) {
-            console.log(ev.data.progress);
-            useBackupStore.getState().setProgress(ev.data.progress);
+        if (data.progress) {
+            console.log(data.progress);
+            useBackupStore.getState().setProgress(data.progress);
             return;
         }
 
         // Check if backup data is received
-        if (ev.data.backup) {
+        if (data.backup) {
             console.log("Backup Finished");
-            const backup = new Blob([ev.data.backup], { type: Mime.JSON_UTF8 });
+            const backup = new Blob([data.backup], { type: Mime.JSON_UTF8 });
 
             let a = document.createElement("a"),
                 url = URL.createObjectURL(backup);
@@ -53,7 +39,7 @@ const BackupWorker = new WorkerController<WorkerRequest, WorkerResponse>(
         }
 
         // Check if progress is done
-        if (ev.data.done) {
+        if (data.done) {
             useBackupStore.getState().setFinishProgress();
         }
 

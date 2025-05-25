@@ -9,6 +9,7 @@ declare const __TAURI_IS_WINDOWS__: boolean;
 declare const __TAURI_IS_LINUX__: boolean;
 declare const __TAURI_IS_ANDROID__: boolean;
 declare const __TAURI_IS_IOS__: boolean;
+declare const __APP_NAME__: string;
 
 interface ImportMetaEnv {
     readonly VITE_IS_TAURI: boolean;

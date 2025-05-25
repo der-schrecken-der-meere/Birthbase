@@ -10,6 +10,8 @@ import { del_notification_middleware } from "./notification";
 import { del_query_client_notification } from "@/features/latest_notifications/query";
 import { AppNotification, NotificationGroupType } from "@/database/tables/notifications/notifications";
 import { queryClient } from "@/globals/constants/query_client";
+import { deleteQueryClientNotification } from "@/features/notifications/queries/notifications/delete_notification";
+import { notificationMiddleware } from "@/features/notifications/lib/instances/middleware";
 
 
 const add_birthday_middleware = async (birthday: Birthday): Promise<Birthday> => {
@@ -61,9 +63,10 @@ const del_birthday_middleware = async (birthday: Birthday): Promise<number> => {
         const old_timestamp = get_next_birthday(timestamp);
 
         await del_birthdays_model([birthday.id]);
+        deleteQueryClientNotification(queryClient);
         const notification_id = del_query_client_notification(NotificationGroupType.BIRTHDAY, (item) => item.data.id === id, queryClient) as AppNotification|null;
         if (notification_id != null) {
-            await del_notification_middleware(notification_id);
+            await notificationMiddleware.deleteNotifications(notification_id);
         }
         del_worker_birthday_notifications(id, old_timestamp);
         return birthday.id;

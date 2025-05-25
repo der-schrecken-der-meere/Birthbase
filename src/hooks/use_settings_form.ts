@@ -1,5 +1,5 @@
 import type { Settings } from "@/database/tables/settings/type";
-import { useGetSettingsQuery } from "@/features/manage_settings/query";
+import { useGetSettingsQuery } from "@/features/settings/query";
 import { z, ZodType } from "zod";
 import { get_default_settings } from "@/database/tables/settings/settings";
 import { useSettingsMutation } from "./use_settings_mutation";

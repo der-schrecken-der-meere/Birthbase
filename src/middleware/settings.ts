@@ -1,10 +1,10 @@
 import { clear_settings_model, get_settings_model, set_settings_model, unset_settings_model } from "@/database/tables/settings/db_model";
 import { get_default_settings, Settings } from "@/database/tables/settings/settings";
-import { change_autostart } from "@/features/manage_settings/app/restart";
-import { change_color } from "@/features/manage_settings/appearance/color";
-import { change_mode } from "@/features/manage_settings/appearance/mode";
-import { change_language } from "@/features/manage_settings/language/language";
-import { change_notification } from "@/features/manage_settings/notifications/notification";
+import { change_autostart } from "@/features/settings/app/restart";
+import { change_color } from "@/features/settings/appearance/color";
+import { change_mode } from "@/features/settings/appearance/mode";
+import { change_language } from "@/features/settings/language/language";
+import { change_notification } from "@/features/settings/notifications/notification";
 import { isTauri } from "@tauri-apps/api/core";
 
 const check_update_prop = (new_values: Partial<Settings>, old_values: Omit<Settings, "id">) => {

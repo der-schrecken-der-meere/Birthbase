@@ -34,5 +34,6 @@
     "misc": "Sonstiges",
     "close_app": "App schließen",
     "history_back_aria": "Ein Schritt im Verlauf zurückgehen",
-    "collapsible_aria": "Öffnet oder schließt ein zuklappbares Element"
+    "collapsible_aria": "Öffnet oder schließt ein zuklappbares Element",
+    "create_birthday": "Geburtstag erstellen"
 }

@@ -10,10 +10,10 @@
     },
     "update_available": {
         "title": "Update verfügbar",
-        "description": "Die neue Version {{version}} ist zum Downloaden verfügbar"
+        "body": "Die neue Version {{version}} ist zum Downloaden verfügbar"
     },
     "update_installed": {
         "title": "Update installiert",
-        "description": "Die Version {{version}} ist installiert"
+        "body": "Die Version {{version}} ist installiert"
     }
 }

@@ -1,25 +1,41 @@
-import { get_birthdays_model, upd_birthdays_model } from "@/database/tables/birthday/db_model";
-import { NotificationGroupType } from "@/database/tables/notifications/notifications";
 // import { get_settings_model } from "@/database/tables/settings/db_model";
-import { Action, type AddNotificationRequest } from "@/features/notify/core";
+// import { Action, type AddNotificationRequest } from "@/features/notify/core";
 import { calculate_days_until_next_birthday } from "@/lib/functions/birthday";
 // import { Tasks } from "./../frontend/worker_scripts/load_birthdays";
 import { type Birthday } from "@/database/tables/birthday/birthdays";
-import { Request } from "./type";
+import { WorkerRequest } from "./type";
 import { Tasks } from "@/frontend/worker_scripts/load_birthdays";
 import { midnight_utc } from "@/lib/functions/date";
+import { WorkerWrapper } from "@/lib/classes/WorkerWrapper";
+import type { CreateNotification } from "@/features/notifications/types/worker";
+import { birthdayModel } from "@/database/birthalert/birthdays/model";
+import { DataOperation } from "@/lib/constants/enums/data_operation";
+import { NotificationGroup } from "@/database/birthalert/notifications/enums/group";
 
-
+new WorkerWrapper<WorkerRequest, {}>(async function({ task }) {
+    switch (task) {
+        case Tasks.LOAD_BIRTHDAYS:
+            const data = await handle_load_birthdays();
+            if (this.port) {
+                console.log("Send notifications to NotificationScheduler", data);
+                this.port.postMessage({ tasks: data });
+                this.postMessage("finished");
+            }
+            break;
+        default:
+            break;
+    }
+});
 
 const handle_load_birthdays = async () => {
     /** Birthdays that will be updated in db */
     const upd_birtdays: Birthday[] = [];
 
     // Get all birthdays from db
-    const birthdays = await get_birthdays_model();
+    const birthdays = await birthdayModel.readAllRecords();
 
     /** All notifications that will be triggerd */
-    const notifications: AddNotificationRequest[] = birthdays.reduce(
+    const notifications: CreateNotification[] = birthdays.reduce(
         (acc, cur) => {
             const { timestamp, id, name: { first, last }, reminder } = cur;
 
@@ -29,10 +45,9 @@ const handle_load_birthdays = async () => {
             // Birthday is today
             if (until === 0) {
                 acc.push({
-                    action: Action.ADD,
-                    id,
+                    action: DataOperation.CREATE,
                     new_data: {
-                        group_type: NotificationGroupType.BIRTHDAY,
+                        group: NotificationGroup.BIRTHDAY,
                         timestamp,
                         data: {
                             id,
@@ -61,10 +76,9 @@ const handle_load_birthdays = async () => {
                 const reminder_timestamp = midnight_utc(Date.now());
 
                 acc.push({
-                    action: Action.ADD,
-                    id,
+                    action: DataOperation.CREATE,
                     new_data: {
-                        group_type: NotificationGroupType.BIRTHDAY_REMINDER,
+                        group: NotificationGroup.BIRTHDAY_REMINDER,
                         timestamp: +reminder_timestamp,
                         data: {
                             id,
@@ -74,40 +88,14 @@ const handle_load_birthdays = async () => {
             }
             return acc;
         },
-        [] as AddNotificationRequest[],
+        [] as CreateNotification[],
     );
 
     if (upd_birtdays.length > 0) {
-        const r = await upd_birthdays_model(upd_birtdays);
-        console.log("Updated birthdays: ", r);
+        const r = await birthdayModel.updateRecords(upd_birtdays);
     }
 
     return notifications;
-};
-
-let WorkerPort: MessagePort;
-
-self.onmessage = async (
-    { data, ports }: MessageEvent<Request>
-) => {
-    console.log("AppStartWorker Request:", data);
-    const { code, task } = data;
-
-    // Set worker port
-    if (code === "port") {
-        WorkerPort = ports[0];
-        return;
-    }
-
-    switch (task) {
-        case Tasks.LOAD_BIRTHDAYS:
-            // Get all birthdays or reminder that will trigger now
-            const data = await handle_load_birthdays();
-            if (WorkerPort) {
-                WorkerPort.postMessage({ tasks: data});
-            }
-            break;
-    }
 };
 
 // Logging

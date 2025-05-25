@@ -8,18 +8,23 @@ type UseQueryProps<T> = {
     useQueryFn: () => DefinedUseQueryResult<T, Error>,
     /** Translation key for the error message
      * 
-     * `test => errors.show.test`
+     * `test => error.test`
      */
     tKey: string,
 };
 
-const useQuery = <T>({
+/**
+ * Hook that handles errors for react queries
+ * @param param0 
+ * @returns 
+ */
+const useErrorQuery = <T>({
     useQueryFn,
     tKey,
 }: UseQueryProps<T>) => {
 
     const setToast = useToastStore((state) => state.setToast);
-    const { t } = useTranslation(["toast", "generally"]);
+    const { t } = useTranslation(["error", "generally"]);
     
     const {
         error,
@@ -38,7 +43,7 @@ const useQuery = <T>({
             console.error(error);
             setToast({
                 title: t("error", { ns: "generally" }),
-                description:t(`errors.show.${tKey}`),
+                description:t(tKey),
             }, ToastType.ERROR);
         }
     }, [isError, error]);
@@ -48,6 +53,4 @@ const useQuery = <T>({
     };
 };
 
-export {
-    useQuery,
-};
+export { useErrorQuery };

@@ -1,5 +1,5 @@
 import type { VersionNumber } from "@/lib/types/number";
-import { OsType } from "@tauri-apps/plugin-os";
+import type { OsType } from "@tauri-apps/plugin-os";
 import { create } from "zustand";
 
 type AppStoreState = {
@@ -11,6 +11,8 @@ type AppStoreState = {
     osType: OsType,
     /** Whether the application is loading initial files or scripts */
     isBooting: boolean,
+    /** App name */
+    appName: string,
 };
 
 interface AppStore extends AppStoreState {
@@ -19,6 +21,7 @@ interface AppStore extends AppStoreState {
     setOsType: (osType: OsType) => void,
     /** Finish booting and remove the loader */
     setFinishedBooting: () => void,
+    setAppName: (appName: string) => void,
 };
 
 const useAppStore = create<AppStore>()((set) => ({
@@ -26,6 +29,7 @@ const useAppStore = create<AppStore>()((set) => ({
     tauriVersion: "0.0.0",
     osType: "" as OsType,
     isBooting: true,
+    appName: "",
     setAppVersion: (appVersion) => set(() => ({ appVersion })),
     setTauriVersion: (tauriVersion) => set(() => ({ tauriVersion })),
     setOsType: (osType) => set(() => ({ osType })),
@@ -36,6 +40,7 @@ const useAppStore = create<AppStore>()((set) => ({
 
         set(() => ({ isBooting: false }));
     },
+    setAppName: (appName) => set(() => ({ appName })),
 }));
 
 export type { AppStoreState };

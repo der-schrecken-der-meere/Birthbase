@@ -4,5 +4,20 @@
         "export_running": "Daten werden exportiert. Es kann derzeit keine andere Backupfunktion genutzt werden.",
         "file_type": "Der Datei-Typ ist nicht zugelassen.",
         "file_structure": "Der Aufbau der Datei ist nicht korrekt."
+    },
+    "notify": {
+        "no_right": "Sie haben keine Berechtigung Benachrichtigungen zu senden.",
+        "unknow_task": "Die Benachrichtungsaufgabe wurde nicht erkannt",
+        "show": "Fehler beim Anzeigen der Benachrichtigungen",
+        "delete": "Fehler beim Löschen der Benachrichtigung",
+        "update": "Fehler beim Aktualisieren der Benachrichtiung",
+        "add": "Fehler beim Hinzufügen der Benachrichtigung"
+    },
+    "update": {
+        "search_title": "Fehler beim Suchen von Updates",
+        "search_description": "Mögliche Ursachen: keine Internetverbindung, Server nicht erreichbar oder ein Fehler beim Suchen nach Updates"
+    },
+    "birthday": {
+        "show": "Fehler beim Anzeigen der Geburtstage"
     }
 }

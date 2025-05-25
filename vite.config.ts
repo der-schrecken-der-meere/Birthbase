@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite'
 import path from "path"
 import react from '@vitejs/plugin-react'
 import tailwindcss from "@tailwindcss/vite";
+import tauriConf from "./src-tauri/tauri.conf.json";
 
 const host = process.env.TAURI_DEV_HOST;
 const platform = process.env.TAURI_ENV_PLATFORM;
@@ -29,6 +30,7 @@ export default defineConfig(({ command, mode, isPreview }) => {
       "__TAURI_IS_WINDOWS__": is_windows,
       "__TAURI_IS_ANDROID__": is_android,
       "__TAURI_IS_IOS__": is_ios,
+      "__APP_NAME__": JSON.stringify(tauriConf.productName),
     },
     publicDir: "public",
     plugins: [

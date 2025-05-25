@@ -121,11 +121,14 @@ class DexieDB extends Dexie implements Birthbase {
     }
     get<K extends keyof Birthbase, T extends getInsert<K>>(table: K): Promise<T[]>;
     get<K extends keyof Birthbase, T extends getInsert<K>>(table: K, id: number): Promise<T>;
-    get<K extends keyof Birthbase, T extends getInsert<K>>(table: K, id?: number): Promise<T|T[]> {
+    get<K extends keyof Birthbase, T extends getInsert<K>>(table: K, id: number[]): Promise<T[]>;
+    get<K extends keyof Birthbase, T extends getInsert<K>>(table: K, id?: number | number[]): Promise<T|T[]> {
         return new Promise((resolve, reject) => {
             this.transaction("r", (this[table] as Dexie.Table<any, number>), async () => {
                 if (typeof id === "number") {
                     return this[table].get(id);
+                } else if (Array.isArray(id)) {
+                    return this[table].bulkGet(id);
                 } else {
                     return this[table].toArray();
                 }

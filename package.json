@@ -6,6 +6,9 @@
   "scripts": {
     "test-db": "node --experimental-strip-types --experimental-test-coverage --test test/db.test.ts",
     "test-lib": "node --experimental-strip-types --experimental-test-coverage --test test/lib.test.ts",
+    "test-lib-classes": "node --experimental-strip-types --experimental-test-coverage --test test/lib/classes/*.test.ts",
+    "test-lib-fns": "node --experimental-strip-types --experimental-test-coverage --test test/lib/functions/*.test.ts",
+    "test-features-notifications": "node --experimental-strip-types --experimental-test-coverage --test test/features/notifications/*.test.ts",
     "dev": "vite",
     "dev:create-db-entries": "node automation/scripts/create_db_entries",
     "nvmrc": "node -v > .nvmrc",

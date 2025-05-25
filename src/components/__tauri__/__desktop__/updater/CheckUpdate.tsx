@@ -3,7 +3,7 @@ import type { CheckUpdateProps } from "./types";
 import { Button } from "../../../ui/button";
 
 // import { mock_check_update } from "@/features/updater/test/update";
-import { check_update } from "@/features/__tauri__/__desktop__/updater/fn/check_updater";
+import { check_update } from "@/features/__tauri__/__desktop__/updater/lib/functions/check_updater";
 
 const CheckUpdate = ({
     onClick,

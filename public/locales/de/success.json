@@ -1,0 +1,7 @@
+{
+    "notification": {
+        "update": "Benachrichtigung wurde erfolgreich aktualisiert",
+        "delete": "Benachrichtigung wurde erfolgreich gelöscht",
+        "add": "Benachrichtigung wurde erfolgreich hinzugefügt"
+    }
+}

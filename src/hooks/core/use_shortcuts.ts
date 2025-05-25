@@ -1,9 +1,15 @@
-import { useEffect } from 'react'
+// Packages
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+
+// External features
+import { useCMDKStore } from '@/features/navigation/stores/use_cmdk';
 
 const useShortcuts = () => {
     const navigate = useNavigate();
     const { pathname } = useLocation();
+
+    const setCMDKIsOpen = useCMDKStore((state) => state.setIsOpen); 
 
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -16,6 +22,10 @@ const useShortcuts = () => {
                 e.preventDefault();
                 if (pathname !== "/notifications") navigate("/notifications");
                 return;
+            }
+            if (e.key === "f" && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                setCMDKIsOpen(true);
             }
         };
         document.addEventListener("keydown", down);

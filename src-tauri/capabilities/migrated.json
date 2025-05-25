@@ -9,6 +9,7 @@
     "notification:default",
     "core:app:allow-version",
     "core:app:allow-tauri-version",
+    "core:app:allow-name",
     "os:allow-arch",
     "os:allow-os-type",
     "os:allow-platform",

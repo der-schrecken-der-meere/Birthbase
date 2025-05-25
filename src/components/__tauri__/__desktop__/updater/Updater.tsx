@@ -8,7 +8,7 @@ import { useUpdateStore } from '@/stores/use_update_store';
 import { useAppStore } from '@/stores/use_app_store';
 
 import { useTranslation } from 'react-i18next';
-import { useGetSettingsQuery } from '@/features/manage_settings/query';
+import { useGetSettingsQuery } from '@/features/settings/query';
 import { useQuery } from '@/hooks/core/use_query';
 
 import { UpdateNotes } from './UpdateNotes';

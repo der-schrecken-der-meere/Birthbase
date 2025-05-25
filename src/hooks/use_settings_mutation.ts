@@ -1,6 +1,6 @@
 import { Settings } from "@/database/tables/settings/settings";
 import { useMutation, UseMutationProps, UseMutationReturn } from "./core/use_mutation";
-import { useSetSettingsQuery, useUnsetSettingsQuery } from "@/features/manage_settings/query";
+import { useSetSettingsQuery, useUnsetSettingsQuery } from "@/features/settings/query";
 
 const useSettingsMutation = ({
     add_cbs,

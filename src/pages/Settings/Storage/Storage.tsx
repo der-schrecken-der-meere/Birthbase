@@ -9,14 +9,14 @@ import { useConfirmStore } from '@/stores/use_confirm_store';
 
 import { useTranslation } from 'react-i18next';
 import { useSettingsBreadcrumbs } from '@/components/layouts/SettingsLayout';
-import { useClearNotificationQuery } from '@/features/latest_notifications/query';
 import { useClearBirthdayQuery } from '@/features/manage_birthdays/query';
-import { useClearSettingsQuery } from '@/features/manage_settings/query';
+import { useClearSettingsQuery } from '@/features/settings/query';
 import { useNavbar } from '@/hooks/core/use_navbar';
 import { clear_app_storage } from '@/lib/functions/storage/clear';
 
 import { calc_app_storage_size } from '@/lib/functions/storage/calculations';
 import { storage_size_to_string } from '@/lib/functions/storage/storageToString';
+import { useClearNotificationsQuery } from '@/features/notifications/queries/notifications/use_clear_notificationts';
 
 const Storage = () => {
     const { breadcrumbs } = useSettingsBreadcrumbs();
@@ -34,7 +34,7 @@ const Storage = () => {
 const StorageForm = () => {
     const [value, setValue] = useState<StorageEstimate>({usage: 0, quota: 0});
 
-    const { mutate: clear_notifications } = useClearNotificationQuery();
+    const { mutate: clear_notifications } = useClearNotificationsQuery();
     const { mutate: clear_birthdays } = useClearBirthdayQuery();
     const { mutate: clear_settings } = useClearSettingsQuery();
 

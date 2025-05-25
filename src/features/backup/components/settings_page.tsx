@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 
 // Internal features
 import { useBackupStore } from "../stores/use_backup";
-import { OperationCode } from "../constants/enums/Tasks";
+import { OperationCode } from "../constants/enums/tasks";
 
 const BackupSettingsPage = () => {
 

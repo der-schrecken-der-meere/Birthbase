@@ -4,7 +4,7 @@ import { create } from "zustand";
 
 // Internal features
 import type { BackupStore } from "../types/store";
-import { OperationCode } from "../constants/enums/Tasks";
+import { OperationCode } from "../constants/enums/tasks";
 import { BackupWorker } from "../controller";
 
 const useBackupStore = create<BackupStore>()((set) => ({
